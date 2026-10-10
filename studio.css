@@ -86,3 +86,4 @@
   .peq-columns, .coach-body { grid-template-columns: 1fr; }
   .peq-graph { height: 280px; }
 }
+.peq-toolbar select { max-width: 100%; min-width: 0; text-overflow: ellipsis; } /* long target names stay inside the card on phones */

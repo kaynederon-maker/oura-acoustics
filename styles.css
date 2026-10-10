@@ -265,8 +265,8 @@ output, .stats dd, td.num { font-variant-numeric: tabular-nums; }
 }
 .brand span { color: var(--text-lo); font-weight: 400; font-style: italic; }
 .brand-mark { color: var(--accent); width: 22px; height: 22px; stroke-width: 1.8; }
-nav { display: flex; gap: 2px; }
-nav a {
+.topbar nav { display: flex; gap: 2px; }
+.topbar nav a {
   color: var(--text-lo);
   text-decoration: none;
   padding: 9px 15px;
@@ -276,8 +276,8 @@ nav a {
   white-space: nowrap;
   transition: color 200ms ease, background-color 200ms ease;
 }
-nav a[aria-current='page'] { color: var(--text-hi); background: var(--shell); box-shadow: inset 0 0 0 1px var(--hairline); }
-@media (hover: hover) and (pointer: fine) { nav a:hover { color: var(--text-hi); } }
+.topbar nav a[aria-current='page'] { color: var(--text-hi); background: var(--shell); box-shadow: inset 0 0 0 1px var(--hairline); }
+@media (hover: hover) and (pointer: fine) { .topbar nav a:hover { color: var(--text-hi); } }
 
 /* Theme picker */
 .theme-picker { position: relative; }
@@ -457,6 +457,7 @@ main { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
   text-decoration: underline;
   text-decoration-color: var(--hairline);
   transition: text-decoration-color 200ms ease;
+  display: inline-flex; align-items: center; min-height: 44px; /* standalone link: full-size tap target */
 }
 @media (hover: hover) and (pointer: fine) {
   .btn:hover { background: color-mix(in srgb, var(--text-hi) 9%, transparent); }
@@ -818,8 +819,8 @@ tr.preamp td { color: var(--accent); }
 @media (max-width: 760px) {
   :root { --dock-h: 104px; }
   .topbar { flex-wrap: wrap; gap: 6px; padding: 8px 8px 8px 16px; border-radius: 24px; top: 8px; }
-  nav { order: 3; width: 100%; justify-content: space-between; }
-  nav a { padding: 8px 6px; font-size: 13px; white-space: nowrap; }
+  .topbar nav { order: 3; width: 100%; justify-content: space-between; }
+  .topbar nav a { padding: 8px 6px; font-size: 13px; white-space: nowrap; }
   .theme-trigger-label { display: none; }
   .theme-trigger { padding: 0 10px; }
   .card { padding: 20px; border-radius: 22px; }

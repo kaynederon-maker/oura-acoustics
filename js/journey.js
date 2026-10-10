@@ -61,7 +61,7 @@ const CHAPTERS = [
 ];
 
 const IMG_CREDITS = {
-  tr808: 'Photo: fr4dd, CC BY 2.0', bass: 'Photo: Niranjan Arminius, CC BY-SA 4.0', mic: 'Photo: Tim Sheerman-Chase, CC BY 2.0',
+  tr808: 'Photo: Brandon Daniel / Clusternote, CC BY-SA 2.0', bass: 'Photo: Niranjan Arminius, CC BY-SA 4.0', mic: 'Photo: Tim Sheerman-Chase, CC BY 2.0',
   ear: 'Diagram: Lars Chittka and Axel Brockmann, CC BY 2.5', cymbal: 'Photo: Dave Kobrehel, CC BY 2.0', loudness: 'Graph: Lindosland, public domain',
 };
 
