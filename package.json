@@ -1,0 +1,14 @@
+{
+  "name": "oura-acoustics",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Audio-reactive headphone tuning site built on AutoEq measurements.",
+  "scripts": {
+    "start": "node server.mjs",
+    "test": "node --test"
+  },
+  "engines": {
+    "node": ">=20.12"
+  }
+}
