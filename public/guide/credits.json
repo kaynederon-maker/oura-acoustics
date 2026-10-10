@@ -1,12 +1,12 @@
 {
   "tr808": {
-    "title": "File:Roland TR-808 Rhythm Composer.jpg",
-    "author": "fr4dd",
-    "license": "CC BY 2.0",
-    "source": "https://commons.wikimedia.org/wiki/File:Roland_TR-808_Rhythm_Composer.jpg",
+    "title": "File:Roland TR-808 (large).jpg",
+    "author": "Roland_TR-808_&amp;_909.jpg: Brandon Daniel\nderivative work: Clusternote (talk)",
+    "license": "CC BY-SA 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Roland_TR-808_(large).jpg",
     "size": [
-      1000,
-      667
+      2000,
+      1167
     ]
   },
   "bass": {
@@ -15,8 +15,8 @@
     "license": "CC BY-SA 4.0",
     "source": "https://commons.wikimedia.org/wiki/File:Fender_AP_P-Bass_20230730.jpg",
     "size": [
-      739,
-      1000
+      1478,
+      2000
     ]
   },
   "mic": {
@@ -25,8 +25,8 @@
     "license": "CC BY 2.0",
     "source": "https://commons.wikimedia.org/wiki/File:Condenser_Microphone_with_Pop_Filter_and_Reflection_Filter.jpg",
     "size": [
-      1000,
-      666
+      2000,
+      1333
     ]
   },
   "ear": {
@@ -35,8 +35,8 @@
     "license": "CC BY 2.5",
     "source": "https://commons.wikimedia.org/wiki/File:Anatomy_of_the_Human_Ear.svg",
     "size": [
-      1000,
-      759
+      2000,
+      1519
     ]
   },
   "cymbal": {
@@ -45,8 +45,8 @@
     "license": "CC BY 2.0",
     "source": "https://commons.wikimedia.org/wiki/File:Anatolian_Emotion_Flat_Ride_Cymbal_(4709180551).jpg",
     "size": [
-      1000,
-      750
+      2000,
+      1500
     ]
   },
   "loudness": {
@@ -55,8 +55,8 @@
     "license": "Public domain",
     "source": "https://commons.wikimedia.org/wiki/File:Lindos1.svg",
     "size": [
-      1000,
-      897
+      2000,
+      1793
     ]
   }
 }

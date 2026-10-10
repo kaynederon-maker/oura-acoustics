@@ -155,3 +155,4 @@
   .m-readout { grid-template-columns: 1fr; grid-template-areas: 'score' 'plot' 'legend' 'verdict'; justify-items: center; }
   .m-readout .m-plot { width: 100%; }
 }
+button.text-link { padding: 0; border: 0; background: none; font: inherit; font-weight: 500; cursor: pointer; } /* a button that reads as a link */
