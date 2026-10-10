@@ -61,6 +61,14 @@ async function loadFonts() {
 
 // ---------- tokens ----------
 
+// Every paint carries the real colour; the variable binding is layered on top. If binding fails
+// (older Figma, permissions), the design still renders correctly instead of turning black.
+const TOKENS = {
+  bg: '#0c0b0a', surface: '#161412', 'surface-2': '#1e1b18', well: '#110f0e', hairline: '#2a2724',
+  'text-hi': '#f3eee6', 'text-lo': '#a89f93', accent: '#e3c58e', 'accent-ink': '#1a1408',
+  'plot-1': '#e0708f', 'plot-2': '#3fb8a8',
+};
+const RADII = { sm: 12, md: 18, lg: 28 };
 const V = {};
 async function makeTokens() {
   const collections = await figma.variables.getLocalVariableCollectionsAsync();
@@ -69,40 +77,63 @@ async function makeTokens() {
   const mode = coll.modes[0].modeId;
   coll.renameMode(mode, 'Dark');
   const existing = await figma.variables.getLocalVariablesAsync();
-  const BG = ['FRAME_FILL', 'SHAPE_FILL'];
-  const defs = [
-    ['color/bg', 'COLOR', hex('#0c0b0a'), BG, '--bg'],
-    ['color/surface', 'COLOR', hex('#161412'), BG, '--surface'],
-    ['color/surface-2', 'COLOR', hex('#1e1b18'), BG, '--surface-2'],
-    ['color/well', 'COLOR', hex('#110f0e'), BG, '--well'],
-    ['color/hairline', 'COLOR', hex('#f3eee6', 0.12), ['STROKE_COLOR', 'FRAME_FILL', 'SHAPE_FILL'], '--hairline'],
-    ['color/text-hi', 'COLOR', hex('#f3eee6'), ['TEXT_FILL', 'SHAPE_FILL', 'STROKE_COLOR'], '--text-hi'],
-    ['color/text-lo', 'COLOR', hex('#a89f93'), ['TEXT_FILL', 'SHAPE_FILL', 'STROKE_COLOR'], '--text-lo'],
-    ['color/accent', 'COLOR', hex('#e3c58e'), ['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL', 'STROKE_COLOR'], '--accent'],
-    ['color/accent-ink', 'COLOR', hex('#1a1408'), ['TEXT_FILL', 'SHAPE_FILL'], '--accent-ink'],
-    ['color/plot-1', 'COLOR', hex('#e0708f'), ['STROKE_COLOR', 'SHAPE_FILL', 'FRAME_FILL', 'TEXT_FILL'], '--plot-1'],
-    ['color/plot-2', 'COLOR', hex('#3fb8a8'), ['STROKE_COLOR', 'SHAPE_FILL', 'FRAME_FILL', 'TEXT_FILL'], '--plot-2'],
-    ['radius/sm', 'FLOAT', 12, ['CORNER_RADIUS'], '--radius-sm'],
-    ['radius/md', 'FLOAT', 18, ['CORNER_RADIUS'], '--radius-md'],
-    ['radius/lg', 'FLOAT', 28, ['CORNER_RADIUS'], '--radius-lg'],
-  ];
-  for (const [name, type, value, scopes, css] of defs) {
+  const fills = ['FRAME_FILL', 'SHAPE_FILL'];
+  const scopes = {
+    bg: fills, surface: fills, 'surface-2': fills, well: fills,
+    hairline: ['STROKE_COLOR', 'FRAME_FILL', 'SHAPE_FILL'], 'text-hi': ['TEXT_FILL', 'SHAPE_FILL', 'STROKE_COLOR'], 'text-lo': ['TEXT_FILL', 'SHAPE_FILL', 'STROKE_COLOR'],
+    accent: ['FRAME_FILL', 'SHAPE_FILL', 'TEXT_FILL', 'STROKE_COLOR'], 'accent-ink': ['TEXT_FILL', 'SHAPE_FILL'],
+    'plot-1': ['STROKE_COLOR', 'SHAPE_FILL', 'FRAME_FILL', 'TEXT_FILL'], 'plot-2': ['STROKE_COLOR', 'SHAPE_FILL', 'FRAME_FILL', 'TEXT_FILL'],
+  };
+  const make = (name, type, value, sc, css) => {
     let v = existing.find((x) => x.name === name && x.variableCollectionId === coll.id);
     if (!v) v = figma.variables.createVariable(name, coll, type);
     v.setValueForMode(mode, value);
-    v.scopes = scopes;
+    v.scopes = sc;
     v.setVariableCodeSyntax('WEB', `var(${css})`);
     V[name] = v;
-  }
+  };
+  for (const [k, value] of Object.entries(TOKENS)) make(`color/${k}`, 'COLOR', hex(value), scopes[k], `--${k}`);
+  for (const [k, value] of Object.entries(RADII)) make(`radius/${k}`, 'FLOAT', value, ['CORNER_RADIUS'], `--radius-${k}`);
 }
 const paint = (name, opacity) => {
-  const p = figma.variables.setBoundVariableForPaint({ type: 'SOLID', color: { r: 0, g: 0, b: 0 } }, 'color', V[`color/${name}`]);
+  let p = { type: 'SOLID', color: hex(TOKENS[name]) };
+  const v = V[`color/${name}`];
+  if (v) {
+    try { p = figma.variables.setBoundVariableForPaint(p, 'color', v); } catch (err) { /* keep the raw colour */ }
+  }
   return opacity === undefined ? p : Object.assign({}, p, { opacity });
 };
 const radius = (node, name) => {
-  for (const corner of ['topLeftRadius', 'topRightRadius', 'bottomLeftRadius', 'bottomRightRadius']) node.setBoundVariable(corner, V[`radius/${name}`]);
+  node.cornerRadius = RADII[name];
+  const v = V[`radius/${name}`];
+  if (!v) return;
+  try {
+    for (const corner of ['topLeftRadius', 'topRightRadius', 'bottomLeftRadius', 'bottomRightRadius']) node.setBoundVariable(corner, v);
+  } catch (err) { /* keep the raw radius */ }
 };
 const clear = () => [{ type: 'SOLID', color: { r: 0, g: 0, b: 0 }, opacity: 0 }];
+
+// ---------- build report: one failing link or section never empties the rest ----------
+
+const REPORT = { ok: [], errors: [], links: 0, linkErrors: 0 };
+async function step(name, fn) {
+  try {
+    await fn();
+    REPORT.ok.push(name);
+  } catch (err) {
+    REPORT.errors.push(`${name}: ${err && err.message ? err.message : err}`);
+  }
+}
+async function react(node, reactions) {
+  if (!node) return;
+  try {
+    await node.setReactionsAsync(reactions);
+    REPORT.links += reactions.length;
+  } catch (err) {
+    REPORT.linkErrors++;
+    if (REPORT.errors.length < 30) REPORT.errors.push(`link on "${node.name}": ${err && err.message ? err.message : err}`);
+  }
+}
 
 // ---------- images ----------
 
@@ -274,7 +305,7 @@ function icon(name) {
   return f;
 }
 
-function buildComponents(screens) {
+function buildComponents() {
   const SECTIONS = ['Home', 'Store', 'Tuning Lab', 'Guide', 'History'];
   C.nav = variantSet('Nav', SECTIONS.map((s) => `Active=${s}`), (c, v) => {
     const active = v.split('=')[1];
@@ -347,8 +378,8 @@ function buildComponents(screens) {
     c.primaryAxisSizingMode = 'AUTO';
     c.counterAxisSizingMode = 'FIXED';
     c.paddingLeft = c.paddingRight = c.paddingTop = 8;
-    c.paddingBottom = 16;
-    c.itemSpacing = 12;
+    c.paddingBottom = 14;
+    c.itemSpacing = 10;
     radius(c, 'lg');
     c.fills = [paint(hover ? 'surface-2' : 'surface')];
     c.strokes = [paint(hover ? 'accent' : 'hairline')];
@@ -356,19 +387,19 @@ function buildComponents(screens) {
     c.effects = shadow(hover ? 30 : 18, hover ? 60 : 40, hover ? 0.6 : 0.4);
     const media = figma.createFrame();
     media.name = 'Media';
-    media.resize(278, 150);
+    media.resize(278, 140);
     media.fills = [paint('well')];
     radius(media, 'md');
     media.clipsContent = true;
-    const quick = box('row', { name: 'Quick view', px: 14, py: 8, radius: 999, fill: 'surface', kids: [text('Quick view', { font: 'uiSemi', size: 13 })] });
-    place(media, quick, 139 - quick.width / 2, hover ? 104 : 118);
+    const quick = box('row', { name: 'Quick view', px: 14, py: 7, radius: 999, fill: 'surface', kids: [text('Quick view', { font: 'uiSemi', size: 12 })] });
+    place(media, quick, 139 - quick.width / 2, hover ? 98 : 112);
     quick.opacity = hover ? 1 : 0;
     c.appendChild(media);
-    c.appendChild(box('col', { name: 'Info', gap: 6, px: 8, kids: [
-      text('Brand', { name: 'Brand', size: 13, color: 'text-lo' }),
-      text('Product name', { name: 'Name', font: 'display', size: 17, w: 262, lh: 115 }),
-      text('★ 4.7 (1,024)', { name: 'Rating', size: 13, color: 'text-lo' }),
-      text('$129.99', { name: 'Price', font: 'display', size: 19 }),
+    c.appendChild(box('col', { name: 'Info', gap: 4, px: 8, kids: [
+      text('Brand', { name: 'Brand', size: 12, color: 'text-lo' }),
+      text('Product name', { name: 'Name', font: 'display', size: 16, w: 262, lh: 115 }),
+      text('★ 4.7 (1,024)', { name: 'Rating', size: 12, color: 'text-lo' }),
+      text('$129.99', { name: 'Price', font: 'display', size: 18 }),
     ] }));
   }, 'Store card. Hover variant lifts the card and reveals Quick view; instances override the Media fill and texts.');
 
@@ -494,61 +525,177 @@ function buildHome(frame) {
 
 // ---------- Store ----------
 
+const PER_PAGE = 8;
+const FREE_SHIPPING_MIN = 199;
+const SHIPPING_FEE = 9.99;
+const SORTS = [
+  ['featured', 'Featured', () => 0],
+  ['price-asc', 'Price ↑', (a, b) => a.price - b.price],
+  ['price-desc', 'Price ↓', (a, b) => b.price - a.price],
+  ['rating', 'Top rated', (a, b) => b.rating - a.rating || b.reviews - a.reviews],
+];
+const sortLabel = (key) => SORTS.find((s) => s[0] === key)[1];
+const catLabel = (id) => (id === 'iems' ? 'In-ear monitors' : (DATA.categories.find((c) => c.id === id) || {}).label || id);
+const TUNABLE = new Set(['headphones', 'earbuds', 'iems', 'speakers', 'monitors']);
+
+function setText(root, layer, value) {
+  const t = root.findOne((n) => n.type === 'TEXT' && n.name === layer);
+  if (t) t.characters = value;
+}
+
+function productCard(p) {
+  const card = inst(C.card, 'Default');
+  card.name = `Card/${p.id}`;
+  card.findOne((n) => n.name === 'Media').fills = [imagePaint(`product:${p.id}`)];
+  setText(card, 'Brand', p.brand);
+  setText(card, 'Name', p.name);
+  setText(card, 'Rating', `★ ${p.rating.toFixed(1)}  (${p.reviews.toLocaleString('en-US')})`);
+  setText(card, 'Price', money(p.price));
+  return card;
+}
+
+function arrowButton(label, name) {
+  const b = inst(C.page, 'Default', { [C.pageLabel]: label });
+  b.name = name;
+  return b;
+}
+
+// One store listing screen. Returns the nodes that need prototype links.
 function storeScreen(frame, o) {
   glow(frame, 1000, -300, 700, 'plot-1', 0.08);
   const head = box('row', { name: 'Header', w: W - 192, justify: 'SPACE_BETWEEN', align: 'MAX' });
-  head.appendChild(box('col', { name: 'Title', gap: 4, kids: [text(o.title, { font: 'display', size: 42, ls: -1 }), text(o.subtitle, { size: 15, color: 'text-lo' })] }));
-  const pager = box('row', { name: 'Pagination', gap: 8, align: 'CENTER' });
-  pager.appendChild(text(`Page ${o.page} of ${o.pages}`, { size: 14, color: 'text-lo' }));
-  const pageItems = [];
-  const shown = o.pages <= 4 ? Array.from({ length: o.pages }, (_, i) => i + 1) : [1, 2, 3, '…', o.pages];
-  for (const p of shown) {
-    if (p === '…') { pager.appendChild(text('…', { color: 'text-lo' })); continue; }
-    const item = inst(C.page, p === o.page ? 'Active' : 'Default', { [C.pageLabel]: String(p) });
-    item.name = `Page ${p}`;
-    pager.appendChild(item);
-    pageItems.push([p, item]);
-  }
-  const next = inst(C.page, 'Default', { [C.pageLabel]: '→' });
-  next.name = 'Next page';
-  pager.appendChild(next);
-  head.appendChild(pager);
-  place(frame, head, 96, 108);
-  const chips = box('row', { name: 'Filters', gap: 8 });
+  head.appendChild(box('col', { name: 'Title', gap: 4, kids: [text(o.title, { font: 'display', size: 40, ls: -1 }), text(o.subtitle, { size: 15, color: 'text-lo' })] }));
+  head.appendChild(box('row', { name: 'Search', w: 320, px: 18, py: 12, radius: 999, fill: 'surface', stroke: 'hairline', kids: [text(`Search ${DATA.total} products…`, { size: 14, color: 'text-lo' })] }));
+  place(frame, head, 96, 104);
+
+  const chips = box('row', { name: 'Categories', gap: 8 });
   const chipNodes = {};
   for (const c of DATA.categories) {
-    const ch = chip(c.id === 'iems' ? 'In-ear monitors' : c.label, c.id === o.category);
-    ch.name = `Filter/${c.id}`;
+    const ch = chip(catLabel(c.id), c.id === o.category);
+    ch.name = `Category/${c.id}`;
     chips.appendChild(ch);
     chipNodes[c.id] = ch;
   }
-  place(frame, chips, 96, 196);
+  place(frame, chips, 96, 184);
+
+  const bar = box('row', { name: 'Toolbar', w: W - 192, justify: 'SPACE_BETWEEN', align: 'CENTER' });
+  const sortRow = box('row', { name: 'Sort', gap: 6, align: 'CENTER', kids: [text('Sort', { size: 13, color: 'text-lo' })] });
+  const sortNodes = {};
+  for (const [key, label] of SORTS) {
+    const sc = chip(label, key === o.sort);
+    sc.name = `Sort/${key}`;
+    sortRow.appendChild(sc);
+    sortNodes[key] = sc;
+  }
+  bar.appendChild(sortRow);
+  const pager = box('row', { name: 'Pagination', gap: 6, align: 'CENTER' });
+  pager.appendChild(text(`${o.count} products · page ${o.page} of ${o.pages}`, { size: 13, color: 'text-lo' }));
+  const prev = o.pages > 1 ? arrowButton('←', 'Previous page') : null;
+  if (prev) pager.appendChild(prev);
+  const pageItems = [];
+  for (let n = 1; n <= o.pages; n++) {
+    const item = inst(C.page, n === o.page ? 'Active' : 'Default', { [C.pageLabel]: String(n) });
+    item.name = `Page ${n}`;
+    pager.appendChild(item);
+    pageItems.push([n, item]);
+  }
+  const next = o.pages > 1 ? arrowButton('→', 'Next page') : null;
+  if (next) pager.appendChild(next);
+  bar.appendChild(pager);
+  place(frame, bar, 96, 236);
+
   const grid = box('row', { name: 'Grid', w: W - 192, gap: 24 });
   grid.layoutWrap = 'WRAP';
-  grid.counterAxisSpacing = 20;
+  grid.counterAxisSpacing = 16;
   const cards = [];
   for (const p of o.products) {
-    const card = inst(C.card, 'Default');
-    card.name = `Card/${p.id}`;
-    card.findOne((n) => n.name === 'Media').fills = [imagePaint(`product:${p.id}`)];
-    const set = (layer, value) => { const t = card.findOne((n) => n.type === 'TEXT' && n.name === layer); if (t) t.characters = value; };
-    set('Brand', p.brand);
-    set('Name', p.name);
-    set('Rating', `★ ${p.rating.toFixed(1)}  (${p.reviews.toLocaleString('en-US')})`);
-    set('Price', money(p.price));
+    const card = productCard(p);
     grid.appendChild(card);
     cards.push([p, card]);
   }
-  place(frame, grid, 96, 252);
+  place(frame, grid, 96, 292);
   navBar(frame, 'Store');
-  return { pageItems, next, chipNodes, cards };
+  return { chipNodes, sortNodes, pageItems, prev, next, cards };
 }
 
-function productOverlay(p, col, y) {
+function hairlineTop(node) {
+  node.strokes = [paint('hairline')];
+  node.strokeTopWeight = 1;
+  node.strokeBottomWeight = 0;
+  node.strokeLeftWeight = 0;
+  node.strokeRightWeight = 0;
+  return node;
+}
+
+function productPage(frame, p, related) {
+  glow(frame, 700, -300, 800, 'accent', 0.06);
+  const crumbs = box('row', { name: 'Breadcrumb', gap: 10, align: 'CENTER' });
+  const crumbStore = text('Store', { name: 'Crumb/Store', size: 14, color: 'text-lo' });
+  const crumbCat = text(catLabel(p.category), { name: 'Crumb/Category', size: 14, color: 'text-lo' });
+  crumbs.appendChild(crumbStore);
+  crumbs.appendChild(text('/', { size: 14, color: 'text-lo' }));
+  crumbs.appendChild(crumbCat);
+  crumbs.appendChild(text('/', { size: 14, color: 'text-lo' }));
+  crumbs.appendChild(text(p.name, { size: 14 }));
+  place(frame, crumbs, 96, 104);
+
+  const hero = place(frame, rect(640, 460, { name: 'Product image', image: `product:${p.id}`, r: 'lg' }), 96, 140);
+  hero.effects = shadow(24, 70, 0.5);
+  if (p.badge) place(frame, box('row', { name: 'Badge', px: 12, py: 6, radius: 999, fill: 'surface', kids: [text(p.badge, { font: 'uiSemi', size: 12 })] }), 116, 160);
+
+  place(frame, text('You might also like', { name: 'Related title', font: 'display', size: 20 }), 96, 628);
+  const minis = [];
+  const row = box('row', { name: 'Related', gap: 16 });
+  for (const r of related) {
+    const mini = box('col', { name: `Related/${r.id}`, w: 148, gap: 6, kids: [rect(148, 96, { name: 'Thumb', image: `product:${r.id}`, r: 'sm' }), text(r.name, { size: 12, w: 148, lh: 125 }), text(money(r.price), { font: 'uiSemi', size: 12, color: 'text-lo' })] });
+    row.appendChild(mini);
+    minis.push([r, mini]);
+  }
+  place(frame, row, 96, 664);
+
+  const d = box('col', { name: 'Details', gap: 12, w: 560 });
+  d.appendChild(text(`${p.brand} · ${catLabel(p.category)}`, { size: 13, color: 'text-lo' }));
+  d.appendChild(text(p.name, { name: 'Name', font: 'display', size: 40, w: 560, lh: 102, ls: -1 }));
+  d.appendChild(text(`★ ${p.rating.toFixed(1)}  ·  ${p.reviews.toLocaleString('en-US')} reviews`, { size: 13, color: 'text-lo' }));
+  const priceRow = box('row', { name: 'Price', gap: 12, align: 'CENTER', kids: [text(money(p.price), { font: 'display', size: 28 })] });
+  if (p.compareAt) {
+    priceRow.appendChild(text(`was ${money(p.compareAt)}`, { size: 14, color: 'text-lo' }));
+    priceRow.appendChild(text(`Save ${money(p.compareAt - p.price)}`, { font: 'uiSemi', size: 13, color: 'plot-2' }));
+  }
+  d.appendChild(priceRow);
+  d.appendChild(text(p.blurb, { size: 15, color: 'text-lo', w: 540, lh: 150 }));
+  const qty = box('row', { name: 'Quantity', gap: 18, px: 18, py: 12, radius: 999, stroke: 'hairline', align: 'CENTER', kids: [text('−', { size: 16 }), text('1', { font: 'mono', size: 15 }), text('+', { size: 16 })] });
+  const addBtn = button('Add to bag', 'Primary');
+  const favBtn = box('row', { name: 'Favourite', w: 48, h: 48, radius: 999, stroke: 'hairline', justify: 'CENTER', align: 'CENTER', kids: [icon('heart')] });
+  d.appendChild(box('row', { name: 'Buy', gap: 10, align: 'CENTER', kids: [qty, addBtn, favBtn] }));
+  d.appendChild(text(`Free shipping over ${money(FREE_SHIPPING_MIN)} · 30-day returns`, { size: 13, color: 'text-lo' }));
+  let tuneBtn = null;
+  if (TUNABLE.has(p.category)) {
+    tuneBtn = box('row', { name: 'Tune in the Lab', w: 540, gap: 12, p: 14, r: 'md', fill: 'surface', stroke: 'hairline', align: 'CENTER', kids: [
+      box('col', { gap: 2, kids: [text('Tune it in the Lab', { font: 'uiSemi', size: 14 }), text('Load the measured correction for this model', { size: 12, color: 'text-lo' })] }),
+    ] });
+    d.appendChild(tuneBtn);
+  }
+  const hl = box('row', { name: 'Highlights', w: 560, gap: 8 });
+  hl.layoutWrap = 'WRAP';
+  hl.counterAxisSpacing = 8;
+  for (const h of p.highlights) hl.appendChild(text(`✓  ${h}`, { size: 13, w: 270 }));
+  d.appendChild(hl);
+  const specs = box('col', { name: 'Specs', w: 560 });
+  for (const [k, v] of Object.entries(p.specs).slice(0, 5)) {
+    specs.appendChild(hairlineTop(box('row', { name: `Spec/${k}`, w: 560, py: 8, justify: 'SPACE_BETWEEN', kids: [text(k, { size: 13, color: 'text-lo' }), text(String(v), { size: 13, w: 340, align: 'RIGHT' })] })));
+  }
+  d.appendChild(specs);
+  place(frame, d, 784, 140);
+  navBar(frame, 'Store');
+  return { crumbStore, crumbCat, addBtn, favBtn, tuneBtn, minis };
+}
+
+function quickView(p, x, y) {
   const f = figma.createFrame();
-  f.name = `Overlay / ${p.brand} ${p.name}`;
-  f.resize(1040, 620);
-  f.x = col * 1160;
+  f.name = `Quick view / ${p.brand} ${p.name}`;
+  f.resize(1000, 600);
+  f.x = x;
   f.y = y;
   f.fills = [paint('surface')];
   radius(f, 'lg');
@@ -556,30 +703,151 @@ function productOverlay(p, col, y) {
   f.strokeWeight = 1;
   f.effects = shadow(40, 120, 0.7);
   f.clipsContent = true;
-  place(f, rect(500, 620, { name: 'Image', image: `product:${p.id}` }), 0, 0);
-  const category = (DATA.categories.find((c) => c.id === p.category) || {}).label || '';
-  const info = box('col', { name: 'Details', gap: 12, w: 460 });
-  info.appendChild(text(`${p.brand} · ${category}`, { size: 13, color: 'text-lo' }));
-  info.appendChild(text(p.name, { name: 'Name', font: 'display', size: 32, w: 440, lh: 105 }));
+  place(f, rect(480, 600, { name: 'Image', image: `product:${p.id}` }), 0, 0);
+  const info = box('col', { name: 'Details', gap: 12, w: 440 });
+  info.appendChild(text(`${p.brand} · ${catLabel(p.category)}`, { size: 13, color: 'text-lo' }));
+  info.appendChild(text(p.name, { name: 'Name', font: 'display', size: 30, w: 420, lh: 105 }));
   info.appendChild(text(`★ ${p.rating.toFixed(1)}  (${p.reviews.toLocaleString('en-US')} reviews)`, { size: 13, color: 'text-lo' }));
   info.appendChild(text(money(p.price) + (p.compareAt ? `   was ${money(p.compareAt)}` : ''), { font: 'display', size: 24 }));
-  info.appendChild(text(p.blurb, { size: 14, color: 'text-lo', w: 440, lh: 150 }));
-  const specs = box('col', { name: 'Spec sheet', w: 440 });
+  info.appendChild(text(p.blurb, { size: 14, color: 'text-lo', w: 420, lh: 150 }));
+  const specs = box('col', { name: 'Spec sheet', w: 420 });
   for (const [k, v] of Object.entries(p.specs).slice(0, 4)) {
-    const r = box('row', { name: `Spec/${k}`, w: 440, py: 8, justify: 'SPACE_BETWEEN', kids: [text(k, { size: 13, color: 'text-lo' }), text(String(v), { size: 13, w: 270, align: 'RIGHT' })] });
-    r.strokes = [paint('hairline')];
-    r.strokeTopWeight = 1;
-    r.strokeBottomWeight = 0;
-    r.strokeLeftWeight = 0;
-    r.strokeRightWeight = 0;
-    specs.appendChild(r);
+    specs.appendChild(hairlineTop(box('row', { name: `Spec/${k}`, w: 420, py: 8, justify: 'SPACE_BETWEEN', kids: [text(k, { size: 13, color: 'text-lo' }), text(String(v), { size: 13, w: 250, align: 'RIGHT' })] })));
   }
   info.appendChild(specs);
-  const tune = button('Tune in the Lab', 'Secondary');
-  info.appendChild(box('row', { name: 'Buttons', gap: 10, kids: [button('Add to bag', 'Primary'), tune] }));
-  place(f, info, 540, 40);
-  const close = place(f, box('row', { name: 'Close', w: 40, h: 40, radius: 999, fill: 'surface-2', stroke: 'hairline', justify: 'CENTER', align: 'CENTER', kids: [text('×', { size: 20 })] }), 984, 16);
-  return { f, close, tune };
+  const add = button('Add to bag', 'Primary');
+  const details = button('View full details', 'Secondary');
+  info.appendChild(box('row', { name: 'Buttons', gap: 10, kids: [add, details] }));
+  place(f, info, 520, 40);
+  const close = place(f, box('row', { name: 'Close', w: 40, h: 40, radius: 999, fill: 'surface-2', stroke: 'hairline', justify: 'CENTER', align: 'CENTER', kids: [text('×', { size: 20 })] }), 944, 16);
+  return { f, add, details, close };
+}
+
+function totals(items) {
+  const sub = items.reduce((t, it) => t + it.p.price * it.qty, 0);
+  const ship = sub >= FREE_SHIPPING_MIN ? 0 : SHIPPING_FEE;
+  return { sub, ship, total: sub + ship, count: items.reduce((t, it) => t + it.qty, 0) };
+}
+
+function sheet(name, title, x, y) {
+  const f = figma.createFrame();
+  f.name = name;
+  f.resize(520, 760);
+  f.x = x;
+  f.y = y;
+  f.fills = [paint('surface')];
+  radius(f, 'lg');
+  f.strokes = [paint('hairline')];
+  f.strokeWeight = 1;
+  f.effects = shadow(40, 120, 0.7);
+  f.clipsContent = true;
+  place(f, text(title, { name: 'Title', font: 'display', size: 28 }), 32, 28);
+  const close = place(f, box('row', { name: 'Close', w: 40, h: 40, radius: 999, fill: 'surface-2', stroke: 'hairline', justify: 'CENTER', align: 'CENTER', kids: [text('×', { size: 20 })] }), 456, 24);
+  return { f, close };
+}
+
+function lineItem(p, right) {
+  return box('row', { name: `Line/${p.id}`, w: 456, gap: 14, py: 12, align: 'CENTER', kids: [
+    rect(76, 76, { name: 'Thumb', image: `product:${p.id}`, r: 'sm' }),
+    box('col', { name: 'Info', gap: 4, w: 220, kids: [text(`${p.brand} ${p.name}`, { size: 14, w: 220, lh: 125 }), text(money(p.price), { font: 'uiSemi', size: 13, color: 'text-lo' })] }),
+    right,
+  ] });
+}
+
+function bagSheet(items, x, y) {
+  const t = totals(items);
+  const { f, close } = sheet(`Bag / ${items.map((it) => it.p.id).join(' + ')}`, `Your bag (${t.count})`, x, y);
+  const list = box('col', { name: 'Items', w: 456 });
+  for (const it of items) list.appendChild(lineItem(it.p, box('row', { name: 'Qty', gap: 12, px: 12, py: 8, radius: 999, stroke: 'hairline', align: 'CENTER', kids: [text('−', { size: 14 }), text(String(it.qty), { font: 'mono', size: 13 }), text('+', { size: 14 })] })));
+  place(f, list, 32, 88);
+  const left = FREE_SHIPPING_MIN - t.sub;
+  const progress = box('col', { name: 'Free shipping', w: 456, gap: 8, p: 16, r: 'md', fill: 'well', kids: [
+    text(left > 0 ? `Add ${money(left)} more for free shipping` : 'Free shipping unlocked', { size: 13 }),
+  ] });
+  const track = box('row', { name: 'Track', w: 424, h: 6, radius: 999, fill: 'hairline' });
+  track.appendChild(rect(Math.max(8, 424 * Math.min(1, t.sub / FREE_SHIPPING_MIN)), 6, { name: 'Fill', fill: 'plot-2', radius: 999 }));
+  progress.appendChild(track);
+  place(f, progress, 32, 420);
+  const sum = box('col', { name: 'Totals', w: 456, gap: 8 });
+  for (const [k, v] of [['Subtotal', money(t.sub)], ['Shipping', t.ship ? money(t.ship) : 'Free'], ['Total', money(t.total)]]) {
+    sum.appendChild(box('row', { name: k, w: 456, justify: 'SPACE_BETWEEN', kids: [text(k, { size: 14, color: k === 'Total' ? 'text-hi' : 'text-lo' }), text(v, { font: k === 'Total' ? 'display' : 'ui', size: k === 'Total' ? 20 : 14 })] }));
+  }
+  place(f, sum, 32, 530);
+  const checkout = button('Checkout', 'Primary');
+  const keep = button('Keep shopping', 'Secondary');
+  place(f, box('row', { name: 'Buttons', gap: 10, kids: [checkout, keep] }), 32, 680);
+  return { f, close, checkout, keep };
+}
+
+function favouritesSheet(products, x, y) {
+  const { f, close } = sheet('Favourites', `Favourites (${products.length})`, x, y);
+  const list = box('col', { name: 'Items', w: 456 });
+  const adds = [];
+  for (const p of products) {
+    const add = button('Add', 'Secondary');
+    adds.push([p, add]);
+    list.appendChild(lineItem(p, add));
+  }
+  place(f, list, 32, 88);
+  place(f, text('Tap the heart on any product to save it here.', { size: 13, color: 'text-lo', w: 456 }), 32, 700);
+  return { f, close, adds };
+}
+
+function field(label, value, w) {
+  return box('col', { name: `Field/${label}`, gap: 6, w, kids: [
+    text(label, { size: 12, color: 'text-lo' }),
+    box('row', { name: 'Input', w, px: 14, py: 12, r: 'sm', fill: 'well', stroke: 'hairline', kids: [text(value, { size: 14 })] }),
+  ] });
+}
+
+function checkoutScreen(frame, items) {
+  const t = totals(items);
+  place(frame, text('Checkout', { font: 'display', size: 40, ls: -1 }), 96, 104);
+  const form = box('col', { name: 'Form', w: 760, gap: 16, p: 32, r: 'lg', fill: 'surface', stroke: 'hairline' });
+  form.appendChild(text('Contact', { font: 'uiSemi', size: 16 }));
+  form.appendChild(field('Email', 'you@example.com', 696));
+  form.appendChild(text('Delivery', { font: 'uiSemi', size: 16 }));
+  form.appendChild(box('row', { gap: 16, kids: [field('First name', 'Alex', 340), field('Last name', 'Rivera', 340)] }));
+  form.appendChild(field('Address', '12 Harbour Street', 696));
+  form.appendChild(box('row', { gap: 16, kids: [field('City', 'Sydney', 340), field('Postcode', '2000', 340)] }));
+  form.appendChild(text('Payment (demo, nothing is charged)', { font: 'uiSemi', size: 16 }));
+  form.appendChild(box('row', { gap: 16, kids: [field('Card number', '4242 4242 4242 4242', 400), field('Expiry', '12 / 28', 130), field('CVC', '123', 134)] }));
+  place(frame, form, 96, 170);
+  const sum = box('col', { name: 'Summary', w: 440, gap: 12, p: 28, r: 'lg', fill: 'surface', stroke: 'hairline' });
+  sum.appendChild(text('Order summary', { font: 'uiSemi', size: 16 }));
+  for (const it of items) sum.appendChild(box('row', { name: `Item/${it.p.id}`, w: 384, gap: 12, align: 'CENTER', kids: [rect(56, 56, { image: `product:${it.p.id}`, r: 'sm' }), text(`${it.qty} × ${it.p.brand} ${it.p.name}`, { size: 13, w: 220 }), text(money(it.p.price * it.qty), { font: 'uiSemi', size: 13 })] }));
+  for (const [k, v] of [['Subtotal', money(t.sub)], ['Shipping', t.ship ? money(t.ship) : 'Free'], ['Total', money(t.total)]]) {
+    sum.appendChild(box('row', { name: k, w: 384, justify: 'SPACE_BETWEEN', kids: [text(k, { size: 14, color: 'text-lo' }), text(v, { font: k === 'Total' ? 'display' : 'ui', size: k === 'Total' ? 22 : 14 })] }));
+  }
+  const placeOrder = button(`Place order · ${money(t.total)}`, 'Primary');
+  sum.appendChild(placeOrder);
+  const back = text('← Back to the store', { name: 'Back', size: 13, color: 'text-lo' });
+  sum.appendChild(back);
+  place(frame, sum, 904, 170);
+  navBar(frame, 'Store');
+  return { placeOrder, back };
+}
+
+function confirmationScreen(frame, items) {
+  const t = totals(items);
+  glow(frame, 420, 100, 600, 'plot-2', 0.14);
+  const tick = figma.createEllipse();
+  tick.name = 'Success';
+  tick.resize(88, 88);
+  tick.fills = [paint('plot-2')];
+  place(frame, tick, W / 2 - 44, 190);
+  const mark = text('✓', { font: 'uiSemi', size: 44, color: 'bg' });
+  place(frame, mark, W / 2 - mark.width / 2, 234 - mark.height / 2);
+  const col = box('col', { name: 'Message', gap: 14, w: 640, align: 'CENTER', kids: [
+    text('Order confirmed', { font: 'display', size: 52, align: 'CENTER', w: 640 }),
+    text(`Order OA-10482 · ${t.count} items · ${money(t.total)}. A receipt is on its way to you@example.com.`, { size: 16, color: 'text-lo', align: 'CENTER', w: 640, lh: 150 }),
+  ] });
+  place(frame, col, W / 2 - 320, 310);
+  const cont = button('Continue shopping', 'Primary');
+  const lab = button('Tune your new gear', 'Secondary');
+  place(frame, box('row', { name: 'Buttons', gap: 12, kids: [cont, lab] }), W / 2 - 190, 470);
+  navBar(frame, 'Store');
+  return { cont, lab };
 }
 
 // ---------- Tuning Lab ----------
@@ -807,36 +1075,88 @@ function historyScreen(frame, i) {
 
 // ---------- main ----------
 
+// Canvas layout: labelled rows of screens, top to bottom.
+const canvas = { y: 0, page: null };
+function newRow(label, height = H) {
+  if (label) rowLabel(canvas.page, label, canvas.y);
+  const y = canvas.y + 110;
+  canvas.y = y + height + 160;
+  return y;
+}
+function screenAt(name, x, y) {
+  const f = figma.createFrame();
+  f.name = name;
+  f.resize(W, H);
+  f.x = x;
+  f.y = y;
+  f.fills = [paint('bg')];
+  f.clipsContent = true;
+  return f;
+}
+
+function writeReport(page, x, y) {
+  const lines = [
+    `${REPORT.ok.length} sections built, ${REPORT.links} prototype links${REPORT.linkErrors ? `, ${REPORT.linkErrors} links failed` : ''}.`,
+    ...(REPORT.errors.length ? ['Problems:', ...REPORT.errors.slice(0, 25).map((e) => `• ${e}`)] : ['No problems.']),
+  ];
+  const card = box('col', { name: 'Build report', w: 900, gap: 8, p: 28, r: 'md', fill: 'surface', stroke: REPORT.errors.length ? 'plot-1' : 'plot-2', kids: [
+    text('Build report', { font: 'display', size: 28 }),
+    ...lines.map((l) => text(l, { size: 14, w: 844, color: l.startsWith('•') ? 'plot-1' : 'text-hi' })),
+  ] });
+  page.appendChild(card);
+  card.x = x;
+  card.y = y;
+}
+
 async function main() {
   const missingFonts = await loadFonts();
-  await makeTokens();
+  await step('Tokens', makeTokens);
   let name = 'Prototype v2';
   let n = 2;
   while (figma.root.children.some((p) => p.name === name)) name = `Prototype v2 (${n++})`;
   const page = figma.createPage();
   page.name = name;
   await figma.setCurrentPageAsync(page);
+  canvas.page = page;
+  canvas.y = 600; // room for the build report above Home
 
-  const ROW = { home: 0, store: 1, overlays: 2, lab: 3, guide: 4, history: 5, components: 6 };
-  for (const [label, row] of [['Home', ROW.home], ['Store', ROW.store], ['Product details (open as overlays)', ROW.overlays], ['Tuning Lab', ROW.lab], ['Guide', ROW.guide], ['History', ROW.history], ['Components', ROW.components]]) {
-    rowLabel(page, label, row * ROW_H - 110);
+  const PRODUCTS = DATA.store.products;
+  const byId = Object.fromEntries(PRODUCTS.map((p) => [p.id, p]));
+  const sortedBy = (list, key) => list.slice().sort(SORTS.find((s) => s[0] === key)[2]);
+  const pagesOf = (list) => Math.max(1, Math.ceil(list.length / PER_PAGE));
+  const listFor = (ctx) => (ctx === 'all' ? PRODUCTS : PRODUCTS.filter((p) => p.category === ctx));
+
+  // ---------- 1. empty screens, so every link has a target ----------
+  const S = { store: {}, product: {}, quick: {}, bag: {} };
+  S.home = screenAt('Home', 0, newRow('Home'));
+  const contexts = DATA.categories.map((c) => c.id); // 'all' first
+  for (const ctx of contexts) {
+    const pages = pagesOf(listFor(ctx));
+    for (const [key] of SORTS) {
+      const y = newRow(`Store · ${catLabel(ctx)} · ${sortLabel(key)}`);
+      for (let pg = 1; pg <= pages; pg++) S.store[`${ctx}|${key}|${pg}`] = screenAt(`Store / ${catLabel(ctx)} · ${sortLabel(key)} · p${pg}`, (pg - 1) * (W + GAP), y);
+    }
   }
+  const storeHome = S.store['all|featured|1'];
+  for (let i = 0; i < PRODUCTS.length; i += 7) {
+    const y = newRow(i === 0 ? 'Product pages' : '');
+    PRODUCTS.slice(i, i + 7).forEach((p, k) => { S.product[p.id] = screenAt(`Product / ${p.brand} ${p.name}`, k * (W + GAP), y); });
+  }
+  const sample = [{ p: byId['sony-wh-1000xm5'] || PRODUCTS[0], qty: 1 }, { p: byId['moondrop-blessing-3'] || PRODUCTS[1], qty: 1 }];
+  const favs = ['sennheiser-hd-600', 'fiio-k11', 'yamaha-hs5'].map((id) => byId[id]).filter(Boolean);
+  const flowY = newRow('Checkout and confirmation');
+  S.checkout = screenAt('Checkout', 0, flowY);
+  S.confirm = screenAt('Order confirmed', W + GAP, flowY);
+  const labY = newRow('Tuning Lab');
+  S.labDefault = screenAt('Tuning Lab / Default', 0, labY);
+  S.labActive = screenAt('Tuning Lab / Dragging band 3', W + GAP, labY);
+  S.labPro = screenAt('Tuning Lab / Advanced settings', 2 * (W + GAP), labY);
+  const guideY = newRow('Guide');
+  S.guide = Array.from({ length: DATA.guide.chapters.length + 1 }, (_, k) => screenAt(k === 0 ? 'Guide / 00 Intro' : `Guide / ${pad2(k)} ${DATA.guide.chapters[k - 1].title}`, k * (W + GAP), guideY));
+  const histY = newRow('History');
+  S.history = Array.from({ length: DATA.history.length + 1 }, (_, k) => screenAt(k === 0 ? 'History / 00 Intro' : `History / ${pad2(k)} ${DATA.history[k - 1].year}`, k * (W + GAP), histY));
 
-  // 1. Empty screens first, so everything can link to them.
-  const s = {
-    home: screen('Home', 0, ROW.home),
-    storeAll1: screen('Store / All · page 1', 0, ROW.store),
-    storeAll2: screen('Store / All · page 2', 1, ROW.store),
-    storeMonitors: screen('Store / Studio monitors', 2, ROW.store),
-    storeIems: screen('Store / In-ear monitors', 3, ROW.store),
-    labDefault: screen('Tuning Lab / Default', 0, ROW.lab),
-    labActive: screen('Tuning Lab / Dragging band 3', 1, ROW.lab),
-    labPro: screen('Tuning Lab / Advanced settings', 2, ROW.lab),
-    guide: Array.from({ length: DATA.guide.chapters.length + 1 }, (_, k) => screen(k === 0 ? 'Guide / 00 Intro' : `Guide / ${pad2(k)} ${DATA.guide.chapters[k - 1].title}`, k, ROW.guide)),
-    history: Array.from({ length: DATA.history.length + 1 }, (_, k) => screen(k === 0 ? 'History / 00 Intro' : `History / ${pad2(k)} ${DATA.history[k - 1].year}`, k, ROW.history)),
-  };
-
-  // 2. Components (on this page, so their links can target the screens).
+  // ---------- 2. components (left of the screens) ----------
   compArea = figma.createFrame();
   compArea.name = 'Components';
   compArea.layoutMode = 'VERTICAL';
@@ -846,100 +1166,164 @@ async function main() {
   compArea.paddingLeft = compArea.paddingRight = compArea.paddingTop = compArea.paddingBottom = 40;
   compArea.fills = [paint('bg')];
   compArea.cornerRadius = 24;
-  compArea.x = 0;
-  compArea.y = ROW.components * ROW_H;
-  buildComponents(s);
-  await wireComponentInteractions();
-  const navDest = { Home: s.home, Store: s.storeAll1, 'Tuning Lab': s.labDefault, Guide: s.guide[0], History: s.history[0] };
-  for (const v of C.nav.children) {
-    for (const [label, dest] of Object.entries(navDest)) {
-      const link = v.findOne((x) => x.name === `Link/${label}`);
-      if (link) await link.setReactionsAsync([on('ON_CLICK', nav(dest))]);
+  compArea.x = -3400;
+  compArea.y = 600;
+  await step('Components', async () => { buildComponents(); await wireComponentInteractions(); });
+
+  // ---------- 3. overlays: quick view + bag per product, nav bag, favourites ----------
+  await step('Overlays', async () => {
+    let y = newRow('Quick view overlays (open from a store card)', 600);
+    PRODUCTS.forEach((p, i) => {
+      if (i && i % 10 === 0) y = newRow('', 600);
+      S.quick[p.id] = quickView(p, (i % 10) * 1100, y);
+    });
+    y = newRow('Bag overlays (open from Add to bag)', 760);
+    PRODUCTS.forEach((p, i) => {
+      if (i && i % 14 === 0) y = newRow('', 760);
+      S.bag[p.id] = bagSheet([{ p, qty: 1 }], (i % 14) * 640, y);
+    });
+    y = newRow('Nav: bag and favourites', 760);
+    S.bagNav = bagSheet(sample, 0, y);
+    S.favs = favouritesSheet(favs, 640, y);
+  });
+
+  // Nav links live in the Nav component, so every screen inherits them.
+  await step('Nav links', async () => {
+    const dest = { Home: S.home, Store: storeHome, 'Tuning Lab': S.labDefault, Guide: S.guide[0], History: S.history[0] };
+    const overlayOf = (f) => ({ type: 'NODE', destinationId: f.id, navigation: 'OVERLAY', transition: smart(300) });
+    for (const v of C.nav.children) {
+      for (const [label, d] of Object.entries(dest)) await react(v.findOne((x) => x.name === `Link/${label}`), [on('ON_CLICK', nav(d))]);
+      if (S.bagNav) await react(v.findOne((x) => x.name === 'Bag'), [on('ON_CLICK', overlayOf(S.bagNav.f))]);
+      if (S.favs) await react(v.findOne((x) => x.name === 'Favourites'), [on('ON_CLICK', overlayOf(S.favs.f))]);
     }
-  }
+  });
 
-  // 3. Home
-  const home = buildHome(s.home);
-  await home.ctas.children[0].setReactionsAsync([on('ON_CLICK', nav(s.labDefault))]);
-  await home.ctas.children[1].setReactionsAsync([on('ON_CLICK', nav(s.guide[0]))]);
-  const entryDest = [s.storeAll1, s.labDefault, s.guide[0], s.history[0]];
-  for (let k = 0; k < entryDest.length; k++) await home.cards.children[k].setReactionsAsync([on('ON_CLICK', nav(entryDest[k]))]);
+  // ---------- 4. Home ----------
+  await step('Home', async () => {
+    const home = buildHome(S.home);
+    await react(home.ctas.children[0], [on('ON_CLICK', nav(S.labDefault))]);
+    await react(home.ctas.children[1], [on('ON_CLICK', nav(S.guide[0]))]);
+    const entryDest = [storeHome, S.labDefault, S.guide[0], S.history[0]];
+    for (let k = 0; k < entryDest.length; k++) await react(home.cards.children[k], [on('ON_CLICK', nav(entryDest[k]))]);
+  });
 
-  // 4. Store: 4 browsing screens + one overlay per product shown
-  const pages = Math.ceil(DATA.total / 8);
-  const sub = `${DATA.total} products · speakers to studio gear`;
-  const stores = [
-    [s.storeAll1, { title: 'The listening room', subtitle: sub, category: 'all', page: 1, pages, products: DATA.store.all1 }],
-    [s.storeAll2, { title: 'The listening room', subtitle: sub, category: 'all', page: 2, pages, products: DATA.store.all2 }],
-    [s.storeMonitors, { title: 'Studio monitors', subtitle: `${DATA.store.monitors.length} products · honest, flat speakers for mixing`, category: 'monitors', page: 1, pages: 1, products: DATA.store.monitors }],
-    [s.storeIems, { title: 'In-ear monitors', subtitle: `${DATA.store.iems.length} products · stage-grade sound in your ears`, category: 'iems', page: 1, pages: 1, products: DATA.store.iems }],
-  ];
-  const overlayFor = {};
-  let oc = 0;
-  for (const [, o] of stores) for (const p of o.products) if (!overlayFor[p.id]) overlayFor[p.id] = productOverlay(p, oc++, ROW.overlays * ROW_H);
-  const hoverCard = variant(C.card, 'Hover');
-  const chipDest = { all: s.storeAll1, monitors: s.storeMonitors, iems: s.storeIems };
-  for (const [frame, o] of stores) {
-    const ui = storeScreen(frame, o);
-    for (const [p, card] of ui.cards) {
-      // keep the inherited hover state and add the overlay on click
-      await card.setReactionsAsync([on('ON_HOVER', changeTo(hoverCard, 220)), on('ON_CLICK', { type: 'NODE', destinationId: overlayFor[p.id].f.id, navigation: 'OVERLAY', transition: smart(320) })]);
+  // ---------- 5. Store listings ----------
+  const overlay = (f) => ({ type: 'NODE', destinationId: f.id, navigation: 'OVERLAY', transition: smart(320) });
+  const swap = (f) => ({ type: 'NODE', destinationId: f.id, navigation: 'SWAP', transition: smart(320) });
+  await step('Store listings', async () => {
+    const hoverCard = variant(C.card, 'Hover');
+    for (const ctx of contexts) {
+      const base = listFor(ctx);
+      const pages = pagesOf(base);
+      for (const [key] of SORTS) {
+        const sorted = sortedBy(base, key);
+        for (let pg = 1; pg <= pages; pg++) {
+          const ui = storeScreen(S.store[`${ctx}|${key}|${pg}`], {
+            title: ctx === 'all' ? 'The listening room' : catLabel(ctx),
+            subtitle: ctx === 'all' ? 'Speakers, headphones, IEMs and studio gear, measured and tunable' : `${base.length} products in ${catLabel(ctx).toLowerCase()}`,
+            category: ctx, sort: key, page: pg, pages, count: base.length,
+            products: sorted.slice((pg - 1) * PER_PAGE, pg * PER_PAGE),
+          });
+          for (const [id, node] of Object.entries(ui.chipNodes)) if (id !== ctx) await react(node, [on('ON_CLICK', nav(S.store[`${id}|featured|1`], smart(380)))]);
+          for (const [k2, node] of Object.entries(ui.sortNodes)) if (k2 !== key) await react(node, [on('ON_CLICK', nav(S.store[`${ctx}|${k2}|1`], smart(380)))]);
+          for (const [p2, item] of ui.pageItems) if (p2 !== pg) await react(item, [on('ON_CLICK', nav(S.store[`${ctx}|${key}|${p2}`], smart(380)))]);
+          if (ui.prev && pg > 1) await react(ui.prev, [on('ON_CLICK', nav(S.store[`${ctx}|${key}|${pg - 1}`], smart(380)))]);
+          if (ui.next && pg < pages) await react(ui.next, [on('ON_CLICK', nav(S.store[`${ctx}|${key}|${pg + 1}`], smart(380)))]);
+          for (const [p, card] of ui.cards) await react(card, [on('ON_HOVER', changeTo(hoverCard, 220)), on('ON_CLICK', overlay(S.quick[p.id].f))]);
+        }
+      }
     }
-    if (o.category === 'all') {
-      const pageDest = { 1: s.storeAll1, 2: s.storeAll2 };
-      for (const [p, item] of ui.pageItems) if (pageDest[p] && pageDest[p] !== frame) await item.setReactionsAsync([on('ON_CLICK', nav(pageDest[p], smart(400)))]);
-      await ui.next.setReactionsAsync([on('ON_CLICK', nav(o.page === 1 ? s.storeAll2 : s.storeAll1, smart(400)))]);
+  });
+
+  // ---------- 6. Product pages, overlay links, checkout ----------
+  await step('Product pages', async () => {
+    for (const p of PRODUCTS) {
+      const related = PRODUCTS.filter((r) => r.category === p.category && r.id !== p.id).concat(PRODUCTS.filter((r) => r.category !== p.category)).slice(0, 4);
+      const ui = productPage(S.product[p.id], p, related);
+      await react(ui.crumbStore, [on('ON_CLICK', nav(storeHome))]);
+      await react(ui.crumbCat, [on('ON_CLICK', nav(S.store[`${p.category}|featured|1`]))]);
+      await react(ui.addBtn, [on('ON_CLICK', overlay(S.bag[p.id].f))]);
+      await react(ui.favBtn, [on('ON_CLICK', overlay(S.favs.f))]);
+      if (ui.tuneBtn) await react(ui.tuneBtn, [on('ON_CLICK', nav(S.labDefault))]);
+      for (const [r, mini] of ui.minis) await react(mini, [on('ON_CLICK', nav(S.product[r.id], smart(400)))]);
     }
-    for (const [id, dest] of Object.entries(chipDest)) if (dest !== frame) await ui.chipNodes[id].setReactionsAsync([on('ON_CLICK', nav(dest, smart(400)))]);
-  }
-  for (const ov of Object.values(overlayFor)) {
-    await ov.close.setReactionsAsync([on('ON_CLICK', { type: 'CLOSE' })]);
-    await ov.tune.setReactionsAsync([on('ON_CLICK', nav(s.labDefault))]);
-  }
+  });
+  await step('Overlay links', async () => {
+    for (const p of PRODUCTS) {
+      const q = S.quick[p.id];
+      await react(q.add, [on('ON_CLICK', swap(S.bag[p.id].f))]);
+      await react(q.details, [on('ON_CLICK', nav(S.product[p.id]))]);
+      await react(q.close, [on('ON_CLICK', { type: 'CLOSE' })]);
+    }
+    for (const b of [...Object.values(S.bag), S.bagNav]) {
+      await react(b.checkout, [on('ON_CLICK', nav(S.checkout))]);
+      await react(b.keep, [on('ON_CLICK', { type: 'CLOSE' })]);
+      await react(b.close, [on('ON_CLICK', { type: 'CLOSE' })]);
+    }
+    for (const [p, add] of S.favs.adds) await react(add, [on('ON_CLICK', swap(S.bag[p.id].f))]);
+    await react(S.favs.close, [on('ON_CLICK', { type: 'CLOSE' })]);
+  });
+  await step('Checkout', async () => {
+    const co = checkoutScreen(S.checkout, sample);
+    await react(co.placeOrder, [on('ON_CLICK', nav(S.confirm, smart(500)))]);
+    await react(co.back, [on('ON_CLICK', nav(storeHome))]);
+    const done = confirmationScreen(S.confirm, sample);
+    await react(done.cont, [on('ON_CLICK', nav(storeHome))]);
+    await react(done.lab, [on('ON_CLICK', nav(S.labDefault))]);
+  });
 
-  // 5. Tuning Lab: Default → (drag or click node 3) Dragging; Advanced row → Advanced settings
-  const labD = labScreen(s.labDefault, 'default', false);
-  const labA = labScreen(s.labActive, 'active', false);
-  const labP = labScreen(s.labPro, 'default', true);
-  const hoverNode = variant(C.node, 'Hover');
-  await labD.nodes[3].setReactionsAsync([on('ON_HOVER', changeTo(hoverNode, 160)), on('ON_DRAG', nav(s.labActive, smart(450))), on('ON_CLICK', nav(s.labActive, smart(450)))]);
-  await labP.nodes[3].setReactionsAsync([on('ON_HOVER', changeTo(hoverNode, 160)), on('ON_DRAG', nav(s.labActive, smart(450))), on('ON_CLICK', nav(s.labActive, smart(450)))]);
-  await labA.nodes[3].setReactionsAsync([on('ON_CLICK', nav(s.labDefault, smart(450))), on('ON_DRAG', nav(s.labDefault, smart(450)))]);
-  await labD.advRow.setReactionsAsync([on('ON_CLICK', nav(s.labPro, smart(400)))]);
-  await labA.advRow.setReactionsAsync([on('ON_CLICK', nav(s.labPro, smart(400)))]);
-  await labP.advRow.setReactionsAsync([on('ON_CLICK', nav(s.labDefault, smart(400)))]);
+  // ---------- 7. Tuning Lab ----------
+  await step('Tuning Lab', async () => {
+    const labD = labScreen(S.labDefault, 'default', false);
+    const labA = labScreen(S.labActive, 'active', false);
+    const labP = labScreen(S.labPro, 'default', true);
+    const hoverNode = variant(C.node, 'Hover');
+    for (const ui of [labD, labP]) await react(ui.nodes[3], [on('ON_HOVER', changeTo(hoverNode, 160)), on('ON_DRAG', nav(S.labActive, smart(450))), on('ON_CLICK', nav(S.labActive, smart(450)))]);
+    await react(labA.nodes[3], [on('ON_CLICK', nav(S.labDefault, smart(450))), on('ON_DRAG', nav(S.labDefault, smart(450)))]);
+    await react(labD.advRow, [on('ON_CLICK', nav(S.labPro, smart(400)))]);
+    await react(labA.advRow, [on('ON_CLICK', nav(S.labPro, smart(400)))]);
+    await react(labP.advRow, [on('ON_CLICK', nav(S.labDefault, smart(400)))]);
+  });
 
-  // 6. Guide: frame by frame, Smart Animate on click and drag
-  const gTotal = s.guide.length;
-  for (let k = 0; k < gTotal; k++) {
-    const ui = guideScreen(s.guide[k], k, gTotal);
-    const last = k === gTotal - 1;
-    await ui.next.setReactionsAsync([on('ON_CLICK', nav(last ? s.labDefault : s.guide[k + 1], last ? dissolve() : smart(600)))]);
-    if (ui.prev) await ui.prev.setReactionsAsync([on('ON_CLICK', nav(s.guide[k - 1], smart(600)))]);
-    if (!last) await ui.swipe.setReactionsAsync([on('ON_DRAG', nav(s.guide[k + 1], smart(600)))]);
-  }
+  // ---------- 8. Guide ----------
+  await step('Guide', async () => {
+    const total = S.guide.length;
+    for (let k = 0; k < total; k++) {
+      const ui = guideScreen(S.guide[k], k, total);
+      const last = k === total - 1;
+      await react(ui.next, [on('ON_CLICK', nav(last ? S.labDefault : S.guide[k + 1], last ? dissolve() : smart(600)))]);
+      if (ui.prev) await react(ui.prev, [on('ON_CLICK', nav(S.guide[k - 1], smart(600)))]);
+      if (!last) await react(ui.swipe, [on('ON_DRAG', nav(S.guide[k + 1], smart(600)))]);
+    }
+  });
 
-  // 7. History: same pattern, plus clickable years on the rail
-  const hTotal = s.history.length;
-  for (let k = 0; k < hTotal; k++) {
-    const ui = historyScreen(s.history[k], k);
-    const last = k === hTotal - 1;
-    await ui.next.setReactionsAsync([on('ON_CLICK', nav(last ? s.labDefault : s.history[k + 1], last ? dissolve() : smart(700)))]);
-    if (ui.prev) await ui.prev.setReactionsAsync([on('ON_CLICK', nav(s.history[k - 1], smart(700)))]);
-    if (!last) await ui.swipe.setReactionsAsync([on('ON_DRAG', nav(s.history[k + 1], smart(700)))]);
-    for (let y = 0; y < ui.years.length; y++) if (y + 1 !== k) await ui.years[y].setReactionsAsync([on('ON_CLICK', nav(s.history[y + 1], smart(800)))]);
-  }
+  // ---------- 9. History ----------
+  await step('History', async () => {
+    const total = S.history.length;
+    for (let k = 0; k < total; k++) {
+      const ui = historyScreen(S.history[k], k);
+      const last = k === total - 1;
+      await react(ui.next, [on('ON_CLICK', nav(last ? S.labDefault : S.history[k + 1], last ? dissolve() : smart(700)))]);
+      if (ui.prev) await react(ui.prev, [on('ON_CLICK', nav(S.history[k - 1], smart(700)))]);
+      if (!last) await react(ui.swipe, [on('ON_DRAG', nav(S.history[k + 1], smart(700)))]);
+      for (let y = 0; y < ui.years.length; y++) if (y + 1 !== k) await react(ui.years[y], [on('ON_CLICK', nav(S.history[y + 1], smart(800)))]);
+    }
+  });
 
-  page.flowStartingPoints = [
-    { nodeId: s.home.id, name: 'Full site' },
-    { nodeId: s.storeAll1.id, name: 'Store' },
-    { nodeId: s.labDefault.id, name: 'Tuning Lab' },
-    { nodeId: s.guide[0].id, name: 'Guide' },
-    { nodeId: s.history[0].id, name: 'History' },
-  ];
-  figma.viewport.scrollAndZoomIntoView([s.home]);
-  const screens = 1 + stores.length + 3 + gTotal + hTotal;
-  return `Built "${name}": ${screens} screens, ${Object.keys(overlayFor).length} product overlays, 8 interactive component sets.${missingFonts.length ? ` Fonts swapped to Inter: ${missingFonts.join(', ')}.` : ''}`;
+  await step('Flows', async () => {
+    page.flowStartingPoints = [
+      { nodeId: S.home.id, name: 'Full site' },
+      { nodeId: storeHome.id, name: 'Store' },
+      { nodeId: S.labDefault.id, name: 'Tuning Lab' },
+      { nodeId: S.guide[0].id, name: 'Guide' },
+      { nodeId: S.history[0].id, name: 'History' },
+    ];
+  });
+  if (missingFonts.length) REPORT.errors.push(`Fonts not available, Inter used instead: ${missingFonts.join(', ')}`);
+  writeReport(page, 0, 0);
+  figma.viewport.scrollAndZoomIntoView([S.home]);
+  const screens = page.children.filter((x) => x.type === 'FRAME' && x.width === W && x.height === H).length;
+  return `Built "${name}": ${screens} screens, ${REPORT.links} links${REPORT.errors.length ? `, ${REPORT.errors.length} problems (see Build report)` : ', no problems'}.`;
 }
 
 main()

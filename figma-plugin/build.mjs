@@ -28,13 +28,8 @@ const chapters = arrayLiteral('journey.js', 'CHAPTERS');
 const eras = arrayLiteral('history.js', 'ERAS');
 
 const pick = (p) => ({ id: p.id, brand: p.brand, name: p.name, category: p.category, price: p.price, compareAt: p.compareAt ?? null, rating: p.rating, reviews: p.reviews, badge: p.badge ?? null, blurb: p.blurb, highlights: p.highlights, specs: p.specs, fit: p.fit });
-const byCat = (c) => PRODUCTS.filter((p) => p.category === c);
-const store = {
-  all1: PRODUCTS.slice(0, 8).map(pick),
-  all2: PRODUCTS.slice(8, 16).map(pick),
-  monitors: byCat('monitors').map(pick),
-  iems: byCat('iems').map(pick),
-};
+// Every product, in catalog ("featured") order; the plugin derives pages, categories and sorts.
+const store = { products: PRODUCTS.map(pick) };
 const total = PRODUCTS.length;
 
 // ---------- curves (same RBJ maths as the site) ----------
@@ -113,7 +108,7 @@ const history = eras.map((e, i) => ({
 // ---------- images ----------
 
 const imageJobs = [
-  ...[...new Set(Object.values(store).flat().map((p) => p.id))].map((id) => [`product:${id}`, pub('products', `${id}.webp`), 640]),
+  ...store.products.map((p) => [`product:${p.id}`, pub('products', `${p.id}.webp`), 640]),
   ...history.map((e) => [`era:${e.img}`, pub('history', `${e.img}.webp`), 960]),
   ...guide.chapters.map((c) => [`guide:${c.img}`, pub('guide', `${c.img}.webp`), 820]),
 ];
@@ -145,4 +140,4 @@ writeFileSync(join(here, 'manifest.json'), `${JSON.stringify({
   networkAccess: { allowedDomains: ['none'] },
 }, null, 2)}\n`);
 const kb = (n) => `${Math.round(n / 1024)} KB`;
-console.log(`code.js ${kb(code.length)} · ${Object.keys(images).length} images · ${Object.values(store).flat().length} store cards · ${history.length} eras · ${guide.chapters.length} chapters`);
+console.log(`code.js ${kb(code.length)} · ${Object.keys(images).length} images · ${store.products.length} products · ${history.length} eras · ${guide.chapters.length} chapters`);
