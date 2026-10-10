@@ -1,0 +1,93 @@
+/* =========================================================================
+   Vengeance UI layer (ported from github.com/Ashutoshx7/VengeanceUI, MIT):
+   GlowBorderCard, BorderBeam and a cursor spotlight, re-coloured from the
+   theme tokens and rewritten as plain CSS (no React/Tailwind).
+   ========================================================================= */
+
+/* ---------- GlowBorderCard: rotating conic glow behind the card edge ---------- */
+@property --vng-glow-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+@keyframes vng-glow-rotate { to { --vng-glow-angle: 360deg; } }
+
+.vng-glow { position: relative; isolation: isolate; }
+.vng-glow::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(from var(--vng-glow-angle),
+    var(--plot-1), var(--accent), var(--plot-2), var(--aura-1), var(--plot-1));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0.55;
+  animation: vng-glow-rotate 8s linear infinite;
+}
+.vng-glow::after { /* the soft halo outside the edge */
+  content: '';
+  position: absolute;
+  inset: -10px;
+  z-index: -2;
+  border-radius: inherit;
+  background: conic-gradient(from var(--vng-glow-angle),
+    var(--plot-1), var(--accent), var(--plot-2), var(--aura-1), var(--plot-1));
+  filter: blur(22px);
+  opacity: 0.12;
+  animation: vng-glow-rotate 8s linear infinite;
+  pointer-events: none;
+}
+
+/* ---------- BorderBeam: a light travelling around the border ---------- */
+@keyframes vng-beam { to { offset-distance: 100%; } }
+.vng-beam {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid transparent;
+  pointer-events: none;
+  -webkit-mask: linear-gradient(transparent, transparent) padding-box, linear-gradient(#fff, #fff) border-box;
+  mask: linear-gradient(transparent, transparent) padding-box, linear-gradient(#fff, #fff) border-box;
+  -webkit-mask-composite: source-in;
+  mask-composite: intersect;
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+.vng-beam::after {
+  content: '';
+  position: absolute;
+  width: 140px;
+  aspect-ratio: 1;
+  background: linear-gradient(to left, var(--accent), var(--plot-1), transparent);
+  offset-anchor: 90% 50%;
+  offset-path: rect(0 auto auto 0 round 140px);
+  animation: vng-beam 6s linear infinite;
+}
+.vng-beam.always { opacity: 1; }
+@media (hover: hover) and (pointer: fine) {
+  :hover > .vng-beam { opacity: 1; }
+}
+
+/* ---------- Cursor spotlight: radial highlight that follows the pointer ---------- */
+.vng-spot { --mx: 50%; --my: 0%; }
+.vng-spot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(420px circle at var(--mx) var(--my), color-mix(in srgb, var(--accent) 14%, transparent), transparent 60%);
+  opacity: 0;
+  transition: opacity 300ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .vng-spot:hover::after { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .vng-glow::before, .vng-glow::after, .vng-beam::after { animation: none; }
+}

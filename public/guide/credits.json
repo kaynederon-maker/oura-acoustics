@@ -1,0 +1,62 @@
+{
+  "tr808": {
+    "title": "File:Roland TR-808 Rhythm Composer.jpg",
+    "author": "fr4dd",
+    "license": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Roland_TR-808_Rhythm_Composer.jpg",
+    "size": [
+      1000,
+      667
+    ]
+  },
+  "bass": {
+    "title": "File:Fender AP P-Bass 20230730.jpg",
+    "author": "Niranjan Arminius",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Fender_AP_P-Bass_20230730.jpg",
+    "size": [
+      739,
+      1000
+    ]
+  },
+  "mic": {
+    "title": "File:Condenser Microphone with Pop Filter and Reflection Filter.jpg",
+    "author": "Tim Sheerman-Chase",
+    "license": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Condenser_Microphone_with_Pop_Filter_and_Reflection_Filter.jpg",
+    "size": [
+      1000,
+      666
+    ]
+  },
+  "ear": {
+    "title": "File:Anatomy of the Human Ear.svg",
+    "author": "Lars Chittka; Axel Brockmann",
+    "license": "CC BY 2.5",
+    "source": "https://commons.wikimedia.org/wiki/File:Anatomy_of_the_Human_Ear.svg",
+    "size": [
+      1000,
+      759
+    ]
+  },
+  "cymbal": {
+    "title": "File:Anatolian Emotion Flat Ride Cymbal (4709180551).jpg",
+    "author": "Dave Kobrehel from CH",
+    "license": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Anatolian_Emotion_Flat_Ride_Cymbal_(4709180551).jpg",
+    "size": [
+      1000,
+      750
+    ]
+  },
+  "loudness": {
+    "title": "File:Lindos1.svg",
+    "author": "Lindosland",
+    "license": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Lindos1.svg",
+    "size": [
+      1000,
+      897
+    ]
+  }
+}

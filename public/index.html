@@ -1,0 +1,654 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="description" content="Oura Acoustics: tune any headphone with measured AutoEq corrections, listen to your system audio, and learn how EQ works.">
+  <meta name="theme-color" content="#07080B">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 20c4-10 8-10 12 0s8 10 12 0' fill='none' stroke='%232DD4BF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <title>Oura Acoustics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+  <link rel="stylesheet" href="/styles.css">
+  <link rel="stylesheet" href="/store.css">
+  <link rel="stylesheet" href="/studio.css">
+  <link rel="stylesheet" href="/vengeance.css">
+  <link rel="stylesheet" href="/journey.css">
+  <link rel="stylesheet" href="/history.css">
+  <link rel="stylesheet" href="/missions.css">
+  <link rel="stylesheet" href="/vendor/lenis/lenis.css">
+  <script src="/vendor/d3.min.js" defer></script>
+  <script src="/vendor/gsap/gsap.min.js" defer></script>
+  <script src="/vendor/gsap/ScrollTrigger.min.js" defer></script>
+  <script src="/vendor/gsap/SplitText.min.js" defer></script>
+  <script src="/vendor/lenis/lenis.min.js" defer></script>
+  <script src="/js/theme-init.js"></script>
+  <script type="module" src="/js/app.js"></script>
+</head>
+<body>
+  <svg class="sprite" aria-hidden="true">
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M7 17 17 7M8.5 7H17v8.5"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.8v12.4a.6.6 0 0 0 .9.5l9.7-6.2a.6.6 0 0 0 0-1L8.9 5.3a.6.6 0 0 0-.9.5Z"/></symbol>
+    <symbol id="i-stop" viewBox="0 0 24 24"><rect x="6.5" y="6.5" width="11" height="11" rx="2.5"/></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M7 7l10 10M17 7 7 17"/></symbol>
+    <symbol id="i-up" viewBox="0 0 24 24"><path d="M6 15l6-6 6 6"/></symbol>
+    <symbol id="i-down" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></symbol>
+    <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2.5 12h2.2l2.1-5.5 3.1 11 3.2-14 3.1 12.5 2-4h3.3"/></symbol>
+    <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.1A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20Z"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5.5 8h13l-1 12.5h-11L5.5 8Z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 4 2.4 5 5.4.6-4 3.7 1.1 5.4L12 16l-4.9 2.7 1.1-5.4-4-3.7 5.4-.6Z"/></symbol>
+    <symbol id="i-truck" viewBox="0 0 24 24"><path d="M3 6.5h11v9H3zM14 10h4l3 3v2.5h-7"/><circle cx="7" cy="17.5" r="1.7"/><circle cx="17" cy="17.5" r="1.7"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5.5" y="10.5" width="13" height="9" rx="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 7 4.5 11.5 9 16"/><path d="M5 11.5h9.5a5 5 0 0 1 0 10H11"/></symbol>
+    <symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 7 4.5 4.5L15 16"/><path d="M19 11.5H9.5a5 5 0 0 0 0 10H13"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/></symbol>
+  </svg>
+  <canvas id="aura" aria-hidden="true"></canvas>
+  <a class="skip" href="#/" data-scroll="main">Skip to content</a>
+
+  <header class="topbar glass">
+    <a class="brand" href="#/" aria-label="Oura Acoustics home"><svg class="icon brand-mark" aria-hidden="true"><use href="#i-wave"/></svg>Oura<span>Acoustics</span></a>
+    <nav aria-label="Main">
+      <a href="#/" data-nav="home">Home</a>
+      <a href="#/store" data-nav="store">Store</a>
+      <a href="#/lab" data-nav="lab">Tuning Lab</a>
+      <a href="#/guide" data-nav="guide">Guide</a>
+      <a href="#/history" data-nav="history">History</a>
+    </nav>
+    <button id="fav-open" type="button" class="head-btn" aria-label="Favourites">
+      <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span id="fav-count" class="count" hidden>0</span>
+    </button>
+    <button id="bag-open" type="button" class="head-btn" aria-label="Bag">
+      <svg class="icon" aria-hidden="true"><use href="#i-bag"/></svg><span id="bag-count" class="count" hidden>0</span>
+    </button>
+    <div class="theme-picker">
+      <button id="theme-trigger" type="button" class="theme-trigger" aria-label="Color theme" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-panel">
+        <span class="swatch" aria-hidden="true"></span><span class="theme-trigger-label">Theme</span>
+      </button>
+      <div id="theme-panel" class="theme-panel" role="menu" aria-label="Color theme" hidden></div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- ================= HOME ================= -->
+    <section id="view-home" class="view">
+      <div class="hero">
+        <h1 class="display" tabindex="-1" aria-label="Hear what your headphones have been hiding.">
+          <span class="line" aria-hidden="true"><span>Hear what your</span></span>
+          <span class="line" aria-hidden="true"><span>headphones have</span></span>
+          <span class="line" aria-hidden="true"><span>been <em>hiding.</em></span></span>
+        </h1>
+        <p class="lede">Oura listens to what you already play, loads a lab measurement of your exact headphones, and turns both into an EQ you can use everywhere.</p>
+        <div class="row hero-actions">
+          <a class="btn primary has-icon" href="#/lab">Open the Tuning Lab<span class="btn-icon"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></span></a>
+          <a class="text-link" href="#/guide">Learn how EQ works</a>
+        </div>
+        <p class="hint">Press <strong>System audio</strong> in the dock, play a song anywhere, and the silk behind this page moves with it.</p>
+      </div>
+      <div class="marquee" aria-hidden="true" data-velocity>
+        <div class="marquee-track">
+          <span>Sub-bass</span><span>Bass</span><span>Low mids</span><span>Presence</span><span>Brilliance</span><span>Air</span>
+          <span>Sub-bass</span><span>Bass</span><span>Low mids</span><span>Presence</span><span>Brilliance</span><span>Air</span>
+        </div>
+      </div>
+
+      <div class="bento">
+        <article class="card feature reveal">
+          <h2>8,800+ measured headphone profiles</h2>
+          <p>Corrections come from <a href="https://github.com/jaakkopasanen/AutoEq" target="_blank" rel="noopener">AutoEq</a>, the open-source project behind most headphone EQ presets, measured by crinacle, oratory1990, Rtings and others.</p>
+          <svg class="curve-art" viewBox="0 0 400 130" aria-hidden="true">
+            <path class="curve-target" d="M0 74 C60 70 120 76 180 73 S300 62 340 60 S390 84 400 100"/>
+            <path class="curve-raw" d="M0 96 C40 62 80 84 120 76 S170 66 200 78 S250 38 290 54 S330 82 360 62 S390 112 400 118"/>
+          </svg>
+        </article>
+        <article class="card reveal">
+          <h2>Listens to your whole computer</h2>
+          <p>Share system audio and the lab analyses the music you actually play: how bass-heavy, how bright, whether it clips. Audio never leaves your browser.</p>
+        </article>
+        <article class="card reveal">
+          <h2>Take it everywhere</h2>
+          <p>Export to Equalizer APO and Peace (Windows), Wavelet (Android), SoundSource and EasyEffects, so the tuning works in every app.</p>
+        </article>
+      </div>
+      <section class="teaser" aria-labelledby="teaser-history">
+        <figure class="teaser-media" data-clip>
+          <img src="/history/shoegaze.webp" alt="" loading="lazy" decoding="async" data-speed="0.12">
+        </figure>
+        <div class="teaser-copy">
+          <p class="eyebrow">New · History of sound</p>
+          <h2 id="teaser-history" data-split>From tinfoil to <em>808s.</em></h2>
+          <p class="lede">Ten stops through 150 years of recorded sound, from Edison's phonograph to shoegaze, blackgaze and trap. Hear each era's fidelity on the same track.</p>
+          <a class="btn primary has-icon" href="#/history">Travel through time<span class="btn-icon"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></span></a>
+        </div>
+      </section>
+
+      <section class="teaser flip" aria-labelledby="teaser-guide">
+        <figure class="teaser-media" data-clip>
+          <img src="/history/trap.webp" alt="" loading="lazy" decoding="async" data-speed="0.12">
+        </figure>
+        <div class="teaser-copy">
+          <p class="eyebrow">The Guide</p>
+          <h2 id="teaser-guide" data-split>Turn a knob. <em>Hear it.</em></h2>
+          <p class="lede">Sweep for resonances, mix in-ear monitors for a live drummer and blend a subwoofer with desk speakers, with instant A/B at every step.</p>
+          <a class="btn has-icon" href="#/guide">Start the missions<span class="btn-icon"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></span></a>
+        </div>
+      </section>
+
+      <section class="featured" aria-labelledby="featured-title">
+        <div class="section-head">
+          <h2 id="featured-title" data-split>Shop the <em>sound</em></h2>
+          <a class="text-link" href="#/store">See all 42 products</a>
+        </div>
+        <div id="home-featured" class="product-grid"></div>
+      </section>
+    </section>
+
+    <!-- ================= STORE ================= -->
+    <section id="view-store" class="view" hidden>
+      <header class="page-head">
+        <h1 tabindex="-1" data-split>The listening <em>room</em></h1>
+        <p class="lede">Speakers, headphones, earbuds and in-ear monitors we would put on our own desks. Every headphone links straight to its measured tuning.</p>
+      </header>
+      <div class="store-bar">
+        <div id="store-chips" class="chips-row" role="group" aria-label="Category"></div>
+        <div class="store-tools">
+          <label class="store-search">
+            <svg class="icon" aria-hidden="true"><use href="#i-search"/></svg>
+            <span class="sr-only">Search products</span>
+            <input id="store-search" type="search" placeholder="Search" autocomplete="off">
+          </label>
+          <label class="select">
+            <span class="sr-only">Sort by</span>
+            <select id="store-sort">
+              <option value="featured">Featured</option>
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+              <option value="rating">Top rated</option>
+            </select>
+          </label>
+          <label class="toggle">
+            <input id="store-favs-only" type="checkbox">
+            <span>Favourites only</span>
+          </label>
+        </div>
+      </div>
+      <p id="store-count" class="muted small" aria-live="polite"></p>
+      <div id="store-grid" class="product-grid"></div>
+      <p class="muted small store-note">Prices are approximate list prices; ratings are demo data. Product photos via the manufacturers, RTINGS and retailers.</p>
+    </section>
+
+    <!-- ================= PRODUCT ================= -->
+    <section id="view-product" class="view" hidden></section>
+
+    <!-- ================= TUNING LAB ================= -->
+    <section id="view-lab" class="view" hidden>
+      <header class="page-head">
+        <h1 tabindex="-1" data-split>Tune like a <em>studio</em></h1>
+        <p class="lede">Load a measured correction, then shape it with a full parametric EQ, crossover and time alignment. What you hear is exactly what the graph shows: both run the same filter maths.</p>
+      </header>
+
+      <div class="lab-grid">
+        <article class="card" id="step-device">
+          <h2><span class="step">1</span> Your headphones</h2>
+          <div class="search">
+            <input id="hp-search" type="search" placeholder="Search your model" autocomplete="off"
+              aria-label="Search headphone model" role="combobox" aria-expanded="false" aria-controls="hp-results">
+            <button id="hp-detect" type="button" class="btn ghost">Detect</button>
+          </div>
+          <ul id="hp-results" class="results" aria-label="Matching headphones"></ul>
+          <div id="hp-selected" class="selected" aria-live="polite">No profile loaded yet.</div>
+        </article>
+
+        <article class="card wide peq-card vng-glow" id="step-graph">
+          <div class="card-head">
+            <h2>Parametric EQ</h2>
+            <ul id="fr-legend" class="legend">
+              <li class="raw">Your headphones</li>
+              <li class="target">Target</li>
+              <li class="tuned">With your EQ</li>
+              <li class="curve">EQ curve</li>
+            </ul>
+          </div>
+          <div class="peq-toolbar">
+            <button id="peq-add" type="button" class="btn small"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Add band</button>
+            <label class="select"><span class="sr-only">Start from a template</span><select id="peq-template"></select></label>
+            <label class="select"><span class="sr-only">Target curve</span><select id="peq-target"></select></label>
+            <label class="toggle"><input id="peq-correction" type="checkbox"><span id="peq-correction-label">AutoEq correction</span></label>
+            <label class="toggle pro-only"><input id="peq-phase" type="checkbox"><span>Show phase</span></label>
+            <label class="pro-switch"><input id="peq-pro" type="checkbox" role="switch"><span>Advanced settings</span></label>
+            <span class="spacer"></span>
+            <span id="peq-preamp" class="tag"></span>
+            <button id="peq-undo" type="button" class="icon-btn" aria-label="Undo"><svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg></button>
+            <button id="peq-redo" type="button" class="icon-btn" aria-label="Redo"><svg class="icon" aria-hidden="true"><use href="#i-redo"/></svg></button>
+            <button id="peq-reset" type="button" class="btn small ghost">Reset</button>
+          </div>
+          <div id="peq-graph" class="peq-graph"></div>
+          <p class="muted small graph-hint">Drag a node for frequency and gain · scroll on it for Q · double-click empty space to add a band · a focused node takes arrows, Page Up/Down and Delete · Ctrl+Z undoes. Hover anywhere to learn what that frequency does.</p>
+          <div class="peq-columns">
+            <div class="table-wrap">
+              <table class="peq-table">
+                <thead><tr><th>#</th><th>On</th><th class="pro-only">Type</th><th>Freq (Hz)</th><th>Gain (dB)</th><th class="pro-only">Q</th><th class="pro-only">Slope</th><th><span class="sr-only">Remove</span></th></tr></thead>
+                <tbody id="peq-bands"></tbody>
+              </table>
+              <p id="peq-empty" class="muted small">No bands yet. Double-click the graph, press Add band, or start from a template.</p>
+            </div>
+            <div class="peq-advanced pro-only">
+              <details id="xo-panel" class="adv">
+                <summary>Crossover <small>2.1 with a subwoofer</small></summary>
+                <label class="toggle"><input id="xo-enabled" type="checkbox"><span>Use a subwoofer crossover</span></label>
+                <fieldset id="xo-fields" class="adv-grid">
+                  <label>Crossover <span><input id="xo-fc" class="mini" type="number" min="40" max="250" step="1"> Hz</span></label>
+                  <label>Slope
+                    <select id="xo-slope"><option value="12">LR2 · 12 dB/oct</option><option value="24">LR4 · 24 dB/oct</option><option value="48">LR8 · 48 dB/oct</option></select>
+                  </label>
+                  <label>Sub level <span><input id="xo-subgain" class="mini" type="number" min="-12" max="12" step="0.5"> dB</span></label>
+                  <label>Sub delay <span><input id="xo-subdelay" class="mini" type="number" min="0" max="20" step="0.05"> ms</span></label>
+                  <label class="toggle"><input id="xo-invert" type="checkbox"><span>Invert sub polarity</span></label>
+                </fieldset>
+                <p class="muted small">Watch the summed curve: a dip at the crossover means the sub is out of phase. The preview mixes the sub into your speakers; the APO export routes it to a real SUB channel.</p>
+              </details>
+              <details id="al-panel" class="adv">
+                <summary>Time &amp; phase <small>speaker alignment</small></summary>
+                <div class="adv-grid">
+                  <label>Left delay <span><input id="al-delayL" data-align class="mini" type="number" min="0" max="20" step="0.01"> ms</span></label>
+                  <label>Right delay <span><input id="al-delayR" data-align class="mini" type="number" min="0" max="20" step="0.01"> ms</span></label>
+                  <label class="toggle"><input id="al-invertL" data-align type="checkbox"><span>Invert left</span></label>
+                  <label class="toggle"><input id="al-invertR" data-align type="checkbox"><span>Invert right</span></label>
+                </div>
+                <p class="small">Measure from your ears: left <input id="al-distL" class="mini" type="number" min="1" step="1" aria-label="Distance to left speaker in cm"> cm, right <input id="al-distR" class="mini" type="number" min="1" step="1" aria-label="Distance to right speaker in cm"> cm.</p>
+                <div class="row">
+                  <button id="al-compute" type="button" class="btn small">Align by distance</button>
+                  <button id="al-allpass" type="button" class="btn small ghost">Add an all-pass</button>
+                </div>
+              </details>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" id="step-listen">
+          <h2><span class="step">2</span> Listen and analyze</h2>
+          <p>Play music anywhere (Spotify, YouTube, a game), press <strong>System audio</strong> in the dock, then analyze. On a phone, use the microphone near your speaker.</p>
+          <div class="graph-wrap">
+            <canvas id="spectrum" class="graph small" aria-hidden="true"></canvas>
+            <i class="crosshair" hidden></i>
+          </div>
+          <div class="row">
+            <button id="analyze" type="button" class="btn">Analyze 20 s</button>
+            <progress id="analyze-progress" max="1" value="0" hidden></progress>
+          </div>
+          <dl id="content-stats" class="stats"></dl>
+        </article>
+
+        <article class="card" id="step-hearing">
+          <h2><span class="step">3</span> Quick hearing check <span class="tag">optional</span></h2>
+          <p>Eight soft tones get slowly louder. Press the button the moment you hear each one. Wear your headphones, pause other audio, and use a comfortable volume. It takes about a minute.</p>
+          <div class="row">
+            <button id="hearing-start" type="button" class="btn ghost">Start check</button>
+            <button id="hearing-tap" type="button" class="btn primary big" hidden>I hear it</button>
+          </div>
+          <p id="hearing-status" class="muted" aria-live="polite"></p>
+        </article>
+
+        <article class="card" id="step-hardware">
+          <h2><span class="step">4</span> Push to hardware</h2>
+          <p>Write this tuning into a DSP dongle, DAC or headphone so it follows you to any phone or PC, no app needed. Works with FiiO, Moondrop and other Walkplay-based dongles, KTMicro and Fosi Audio over USB; JDS Labs Element IV, Tanchjim Rita, Moondrop Edge, Nothing Headphone (1) and Edifier ConnectX headphones over serial or Bluetooth; Audeze Maxwell over Bluetooth LE.</p>
+          <button id="hw-enable" type="button" class="btn">Connect a device</button>
+          <p id="hw-status" class="muted small" aria-live="polite"></p>
+          <div class="extra-eq"></div>
+          <p class="muted small">Bridge: the open-source <a href="https://github.com/jeromeof/devicePEQ" target="_blank" rel="noopener">devicePEQ</a> project. Desktop Chrome or Edge. Speakers like the R1700BT have no EQ protocol; use the APO export for them.</p>
+        </article>
+
+        <article class="card wide" id="step-recs">
+          <h2>Recommendations</h2>
+          <ul id="recs" class="recs"></ul>
+          <div class="row">
+            <button id="ai-advice" type="button" class="btn">Ask the AI Sommelier</button>
+            <span class="muted">Sends a short summary (model, EQ, 30 band levels). Never audio.</span>
+          </div>
+          <div id="ai-out" aria-live="polite"></div>
+        </article>
+
+        <article class="card wide" id="step-export">
+          <div class="card-head">
+            <h2>Export</h2>
+            <span id="eq-summary" class="tag"></span>
+          </div>
+          <div class="row">
+            <button type="button" class="btn primary" data-export="apo">Download Equalizer APO config</button>
+            <button type="button" class="btn ghost" data-export="parametric">AutoEq ParametricEQ</button>
+            <button type="button" class="btn ghost" data-export="graphic">GraphicEQ (Wavelet)</button>
+            <button id="copy-eq" type="button" class="btn ghost">Copy APO config</button>
+          </div>
+          <details class="howto">
+            <summary>How to use it system-wide</summary>
+            <ul>
+              <li><strong>Windows:</strong> install <a href="https://sourceforge.net/projects/equalizerapo/" target="_blank" rel="noopener">Equalizer APO</a> and paste the APO config into its <code>config.txt</code> (or <em>Import</em> it in <a href="https://sourceforge.net/projects/peace-equalizer-apo-extension/" target="_blank" rel="noopener">Peace</a>). It is the only export that carries crossover, delay and polarity.</li>
+              <li><strong>Android:</strong> in <a href="https://play.google.com/store/apps/details?id=com.pittvandewitt.wavelet" target="_blank" rel="noopener">Wavelet</a>, open Graphic equalizer, then <em>Import</em> the GraphicEQ file.</li>
+              <li><strong>macOS:</strong> SoundSource has an AutoEq headphone EQ; or enter the parametric filters in eqMac.</li>
+              <li><strong>Linux:</strong> EasyEffects, Equalizer, then <em>Import APO preset</em>.</li>
+              <li><strong>iPhone:</strong> iOS has no system-wide parametric EQ. Use a player with EQ (e.g. Neutron) or Settings, Accessibility, Audio &amp; Visual, Headphone Accommodations.</li>
+            </ul>
+          </details>
+        </article>
+      </div>
+    </section>
+
+    <!-- ================= TUNING GUIDE ================= -->
+    <section id="view-guide" class="view" hidden>
+      <header class="g-hero">
+        <div class="g-hero-copy">
+          <p class="eyebrow">The Guide · hands on</p>
+          <h1 tabindex="-1" data-split>Tune by <em>ear.</em></h1>
+          <p class="lede">Not a manual. Grab the dial, press Listen and sweep it: every frequency has a sound, and you are about to learn all of them.</p>
+        </div>
+        <div id="mission-sweep" class="g-sweep card vng-glow"></div>
+      </header>
+
+      <section class="missions" aria-labelledby="missions-title">
+        <div class="section-intro">
+          <p class="eyebrow">Pro missions</p>
+          <h2 id="missions-title" data-split>Two real jobs. <em>Your ears</em> on the line.</h2>
+        </div>
+
+        <article class="mission card">
+          <div class="m-brief">
+            <p class="m-tag">Mission 01 · Live sound</p>
+            <h3 class="m-title">An in-ear mix for a blast-beat drummer</h3>
+            <p>Soundcheck, ten minutes to doors. The drummer's in-ear monitors are flat, and the overhead mics are drowning everything in cymbal wash. They want a kick they can feel, a snare that cracks and no boxy toms. Shape their mix with four bands.</p>
+            <ul class="m-goals">
+              <li>Kick thump: a low shelf at 70 Hz</li>
+              <li>Boxiness: a cut around 380 Hz</li>
+              <li>Snare crack: a lift at 4 kHz</li>
+              <li>Cymbal wash: a cut at 9 kHz</li>
+            </ul>
+          </div>
+          <div id="ex-iem"></div>
+          <div id="mission-iem" class="m-body"></div>
+        </article>
+
+        <article class="mission card">
+          <div class="m-brief">
+            <p class="m-tag">Mission 02 · Desk studio</p>
+            <h3 class="m-title">Blend a subwoofer with bookshelf speakers</h3>
+            <p>Small powered speakers roll off around 65 Hz, so you add an 8-inch sub under the desk, 75 cm further away than the speakers. Right now it booms in one place and vanishes in another. Make the solid line flat from 35 to 200 Hz.</p>
+            <ul class="m-goals">
+              <li>Pick a crossover frequency</li>
+              <li>Match the sub's level</li>
+              <li>Line up the timing with phase and polarity</li>
+              <li>Two different setups can work. Find one.</li>
+            </ul>
+          </div>
+          <div id="ex-speaker"></div>
+          <div id="mission-xo" class="m-body"></div>
+        </article>
+      </section>
+
+      <div class="section-intro">
+        <p class="eyebrow">The spectrum</p>
+        <h2 data-split>Twenty hertz to twenty <em>thousand.</em></h2>
+      </div>
+
+      <section id="journey" class="journey" aria-label="A journey through the spectrum">
+        <div id="j-stage" class="j-stage card vng-glow" data-live="false">
+          <div class="j-stage-head">
+            <div>
+              <p id="j-kicker" class="j-kicker"></p>
+              <h2 id="j-title" class="j-stage-title"></h2>
+            </div>
+            <ol id="j-dots" class="j-dots" aria-hidden="true"></ol>
+          </div>
+          <div id="j-graph" class="j-graph"><canvas class="j-spectrum" aria-hidden="true"></canvas></div>
+          <p class="j-legend"><span class="j-key curve"></span>EQ curve <span class="j-key spectrum"></span>Live spectrum <span id="j-ab-note" class="muted"></span></p>
+          <div class="j-progress-track" aria-hidden="true"><span id="j-progress" class="j-progress"></span></div>
+        </div>
+        <div id="j-steps" class="j-steps"></div>
+      </section>
+
+      <h2 class="handbook-title">Practice: eight hands-on lessons</h2>
+
+      <div class="coach card">
+        <ol id="coach-steps" class="coach-steps" aria-label="Lessons"></ol>
+        <div class="coach-body">
+          <div id="coach-text" class="coach-text"></div>
+          <div class="coach-viz">
+            <canvas id="viz-spectrogram" class="viz-spectrogram" role="img" aria-label="Live spectrogram: low frequencies at the bottom, high at the top"></canvas>
+            <canvas id="viz-scope" class="viz-scope" aria-hidden="true"></canvas>
+            <div id="coach-mini" class="peq-graph mini" hidden></div>
+          </div>
+        </div>
+        <div class="coach-transport">
+          <div class="seg" role="group" aria-label="Practice track">
+            <button type="button" data-track="hiphop" aria-pressed="true">808 hip-hop</button>
+            <button type="button" data-track="metal" aria-pressed="false">Black-metal blast beat</button>
+          </div>
+          <button id="coach-play" type="button" class="btn primary">Play</button>
+          <div id="coach-ab" class="seg ab" role="group" aria-label="Compare (keys A and B)">
+            <button id="ab-a" type="button" aria-pressed="true">A · original</button>
+            <button id="ab-b" type="button" aria-pressed="false">B · tuned</button>
+          </div>
+          <span class="spacer"></span>
+          <button id="coach-prev" type="button" class="btn ghost">Back</button>
+          <button id="coach-next" type="button" class="btn">Next</button>
+        </div>
+      </div>
+      <details class="handbook">
+        <summary><span class="eyebrow">Reference</span><span class="handbook-sum">The tuning handbook</span><span class="muted">Nine short chapters to keep for later</span></summary>
+
+
+      <article class="card prose reveal" id="g-range">
+        <h2>1. The range: 20 Hz to 20 kHz</h2>
+        <p>Each octave doubles the frequency: 20, 40, 80, 160, 320, 640 Hz, then 1.3, 2.6, 5.1, 10 and 20 kHz. That makes 10 octaves, and each one gets equal space on an EQ because your ear hears pitch logarithmically.</p>
+        <p>Young ears reach about 20 kHz. Most adults over 25 stop around 15 to 17 kHz, so the top octave matters less than its size suggests. The most sensitive zone is 2 to 5 kHz, where the ear canal resonates. Small changes there are very audible.</p>
+        <div class="spectrum-bar" aria-hidden="true">
+          <span>Sub-bass</span><span>Bass</span><span>Low mids</span><span>Mids</span><span>Upper mids</span><span>Presence</span><span>Brilliance</span><span>Air</span>
+        </div>
+      </article>
+
+      <article class="card prose reveal" id="g-regions">
+        <h2>2. The 8 regions and what they sound like</h2>
+        <div class="table-wrap">
+          <table class="guide-table">
+            <thead><tr><th>Range</th><th>Region</th><th>You hear</th><th>Too much</th><th>Too little</th><th>Listen</th></tr></thead>
+            <tbody>
+              <tr><td>20–60 Hz</td><td>Sub-bass</td><td>Rumble you feel: 808s, kick weight, synth drops</td><td>Boom, distortion</td><td>No weight</td><td><button type="button" class="play" data-band="40" data-label="Sub-bass · 40 Hz" aria-label="Play sub-bass"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button></td></tr>
+              <tr><td>60–250 Hz</td><td>Bass</td><td>Punch and warmth, bass guitar, kick punch</td><td>Muddy, bloated</td><td>Thin, cold</td><td><button type="button" class="play" data-band="120" data-label="Bass · 120 Hz" aria-label="Play bass"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button></td></tr>
+              <tr><td>250–500 Hz</td><td>Low mids</td><td>Body of voices and guitars</td><td>Boxy, muddy</td><td>Hollow</td><td><button type="button" class="play" data-band="350" data-label="Low mids · 350 Hz" aria-label="Play low mids"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button></td></tr>
+              <tr><td>500 Hz–2 kHz</td><td>Mids</td><td>The core of vocals and most instruments</td><td>Honky, nasal</td><td>Distant vocals</td><td><button type="button" class="play" data-band="1000" data-label="Mids · 1 kHz" aria-label="Play mids"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button></td></tr>
+              <tr><td>2–4 kHz</td><td>Upper mids</td><td>Clarity and attack; the ear's most sensitive zone</td><td>Shouty, fatiguing</td><td>Dull, veiled</td><td><button type="button" class="play" data-band="3000" data-label="Upper mids · 3 kHz" aria-label="Play upper mids"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button></td></tr>
+              <tr><td>4–6 kHz</td><td>Presence</td><td>Definition, guitar bite, consonants</td><td>Harsh edges</td><td>Lifeless</td><td><button type="button" class="play" data-band="5000" data-label="Presence · 5 kHz" aria-label="Play presence"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button></td></tr>
+              <tr><td>6–10 kHz</td><td>Brilliance</td><td>"S" sounds, cymbals, hi-hats</td><td>Sibilant, splashy</td><td>Dark</td><td><button type="button" class="play" data-band="8000" data-label="Brilliance · 8 kHz" aria-label="Play brilliance"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button></td></tr>
+              <tr><td>10–20 kHz</td><td>Air</td><td>Sparkle and sense of space</td><td>Brittle, hiss</td><td>Closed-in</td><td><button type="button" class="play" data-band="14000" data-label="Air · 14 kHz" aria-label="Play air"><svg class="icon" aria-hidden="true"><use href="#i-play"/></svg></button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card prose reveal" id="g-layouts">
+        <h2>3. How many bands? The common layouts</h2>
+        <p>A <strong>graphic EQ</strong> has fixed bands you only raise or lower. More bands means finer control. Tap a band to hear it.</p>
+        <h3>5 bands: Android's built-in equalizer</h3>
+        <div class="band-chips">
+          <button type="button" data-band="60">60 Hz</button><button type="button" data-band="230">230 Hz</button><button type="button" data-band="910">910 Hz</button><button type="button" data-band="3600">3.6 kHz</button><button type="button" data-band="14000">14 kHz</button>
+        </div>
+        <h3>6 bands: Spotify's equalizer</h3>
+        <div class="band-chips">
+          <button type="button" data-band="60" data-label="Spotify 60 Hz">60 Hz</button><button type="button" data-band="150">150 Hz</button><button type="button" data-band="400">400 Hz</button><button type="button" data-band="1000" data-label="Spotify 1 kHz">1 kHz</button><button type="button" data-band="2400">2.4 kHz</button><button type="button" data-band="15000">15 kHz</button>
+        </div>
+        <h3>10 bands: one per octave (ISO standard, most DSPs and apps)</h3>
+        <div class="band-chips">
+          <button type="button" data-band="31.5" data-label="ISO 31 Hz">31</button><button type="button" data-band="63" data-label="ISO 63 Hz">63</button><button type="button" data-band="125" data-label="ISO 125 Hz">125</button><button type="button" data-band="250" data-label="ISO 250 Hz">250</button><button type="button" data-band="500" data-label="ISO 500 Hz">500</button><button type="button" data-band="1000" data-label="ISO 1 kHz">1k</button><button type="button" data-band="2000" data-label="ISO 2 kHz">2k</button><button type="button" data-band="4000" data-label="ISO 4 kHz">4k</button><button type="button" data-band="8000" data-label="ISO 8 kHz">8k</button><button type="button" data-band="16000" data-label="ISO 16 kHz">16k</button>
+        </div>
+        <h3>31 bands: one per third-octave (studio and live sound)</h3>
+        <p class="mono small">20 · 25 · 31.5 · 40 · 50 · 63 · 80 · 100 · 125 · 160 · 200 · 250 · 315 · 400 · 500 · 630 · 800 · 1k · 1.25k · 1.6k · 2k · 2.5k · 3.15k · 4k · 5k · 6.3k · 8k · 10k · 12.5k · 16k · 20k</p>
+        <p>A <strong>parametric EQ</strong> has no fixed bands: you place each filter anywhere. Five to ten parametric filters usually beat 31 graphic bands, which is why AutoEq, Equalizer APO, Qudelix and most DSPs use them.</p>
+      </article>
+
+      <article class="card prose reveal" id="g-pq">
+        <h2>4. Parametric EQ: frequency, gain, Q</h2>
+        <dl class="defs">
+          <dt>Frequency (Fc)</dt><dd>Where the filter acts, in Hz.</dd>
+          <dt>Gain</dt><dd>How much it boosts (+) or cuts (−), in dB. +6 dB is roughly twice the acoustic pressure, and sounds clearly louder.</dd>
+          <dt>Q</dt><dd>How wide the filter is. Higher Q is narrower. Q 0.7 spans about 2 octaves (broad, musical); Q 1.4 is 1 octave; Q 4.3 is a third of an octave; Q 6 or more is surgical, for one resonance.</dd>
+        </dl>
+        <div class="table-wrap">
+          <table class="guide-table">
+            <thead><tr><th>Filter type</th><th>Shorthand</th><th>What it does</th><th>Typical use</th></tr></thead>
+            <tbody>
+              <tr><td>Peak (bell)</td><td>PK</td><td>Raises or lowers a bump around Fc</td><td>Fix a peak, add presence</td></tr>
+              <tr><td>Low shelf</td><td>LSC / LS</td><td>Moves everything below Fc</td><td>Bass to taste (around 105 Hz, Q 0.7)</td></tr>
+              <tr><td>High shelf</td><td>HSC / HS</td><td>Moves everything above Fc</td><td>Treble or air (around 10 kHz)</td></tr>
+              <tr><td>High-pass</td><td>HPF</td><td>Removes what is below Fc</td><td>Protect small speakers from deep bass</td></tr>
+              <tr><td>Low-pass</td><td>LPF</td><td>Removes what is above Fc</td><td>Subwoofer crossover</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card prose reveal" id="g-preamp">
+        <h2>5. Preamp: why every boost needs a cut</h2>
+        <p>Digital audio cannot go above 0 dBFS. If a song already peaks near 0 and you boost 6 dB of bass, it clips and crackles. The fix is a <strong>preamp</strong> equal to your largest boost: +6 dB peak means −6 dB preamp. The Tuning Lab computes this for you.</p>
+        <p>The cut makes things a bit quieter, so turn the volume up. It's also why cutting what's too loud usually beats boosting what's too quiet.</p>
+      </article>
+
+      <article class="card prose reveal" id="g-steps">
+        <h2>6. Step by step</h2>
+        <ol class="steps">
+          <li><strong>Fix the fit first.</strong> An IEM tip one size too small can lose 10 dB of bass. No EQ fixes a bad seal.</li>
+          <li><strong>Fix your volume.</strong> Louder always sounds "better", so keep it the same while comparing.</li>
+          <li><strong>Load a measured correction</strong> for your exact model (Tuning Lab, step 1). This brings it close to a research-backed target.</li>
+          <li><strong>Set the preamp</strong> to the largest boost.</li>
+          <li><strong>Bass to taste</strong> with a low shelf at about 105 Hz, in 1 dB steps.</li>
+          <li><strong>Treble to taste</strong> with a high shelf at about 10 kHz, or tame one harsh peak with a narrow cut (Q 3 to 6) between 5 and 9 kHz.</li>
+          <li><strong>Fix specific problems:</strong> mud at 200–400 Hz, shout at 2–4 kHz, sibilance at 5–9 kHz.</li>
+          <li><strong>Compare level-matched</strong> with the EQ switch in the dock, and live with it for a day before changing more.</li>
+          <li><strong>Save presets</strong> per device, and per genre if you like.</li>
+        </ol>
+      </article>
+
+      <article class="card prose reveal" id="g-devices">
+        <h2>7. Tuning by device</h2>
+        <div class="cards two">
+          <section><h3>IEMs</h3><p>Seal is everything; try every tip size. Peaks between 6 and 10 kHz differ from ear to ear, so use narrow cuts and trust your ears over the graph. Sensitive IEMs can hiss, so lower the source gain.</p></section>
+          <section><h3>Earbuds and TWS (AirPods, Galaxy Buds)</h3><p>They already run their own DSP; AirPods use Adaptive EQ. ANC on, off, and transparency each sound different, so use the matching profile (AutoEq has several for AirPods Pro 2).</p></section>
+          <section><h3>Over-ear headphones</h3><p>Worn pads and glasses leak bass. Open-backs roll off in the sub-bass; boost it gently, because large boosts push the driver into distortion.</p></section>
+          <section><h3>Desk speakers</h3><p>Placement first: an equilateral triangle, tweeters at ear height, away from walls. Below about 300 Hz the room dominates. Cut room peaks; never boost dips, they won't fill. Measure with a microphone and REW.</p></section>
+          <section><h3>Hardware DSPs and dongles</h3><p>Qudelix 5K, FiiO BTR/K-series and miniDSP store a parametric EQ on the device, so it follows you to any phone or PC. Enter the same filters the Lab exports.</p></section>
+          <section><h3>Targets</h3><p>Harman over-ear (2018) and Harman in-ear (2019) are the research-based "most people prefer this" curves. Diffuse field is flatter and more neutral. AutoEq defaults to Harman.</p></section>
+        </div>
+      </article>
+
+      <article class="card prose reveal" id="g-tools">
+        <h2>8. Where to apply your EQ</h2>
+        <div class="table-wrap">
+          <table class="guide-table">
+            <thead><tr><th>Platform</th><th>Tool</th><th>Import format</th></tr></thead>
+            <tbody>
+              <tr><td>Windows</td><td>Equalizer APO + Peace</td><td>ParametricEQ.txt</td></tr>
+              <tr><td>macOS</td><td>SoundSource, eqMac</td><td>AutoEq built in / manual filters</td></tr>
+              <tr><td>Linux</td><td>EasyEffects</td><td>APO preset (ParametricEQ.txt)</td></tr>
+              <tr><td>Android</td><td>Wavelet, Poweramp</td><td>GraphicEQ.txt</td></tr>
+              <tr><td>iOS</td><td>Player apps with EQ; Headphone Accommodations</td><td>Manual</td></tr>
+              <tr><td>Hardware</td><td>Qudelix, FiiO, miniDSP apps</td><td>Manual parametric filters</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+
+      <article class="card prose reveal" id="g-mistakes">
+        <h2>9. Common mistakes</h2>
+        <ul>
+          <li><strong>The "smile" curve</strong>: big bass and treble boosts with scooped mids. Exciting for a minute, fatiguing after an hour.</li>
+          <li><strong>Boosting more than 6 dB</strong> anywhere. It adds distortion and needs a big preamp cut.</li>
+          <li><strong>Skipping the preamp</strong>, which gives quiet crackles on loud songs.</li>
+          <li><strong>A/B tests at different volumes.</strong> The louder side always wins.</li>
+          <li><strong>EQing around a bad fit</strong> instead of changing tips or pads.</li>
+          <li><strong>Chasing the graph</strong> above 8 kHz with IEMs, where measurements and real ears differ most.</li>
+        </ul>
+        <p><a class="btn primary" href="#/lab">Try it in the Tuning Lab</a></p>
+      </article>
+      </details>
+    </section>
+    <!-- ================= HISTORY ================= -->
+    <section id="view-history" class="view" hidden>
+      <header class="tl-hero">
+        <p class="eyebrow">1877 — 2026 · Ten stops</p>
+        <h1 tabindex="-1" data-split>Every sound has a <em>history.</em></h1>
+        <p class="lede">From a needle scratching tinfoil to an 808 shaking a car: how recorded sound grew up, and what each era actually sounded like. Put on headphones and press <strong>Hear it</strong> at any stop.</p>
+        <p class="tl-cue" aria-hidden="true"><span></span>Scroll to travel through time</p>
+      </header>
+
+      <section id="tl" class="tl" aria-label="Timeline of recorded sound">
+        <canvas id="tl-gl" class="tl-gl" aria-hidden="true"></canvas>
+        <div class="tl-hud" aria-hidden="true">
+          <p class="tl-count"><span id="tl-index">01</span> / <span id="tl-total">10</span></p>
+          <p id="tl-place" class="tl-place"></p>
+        </div>
+        <p class="tl-year" aria-hidden="true"><span id="tl-year">1877</span></p>
+        <div id="tl-track" class="tl-track"></div>
+        <div class="tl-rail-wrap">
+          <div class="tl-progress-track" aria-hidden="true"><span id="tl-progress" class="tl-progress"></span></div>
+          <nav id="tl-rail" class="tl-rail" aria-label="Jump to an era"></nav>
+        </div>
+      </section>
+
+      <section class="tl-outro">
+        <h2 data-split>The next era is <em>yours.</em></h2>
+        <p class="lede">Every stop on this timeline was shaped by its medium. Today the medium is transparent, so the last variable is your headphones and your ears.</p>
+        <div class="row">
+          <a class="btn primary" href="#/lab">Tune your sound</a>
+          <a class="text-link" href="#/guide">Learn by ear first</a>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer id="dock" class="dock glass" data-live="false">
+    <div class="dock-status">
+      <span class="meter" aria-hidden="true"><i class="b"></i><i class="m"></i><i class="h"></i></span>
+      <div>
+        <strong id="dock-label">Silent</strong>
+        <small id="dock-note"></small>
+      </div>
+    </div>
+    <div class="dock-sources" role="group" aria-label="Sound source">
+      <button type="button" class="chip-btn" data-source="system" aria-pressed="false">System audio</button>
+      <button type="button" class="chip-btn" data-source="mic" aria-pressed="false">Microphone</button>
+      <button type="button" class="chip-btn" data-source="file" aria-pressed="false">Play a file</button>
+      <button type="button" class="chip-btn" data-source="pink" aria-pressed="false">Pink noise</button>
+      <button type="button" id="dock-stop" class="chip-btn icon-only" aria-label="Stop sound"><svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg></button>
+    </div>
+    <label class="switch">
+      <input id="eq-toggle" type="checkbox" checked>
+      <span>EQ</span>
+    </label>
+  </footer>
+
+  <dialog id="bag-sheet" class="sheet" aria-labelledby="bag-title">
+    <header class="sheet-head">
+      <h2 id="bag-title">Your bag</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close bag"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </header>
+    <div id="bag-body" class="sheet-body"></div>
+    <footer id="bag-foot" class="sheet-foot"></footer>
+  </dialog>
+  <dialog id="fav-sheet" class="sheet" aria-labelledby="fav-title">
+    <header class="sheet-head">
+      <h2 id="fav-title">Favourites</h2>
+      <button type="button" class="icon-btn" data-close aria-label="Close favourites"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </header>
+    <div id="fav-body" class="sheet-body"></div>
+  </dialog>
+
+  <dialog id="quick-view" class="qv" aria-labelledby="qv-title">
+    <button type="button" class="icon-btn qv-close" data-close aria-label="Close quick view"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+    <div id="qv-body" class="qv-body"></div>
+  </dialog>
+
+  <input id="file-input" type="file" accept="audio/*" hidden>
+  <div id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

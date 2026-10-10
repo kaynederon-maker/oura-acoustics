@@ -1,0 +1,98 @@
+{
+  "phonograph": {
+    "title": "File:Edison and phonograph edit1.jpg",
+    "author": "Levin C. Handy (per http://hdl.loc.gov/loc.pnp/cwpbh.04326)",
+    "license": "Public domain",
+    "source": "https://commons.wikimedia.org/wiki/File:Edison_and_phonograph_edit1.jpg",
+    "size": [
+      794,
+      1000
+    ]
+  },
+  "ribbon": {
+    "title": "File:RCA 44-A Velocity Microphone.jpg",
+    "author": "Roadside Guitars",
+    "license": "CC BY-SA 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:RCA_44-A_Velocity_Microphone.jpg",
+    "size": [
+      487,
+      1000
+    ]
+  },
+  "vinyl": {
+    "title": "File:Groove and needle in close embrace from beginning to end.jpg",
+    "author": "Franz van Duns",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Groove_and_needle_in_close_embrace_from_beginning_to_end.jpg",
+    "size": [
+      1000,
+      400
+    ]
+  },
+  "tape": {
+    "title": "File:Studer J37 4-track tape recorder (1964-1972), Abbey Road Studios.jpg",
+    "author": "Josephenus P. Riley",
+    "license": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Studer_J37_4-track_tape_recorder_(1964-1972),_Abbey_Road_Studios.jpg",
+    "size": [
+      1000,
+      773
+    ]
+  },
+  "cd": {
+    "title": "File:Rainbow from CD Part.jpg",
+    "author": "Vahram Mekhitarian",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Rainbow_from_CD_Part.jpg",
+    "size": [
+      1000,
+      592
+    ]
+  },
+  "shoegaze": {
+    "title": "File:My Bloody Valentine - Manchester 2013.jpg",
+    "author": "Martie Donohoe",
+    "license": "CC BY-SA 3.0",
+    "source": "https://commons.wikimedia.org/wiki/File:My_Bloody_Valentine_-_Manchester_2013.jpg",
+    "size": [
+      1000,
+      601
+    ]
+  },
+  "ipod": {
+    "title": "File:IPod classic 80 GB (A1238, YMV)-2.jpg",
+    "author": "Raimond Spekking",
+    "license": "CC BY-SA 4.0",
+    "source": "https://commons.wikimedia.org/wiki/File:IPod_classic_80_GB_(A1238,_YMV)-2.jpg",
+    "size": [
+      1000,
+      563
+    ]
+  },
+  "blackgaze": {
+    "title": "File:Deafheaven - Live 2013.jpg",
+    "author": "saul torres",
+    "license": "CC BY-SA 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Deafheaven_-_Live_2013.jpg",
+    "size": [
+      1000,
+      667
+    ]
+  },
+  "trap": {
+    "title": "File:Roland TR-808 Rhythm Composer.jpg",
+    "author": "fr4dd",
+    "license": "CC BY 2.0",
+    "source": "https://commons.wikimedia.org/wiki/File:Roland_TR-808_Rhythm_Composer.jpg",
+    "size": [
+      1000,
+      667
+    ]
+  },
+  "now": {
+    "title": "Moondrop Blessing 3 product photo",
+    "author": "Moondrop (retailer press image)",
+    "license": "Product photo, see public/products/sources.json",
+    "source": ""
+  }
+}

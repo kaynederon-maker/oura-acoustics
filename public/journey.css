@@ -1,0 +1,65 @@
+/* Tuning Guide journey: sticky analyzer stage beside long scrolling chapters. */
+.journey {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  gap: 48px;
+  align-items: start;
+  margin: 8px 0 72px;
+}
+.j-stage {
+  position: sticky;
+  top: 92px;
+  order: 2;
+  display: grid;
+  gap: 10px;
+  padding: 22px 22px 18px;
+}
+.j-stage-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.j-kicker { margin: 0; color: var(--accent); font: 600 13px var(--font-ui); letter-spacing: 0.08em; text-transform: uppercase; font-variant-numeric: tabular-nums; }
+.j-stage-title { margin: 2px 0 0; font-size: clamp(26px, 3vw, 38px); }
+.j-dots { display: flex; gap: 6px; list-style: none; margin: 8px 0 0; padding: 0; }
+.j-dots li { width: 8px; height: 8px; border-radius: 50%; background: var(--hairline); transition: background-color 300ms ease, transform 300ms var(--ease-out); }
+.j-dots li.on { background: var(--accent); transform: scale(1.35); }
+
+.j-graph { position: relative; height: clamp(220px, 34vh, 340px); border-radius: var(--radius-md); background: var(--well); overflow: hidden; }
+.j-spectrum, .j-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.j-spectrum { opacity: 0.6; }
+.j-region { fill: var(--accent); opacity: 0; transition: opacity 500ms ease; }
+.j-region.on { opacity: 0.12; }
+.j-curve { fill: none; stroke: var(--plot-2); stroke-width: 3; stroke-linecap: round; filter: drop-shadow(0 0 8px color-mix(in srgb, var(--plot-2) 50%, transparent)); }
+.j-region-label { fill: var(--text-hi); font: 600 13px var(--font-ui); text-anchor: middle; opacity: 0.8; }
+.j-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; margin: 0; font-size: 13px; color: var(--text-lo); }
+.j-key { display: inline-block; width: 18px; height: 3px; border-radius: 2px; }
+.j-key.curve { background: var(--plot-2); }
+.j-key.spectrum { height: 10px; background: linear-gradient(var(--plot-1), transparent); }
+#j-ab-note { flex-basis: 100%; }
+.j-progress-track { height: 3px; border-radius: 2px; background: var(--hairline); overflow: hidden; }
+.j-progress { display: block; height: 100%; background: var(--accent); transform: scaleX(0); transform-origin: left; }
+
+.j-steps { order: 1; display: grid; }
+.j-step { min-height: 92vh; padding: 12vh 0; display: grid; align-content: center; gap: 12px; }
+.j-step:first-child { padding-top: 0; min-height: 80vh; }
+.j-figure { position: relative; margin: 0 0 12px; aspect-ratio: 3 / 2; border-radius: var(--radius-lg); overflow: hidden; background: var(--well); }
+.j-figure img { width: 100%; height: 100%; object-fit: cover; display: block; will-change: transform; }
+#j-presence .j-figure img, #j-loudness .j-figure img { object-fit: contain; background: #fff; }
+.j-figure figcaption {
+  position: absolute; right: 10px; bottom: 10px; padding: 3px 8px; border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55); color: #fff; font-size: 11px;
+}
+.j-step-title { margin: 0; font-size: clamp(32px, 4.4vw, 54px); line-height: 1.02; }
+.j-lede { margin: 0; font-size: 18px; line-height: 1.6; color: var(--text-body); max-width: 52ch; }
+.j-tip { margin: 0; padding: 12px 16px; border-left: 3px solid var(--accent); border-radius: 0 12px 12px 0; background: var(--well); color: var(--text-body); max-width: 52ch; }
+.j-player { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 6px; }
+.j-player .j-ab-text { flex-basis: 100%; margin: 0; }
+.j-play.on { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent); }
+
+@media (max-width: 900px) {
+  .journey { grid-template-columns: 1fr; gap: 0; }
+  .j-stage { order: 0; top: 124px; z-index: 5; padding: 12px 14px; gap: 6px; background: color-mix(in srgb, var(--card) 92%, transparent); backdrop-filter: blur(10px); }
+  .j-stage-title { font-size: 22px; }
+  .j-graph { height: 150px; }
+  .j-legend { display: none; }
+  .j-step { min-height: auto; padding: 48px 0; }
+  .j-step-title { font-size: 32px; }
+  .j-lede { font-size: 16px; }
+}
