@@ -1,0 +1,300 @@
+{
+  "edifier-r1280t": {
+    "page": "https://www.edifier.com/global/p/bookshelf-speakers/r1280t",
+    "image": "https://new-edifier-us-oss.edifier.com/images/20221114/4e0349e4ae92c0bd1c8d0d89e9e30c30.png",
+    "size": [
+      800,
+      800
+    ]
+  },
+  "edifier-r1700bt": {
+    "page": "https://www.edifier.com/global/p/bookshelf-speakers/r1700bt",
+    "image": "https://new-edifier-us-oss.edifier.com/images/20221114/68cd9243dd573f942af5fb75c5dbd676.png",
+    "size": [
+      800,
+      800
+    ]
+  },
+  "edifier-mr4": {
+    "page": "https://www.edifier.com/global/p/studio-monitors/mr4",
+    "image": "https://new-edifier-us-oss.edifier.com/images/20240910/5e8e69f21bc50cf0e822f6e366ad209f.png",
+    "size": [
+      800,
+      800
+    ]
+  },
+  "sonos-era-100": {
+    "page": "https://www.rtings.com/speaker/reviews/sonos/era-100",
+    "image": "https://i.rtings.com/assets/products/2zldlntt/sonos-era-100/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "jbl-charge-5": {
+    "page": "https://www.rtings.com/speaker/reviews/jbl/charge-5",
+    "image": "https://i.rtings.com/assets/products/sVaiMndk/jbl-charge-5/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "marshall-stanmore-iii": {
+    "page": "https://www.marshall.com/us/en/product/stanmore-iii",
+    "image": "https://images.ctfassets.net/javen7msabdh/5LOAFWVpiW6lzYx5Kva89z/16046df6b06376f322bc253117ad4977/stanmore_iii-front-desktop-1.jpeg",
+    "size": [
+      800,
+      800
+    ]
+  },
+  "bose-soundlink-flex": {
+    "page": "https://www.rtings.com/speaker/reviews/bose/soundlink-flex",
+    "image": "https://i.rtings.com/assets/products/y8VC5NUj/bose-soundlink-flex/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "sony-wh-1000xm5": {
+    "page": "https://www.rtings.com/headphones/reviews/sony/wh-1000xm5-wireless",
+    "image": "https://i.rtings.com/assets/products/Nc33W9lA/sony-wh-1000xm5-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "airpods-max": {
+    "page": "https://www.rtings.com/headphones/reviews/apple/airpods-max-wireless",
+    "image": "https://i.rtings.com/assets/products/dlbLQ8NA/apple-airpods-max-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "beats-studio-pro": {
+    "page": "https://www.rtings.com/headphones/reviews/beats/studio-pro-wireless",
+    "image": "https://i.rtings.com/assets/products/eX8xwK7x/beats-studio-pro-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "bose-qc-ultra": {
+    "page": "https://www.rtings.com/headphones/reviews/bose/quietcomfort-ultra-headphones",
+    "image": "https://i.rtings.com/assets/products/og42voeg/bose-quietcomfort-ultra-headphones-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "sennheiser-hd-600": {
+    "page": "https://www.rtings.com/headphones/reviews/sennheiser/hd-600",
+    "image": "https://i.rtings.com/assets/products/Tlv3KCRp/sennheiser-hd-600/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "sennheiser-momentum-4": {
+    "page": "https://www.rtings.com/headphones/reviews/sennheiser/momentum-4-wireless",
+    "image": "https://i.rtings.com/assets/products/0DyKny4w/sennheiser-momentum-4-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "audio-technica-ath-m50x": {
+    "page": "https://www.rtings.com/headphones/reviews/audio-technica/ath-m50x",
+    "image": "https://i.rtings.com/assets/products/alQiTBPT/audio-technica-ath-m50x/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "airpods-pro-2": {
+    "page": "https://www.rtings.com/headphones/reviews/apple/airpods-pro-2nd-generation-truly-wireless",
+    "image": "https://i.rtings.com/assets/products/s8HlCeNR/apple-airpods-pro-2nd-generation-truly-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "airpods-4": {
+    "page": "https://www.rtings.com/headphones/reviews/apple/airpods-4-truly-wireless",
+    "image": "https://i.rtings.com/assets/products/h1MqJUpy/apple-airpods-4-truly-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "sony-wf-1000xm5": {
+    "page": "https://www.rtings.com/headphones/reviews/sony/wf-1000xm5-truly-wireless",
+    "image": "https://i.rtings.com/assets/products/c93aW5Hs/sony-wf-1000xm5-truly-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "galaxy-buds3-pro": {
+    "page": "https://www.rtings.com/headphones/reviews/samsung/galaxy-buds3-pro-truly-wireless",
+    "image": "https://i.rtings.com/assets/products/sUyvKh2O/samsung-galaxy-buds3-pro-truly-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "nothing-ear": {
+    "page": "https://www.rtings.com/headphones/reviews/nothing/ear-truly-wireless",
+    "image": "https://i.rtings.com/assets/products/Ww81hUMY/nothing-ear-truly-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "beats-solo-4": {
+    "page": "https://www.rtings.com/headphones/reviews/beats/solo-4-wireless",
+    "image": "https://i.rtings.com/assets/products/IH2maBNJ/beats-solo-4-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "edifier-s1000mkii": {
+    "page": "https://www.edifier.com/global/p/bookshelf-speakers/s1000mkii",
+    "image": "https://new-edifier-us-oss.edifier.com/images/20221201/a851b68836bab980f91a1f7d3ecac7b1.png",
+    "size": [
+      800,
+      800
+    ]
+  },
+  "beats-fit-pro": {
+    "page": "https://www.rtings.com/headphones/reviews/beats/fit-pro-true-wireless",
+    "image": "https://i.rtings.com/assets/products/eP1P8PhP/beats-fit-pro-true-wireless/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "sennheiser-ie-200": {
+    "page": "https://www.rtings.com/headphones/reviews/sennheiser/ie-200",
+    "image": "https://i.rtings.com/assets/products/UnAFlPOG/sennheiser-ie-200/design-medium.jpg?format=auto",
+    "size": [
+      800,
+      374
+    ],
+    "cropped": "top 17% (watermark)"
+  },
+  "moondrop-blessing-3": {
+    "page": "https://www.ple.com.au/products/685576/moondrop-blessing-3-2dd-4ba-hybrid-wired-iem-in-ear-monitor-headphones",
+    "image": "https://plecom.imgix.net/iil-473430-685576.jpg?w=600&h=600",
+    "size": [
+      600,
+      600
+    ]
+  },
+  "truthear-hexa": {
+    "page": "https://truthear.com/products/hexa",
+    "image": "https://cdn.prod.website-files.com/63bcdfa5158ffcd72a7a8d8e/647560ee03a904b42ae5e301_DM_20230530103500_006.JPEG",
+    "size": [
+      800,
+      800
+    ]
+  },
+  "moondrop-aria-2": {
+    "page": "https://apos.audio/products/moondrop-aria-2-iems",
+    "image": "https://apos.audio/cdn/shop/files/apos-audio-moondrop-earphone-in-ear-monitor-iem-moondrop-aria-2-iems-39332421075180.jpg?v=1741111586&width=1200",
+    "size": [
+      800,
+      533
+    ]
+  },
+  "jds-element-iv": {
+    "page": "https://jdslabs.com/product/element-iv/",
+    "image": "https://jdslabs.com/media/cache/43/02/4302a7fb34a39c935136a30b000048ca.jpg",
+    "size": [
+      600,
+      450
+    ]
+  },
+  "topping-dx5-ii": {
+    "page": "https://www.toppingaudio.com/product-item/dx5-ii",
+    "image": "http://upload.toppingaudio.com/pics/2025/77/1f/E9s6TdMKfinxHfVlyCtr7W583Ft0s2jBi93GMamI.webp",
+    "size": [
+      800,
+      450
+    ]
+  },
+  "yamaha-hs5": {
+    "page": "https://usa.yamaha.com/products/proaudio/speakers/hs_series/index.html",
+    "image": "https://usa.yamaha.com/files/HS5-7-8-8s-banner-ogp-1200x630_d7fc977f84d514481c7d9bc1d06ed223.png",
+    "size": [
+      800,
+      420
+    ]
+  },
+  "focusrite-scarlett-2i2": {
+    "page": "https://focusrite.com/products/scarlett-2i2",
+    "image": "https://cdn11.bigcommerce.com/s-7exlzlf13h/products/307/images/785/scarlett-2i2-top-image-2400-2400__78159.1693324453.386.513.png?c=3",
+    "size": [
+      386,
+      386
+    ]
+  },
+  "motu-m2": {
+    "page": "https://motu.com/en-us/products/m-series/m2/",
+    "image": "https://cdn-data.motu.com/django_prod/resources/motu-logo-og-thumb.png",
+    "size": [
+      800,
+      420
+    ]
+  },
+  "audient-id4": {
+    "page": "https://audient.com/products/audio-interfaces/id4/",
+    "image": "https://audient.com/wp-content/uploads/2025/03/iD4-Mark-II-Logo-White-Crop.png",
+    "size": [
+      800,
+      352
+    ]
+  },
+  "apple-usb-c-dongle": {
+    "page": "https://www.apple.com/shop/product/MW2Q3AM/A/usb-c-to-35-mm-headphone-jack-adapter",
+    "image": "https://store.storeimages.cdn-apple.com/1/as-images.apple.com/is/MU7E2?wid=1200&hei=630&fmt=jpeg&qlt=95&.v=1539385665732",
+    "size": [
+      800,
+      420
+    ]
+  },
+  "presonus-eris-3-5": {
+    "page": "https://www.fender.com/en-GB/presonus-eris-e3.5-studiomonitor/2777504101.html",
+    "image": "https://cdn.shopify.com/s/files/1/0894/4055/1199/files/fender-og-1.jpg?v=1791228125",
+    "size": [
+      800,
+      420
+    ]
+  },
+  "qudelix-5k": {
+    "page": "https://www.qudelix.com/",
+    "image": "http://www.qudelix.com/cdn/shop/files/Qudelix_Logo_Black_300DPI_49fa5bbc-4268-41b0-add8-656d402f65f7.png?v=1590989240",
+    "size": [
+      800,
+      216
+    ]
+  }
+}
