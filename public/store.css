@@ -128,7 +128,7 @@
 }
 /* Studio sweep for cut-out product shots; multiply melts their white backgrounds into it. */
 .fit-contain { background: radial-gradient(120% 90% at 50% 30%, #ffffff, #e9e6e1); }
-.fit-contain img { object-fit: contain; padding: 9%; mix-blend-mode: multiply; }
+.fit-contain img { object-fit: contain; padding: 2%; mix-blend-mode: multiply; } /* images carry their own margin */
 
 .badge {
   position: absolute;
@@ -188,10 +188,10 @@
 .crumbs { display: flex; gap: 8px; align-items: center; padding: 32px 0 18px; font-size: 14px; color: var(--text-lo); }
 .crumbs a { color: var(--text-lo); }
 .product-page { display: grid; grid-template-columns: 1.1fr 1fr; gap: clamp(28px, 4vw, 56px); align-items: start; }
-.product-hero { position: sticky; top: 100px; padding: 10px; aspect-ratio: 1; overflow: hidden; }
+.product-hero { position: sticky; top: 100px; padding: 10px; aspect-ratio: 4 / 3; overflow: hidden; } /* all product images are 4:3 */
 .product-hero img { border-radius: 20px; }
-.product-hero.fit-contain img { padding: 12%; }
-.product-hero.fit-cover { aspect-ratio: 4 / 3; } /* photos are 16:9-ish; a square frame would upscale them */
+.product-hero.fit-contain img { padding: 3%; }
+
 .product-detail h1 { font-size: clamp(36px, 4.4vw, 56px); margin: 4px 0 8px; }
 .product-detail .price { font-size: 28px; }
 .product-detail .lede { margin: 6px 0 22px; }
@@ -279,7 +279,7 @@
 .line { display: grid; grid-template-columns: 76px 1fr auto; gap: 14px; align-items: center; padding: 14px 0; border-bottom: 1px solid var(--grid); }
 .line-media { display: block; width: 76px; height: 76px; border-radius: 14px; overflow: hidden; background: var(--well); }
 .line-media.fit-contain { background: radial-gradient(120% 90% at 50% 30%, #ffffff, #e9e6e1); }
-.line-media.fit-contain img { padding: 8%; }
+.line-media.fit-contain img { padding: 2%; }
 html:has(dialog.sheet[open]) { overflow: hidden; } /* keep the page still behind an open sheet */
 .line-info { display: grid; gap: 8px; justify-items: start; min-width: 0; }
 .line-name { color: var(--text-hi); text-decoration: none; font-weight: 500; line-height: 1.3; }
@@ -401,7 +401,7 @@ html:has(dialog.sheet[open]) { overflow: hidden; } /* keep the page still behind
 .qv-media { position: relative; min-height: 320px; background: var(--well); }
 .qv-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .qv-media.fit-contain { background: radial-gradient(120% 90% at 50% 30%, #ffffff, #e9e6e1); }
-.qv-media.fit-contain img { object-fit: contain; padding: 10%; mix-blend-mode: multiply; }
+.qv-media.fit-contain img { object-fit: contain; padding: 4%; mix-blend-mode: multiply; }
 .qv-info { overflow-y: auto; padding: 32px 32px 28px; overscroll-behavior: contain; }
 .qv-info h2 { margin: 2px 0 6px; font-size: clamp(26px, 3vw, 34px); padding-right: 40px; }
 .qv-blurb { color: var(--text-body); line-height: 1.55; }

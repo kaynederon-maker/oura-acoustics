@@ -34,7 +34,7 @@ function save() {
 function media(p, { eager = false } = {}) {
   return h('img', {
     src: imgSrc(p), alt: `${p.brand} ${p.name}`, loading: eager ? 'eager' : 'lazy', decoding: 'async',
-    width: '800', height: p.fit === 'contain' ? '800' : '450',
+    width: '1200', height: '900', // every product image is reframed to 4:3 (see products/sources.json)
   });
 }
 

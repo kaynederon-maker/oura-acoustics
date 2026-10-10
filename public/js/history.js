@@ -75,7 +75,7 @@ const ERAS = [
     text: 'Producers like Lex Luger and Metro Boomin tune the TR-808 kick into the bass line itself: long, gliding sub notes under rattling hi-hat rolls. The song now lives below 60 Hz, so your headphones\' bass suddenly matters.',
     facts: { Signature: '808 bass, hi-hat rolls', 'Key range': '30 – 60 Hz sub', Tempo: '≈ 140 BPM, half-time' },
     filters: [B('LSC', 60, 8, 0.71), B('PK', 300, -3, 1), B('HSC', 10000, 3, 0.71)],
-    credit: 'Photo: fr4dd, CC BY 2.0',
+    credit: 'Photo: Brandon Daniel / Clusternote, CC BY-SA 2.0',
   },
   {
     year: 2026, place: 'Everywhere · Personal', title: 'Your sound', img: 'now', track: 'hiphop', personal: true,
