@@ -52,7 +52,8 @@ const SECURITY_HEADERS = {
 
 function send(res, status, body, type = 'application/json') {
   res.writeHead(status, { 'content-type': type, ...SECURITY_HEADERS });
-  res.end(type === 'application/json' ? JSON.stringify(body) : body);
+  const raw = Buffer.isBuffer(body) || typeof body === 'string';
+  res.end(type === 'application/json' && !raw ? JSON.stringify(body) : body);
 }
 
 async function readJson(req) {
