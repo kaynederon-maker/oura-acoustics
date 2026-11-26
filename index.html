@@ -202,10 +202,12 @@
 
     <!-- ================= STORE ================= -->
     <section id="view-store" class="view" hidden>
-      <header class="page-head">
-        <h1 tabindex="-1" data-split>The listening <em>room</em></h1>
+      <header class="page-head store-head">
+        <p class="eyebrow">The store</p>
+        <h1 tabindex="-1" data-split>Objects for <em>listening.</em></h1>
         <p class="lede">Speakers, headphones, earbuds and in-ear monitors we would put on our own desks. Every headphone links straight to its measured tuning.</p>
       </header>
+      <div id="store-banner" class="store-banner"></div>
       <div class="store-bar">
         <div id="store-chips" class="chips-row" role="group" aria-label="Category"></div>
         <div class="store-tools">
@@ -224,7 +226,7 @@
             </select>
           </label>
           <label class="toggle">
-            <input id="store-favs-only" type="checkbox">
+            <input id="store-favs-only" class="lever" type="checkbox" role="switch">
             <span>Favourites only</span>
           </label>
         </div>
