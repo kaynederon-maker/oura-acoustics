@@ -4,16 +4,15 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="Oura Acoustics: tune any headphone with measured AutoEq corrections, listen to your system audio, and learn how EQ works.">
-  <meta name="theme-color" content="#07080B">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 20c4-10 8-10 12 0s8 10 12 0' fill='none' stroke='%232DD4BF' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
+  <meta name="theme-color" content="#0e0d0c">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 20c4-10 8-10 12 0s8 10 12 0' fill='none' stroke='%23D4B06A' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E">
   <title>Oura Acoustics</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..700,0..100,0..1;1,9..144,300..700,0..100,0..1&family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap">
+  <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/instrument-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/fonts/fonts.css">
   <link rel="stylesheet" href="/styles.css">
   <link rel="stylesheet" href="/store.css">
   <link rel="stylesheet" href="/studio.css">
-  <link rel="stylesheet" href="/vengeance.css">
   <link rel="stylesheet" href="/journey.css">
   <link rel="stylesheet" href="/history.css">
   <link rel="stylesheet" href="/missions.css">
@@ -48,10 +47,20 @@
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/></symbol>
   </svg>
   <canvas id="aura" aria-hidden="true"></canvas>
+  <div id="intro" class="intro" role="status" aria-label="Loading Oura Acoustics" hidden>
+    <div class="intro-inner">
+      <p class="intro-mark" aria-hidden="true">Oura<em>.</em></p>
+      <div class="intro-groove" aria-hidden="true"><i></i><b></b></div>
+      <p class="intro-meta" aria-hidden="true"><span>Side A</span><span id="intro-count">000</span><span>33⅓ rpm</span></p>
+    </div>
+    <button id="intro-skip" type="button" class="text-link intro-skip">Skip intro</button>
+  </div>
+  <div class="curtain" aria-hidden="true"></div>
+  <div class="cursor" aria-hidden="true"><span class="cursor-ring"></span></div>
   <a class="skip" href="#/" data-scroll="main">Skip to content</a>
 
-  <header class="topbar glass">
-    <a class="brand" href="#/" aria-label="Oura Acoustics home"><svg class="icon brand-mark" aria-hidden="true"><use href="#i-wave"/></svg>Oura<span>Acoustics</span></a>
+  <header class="topbar">
+    <a class="brand" href="#/" aria-label="Oura Acoustics home">Oura<span>Acoustics</span></a>
     <nav aria-label="Main">
       <a href="#/" data-nav="home">Home</a>
       <a href="#/store" data-nav="store">Store</a>
@@ -59,17 +68,22 @@
       <a href="#/guide" data-nav="guide">Guide</a>
       <a href="#/history" data-nav="history">History</a>
     </nav>
-    <button id="fav-open" type="button" class="head-btn" aria-label="Favourites">
-      <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span id="fav-count" class="count" hidden>0</span>
-    </button>
-    <button id="bag-open" type="button" class="head-btn" aria-label="Bag">
-      <svg class="icon" aria-hidden="true"><use href="#i-bag"/></svg><span id="bag-count" class="count" hidden>0</span>
-    </button>
-    <div class="theme-picker">
-      <button id="theme-trigger" type="button" class="theme-trigger" aria-label="Color theme" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-panel">
-        <span class="swatch" aria-hidden="true"></span><span class="theme-trigger-label">Theme</span>
+    <div class="head-tools">
+      <button id="sound-toggle" type="button" class="sound-toggle" aria-pressed="false" aria-label="Interface sounds">
+        <span class="bars" aria-hidden="true"><i></i><i></i><i></i></span><span class="label" aria-hidden="true">Sound</span>
       </button>
-      <div id="theme-panel" class="theme-panel" role="menu" aria-label="Color theme" hidden></div>
+      <button id="fav-open" type="button" class="head-btn" aria-label="Favourites">
+        <svg class="icon" aria-hidden="true"><use href="#i-heart"/></svg><span id="fav-count" class="count" hidden>0</span>
+      </button>
+      <button id="bag-open" type="button" class="head-btn" aria-label="Bag">
+        <svg class="icon" aria-hidden="true"><use href="#i-bag"/></svg><span id="bag-count" class="count" hidden>0</span>
+      </button>
+      <div class="theme-picker">
+        <button id="theme-trigger" type="button" class="theme-trigger" aria-label="Color theme" aria-haspopup="menu" aria-expanded="false" aria-controls="theme-panel">
+          <span class="swatch" aria-hidden="true"></span><span class="theme-trigger-label">Theme</span>
+        </button>
+        <div id="theme-panel" class="theme-panel" role="menu" aria-label="Color theme" hidden></div>
+      </div>
     </div>
   </header>
 
@@ -203,7 +217,7 @@
           <div id="hp-selected" class="selected" aria-live="polite">No profile loaded yet.</div>
         </article>
 
-        <article class="card wide peq-card vng-glow" id="step-graph">
+        <article class="card wide peq-card" id="step-graph">
           <div class="card-head">
             <h2>Parametric EQ</h2>
             <ul id="fr-legend" class="legend">
@@ -345,7 +359,7 @@
           <h1 tabindex="-1" data-split>Tune by <em>ear.</em></h1>
           <p class="lede">Not a manual. Grab the dial, press Listen and sweep it: every frequency has a sound, and you are about to learn all of them.</p>
         </div>
-        <div id="mission-sweep" class="g-sweep card vng-glow"></div>
+        <div id="mission-sweep" class="g-sweep card"></div>
       </header>
 
       <section class="missions" aria-labelledby="missions-title">
@@ -393,7 +407,7 @@
       </div>
 
       <section id="journey" class="journey" aria-label="A journey through the spectrum">
-        <div id="j-stage" class="j-stage card vng-glow" data-live="false">
+        <div id="j-stage" class="j-stage card" data-live="false">
           <div class="j-stage-head">
             <div>
               <p id="j-kicker" class="j-kicker"></p>
@@ -606,7 +620,7 @@
     </section>
   </main>
 
-  <footer id="dock" class="dock glass" data-live="false">
+  <footer id="dock" class="dock" data-live="false">
     <div class="dock-status">
       <span class="meter" aria-hidden="true"><i class="b"></i><i class="m"></i><i class="h"></i></span>
       <div>
@@ -622,7 +636,7 @@
       <button type="button" id="dock-stop" class="chip-btn icon-only" aria-label="Stop sound"><svg class="icon" aria-hidden="true"><use href="#i-stop"/></svg></button>
     </div>
     <label class="switch">
-      <input id="eq-toggle" type="checkbox" checked>
+      <input id="eq-toggle" class="lever" type="checkbox" role="switch" checked>
       <span>EQ</span>
     </label>
   </footer>

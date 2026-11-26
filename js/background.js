@@ -98,7 +98,7 @@ export function startBackground(canvas) {
 
   function frame(now) {
     requestAnimationFrame(frame);
-    if (document.hidden || now - last < FRAME_MS) return;
+    if (document.hidden || intensity === 0 || now - last < FRAME_MS) return; // hidden off Home: no GPU work
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
     const { bass, mid, high } = levels();
