@@ -5,6 +5,7 @@ import { initLab, redrawLab } from './lab.js';
 import { initGuide } from './guide.js';
 import { initJourney } from './journey.js';
 import { initHistory } from './history.js';
+import { initHome } from './home.js';
 import { initMissions } from './missions.js';
 import { initMotion, showView, scrollTop } from './motion.js';
 import { attachElementHover } from './freq-hover.js';
@@ -14,6 +15,7 @@ import { $, $$, toast } from './ui.js';
 import { initSound } from './sound.js';
 import { initCursor } from './cursor.js';
 import { runIntro } from './intro.js';
+import { loadCredits } from './img.js';
 
 const VIEWS = { '': 'home', store: 'store', lab: 'lab', guide: 'guide', history: 'history' };
 const ALL_VIEWS = [...Object.values(VIEWS), 'product'];
@@ -35,6 +37,7 @@ function route() {
   }
   document.title = view === 'home' ? title : `${title} · Oura Acoustics`;
   document.body.dataset.view = view;
+  if (view !== 'history') document.body.classList.remove('hx-staging');
   setIntensity(AURA_INTENSITY[view]);
   scrollTop();
   $(`#view-${view} h1`).focus({ preventScroll: true });
@@ -141,6 +144,7 @@ function initReveals() {
   items.forEach((el) => observer.observe(el));
 }
 
+await loadCredits();
 try {
   startBackground($('#aura'));
 } catch (err) {
@@ -157,10 +161,11 @@ initGuide();
 initMissions();
 initJourney();
 initHistory();
+const heroReady = initHome();
 attachElementHover(document);
 initThemePicker();
 initStore();
 initReveals();
 addEventListener('hashchange', navigate);
 navigate();
-runIntro(document.fonts.ready);
+runIntro(Promise.all([document.fonts.ready, heroReady]));

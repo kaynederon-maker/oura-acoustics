@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="/studio.css">
   <link rel="stylesheet" href="/journey.css">
   <link rel="stylesheet" href="/history.css">
+  <link rel="stylesheet" href="/home.css">
   <link rel="stylesheet" href="/missions.css">
   <link rel="stylesheet" href="/vendor/lenis/lenis.css">
   <script src="/vendor/d3.min.js" defer></script>
@@ -89,20 +90,37 @@
 
   <main id="main">
     <!-- ================= HOME ================= -->
-    <section id="view-home" class="view">
-      <div class="hero">
-        <h1 class="display" tabindex="-1" aria-label="Hear what your headphones have been hiding.">
-          <span class="line" aria-hidden="true"><span>Hear what your</span></span>
-          <span class="line" aria-hidden="true"><span>headphones have</span></span>
-          <span class="line" aria-hidden="true"><span>been <em>hiding.</em></span></span>
-        </h1>
-        <p class="lede">Oura listens to what you already play, loads a lab measurement of your exact headphones, and turns both into an EQ you can use everywhere.</p>
-        <div class="row hero-actions">
-          <a class="btn primary has-icon" href="#/lab">Open the Tuning Lab<span class="btn-icon"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></span></a>
-          <a class="text-link" href="#/guide">Learn how EQ works</a>
+    <section id="view-home" class="view home" hidden>
+      <div class="hero-pin">
+        <div class="hero">
+          <p class="hero-word" aria-hidden="true">Oura</p>
+          <div class="hero-ring" aria-hidden="true"><svg viewBox="0 0 200 200"><circle class="r0" cx="100" cy="100" r="96"/><circle class="r1" cx="100" cy="100" r="96" pathLength="100"/><path class="r2" d="M100 4v10M100 186v10M4 100h10M186 100h10"/></svg></div>
+          <div id="hero-object" class="hero-object" tabindex="0" role="img" data-cursor="drag" aria-label="The Oura reference in-ear monitor in 3D. Drag, or use the arrow keys, to turn it."></div>
+          <div class="hero-specs" aria-hidden="true"></div>
+          <div class="hero-meta">
+            <p class="caps">Study No. 01</p>
+            <p class="hero-meta-name">The reference<br>in-ear</p>
+            <p class="caps hero-meta-hint">Drag to turn · scroll to take it apart</p>
+          </div>
+          <div class="hero-copy">
+            <h1 class="display" tabindex="-1">Hear what your headphones have been <em>hiding.</em></h1>
+            <p class="lede">Oura listens to what you already play, loads a lab measurement of your exact headphones and turns both into an EQ you can use everywhere.</p>
+            <div class="row hero-actions">
+              <a class="btn primary has-icon" href="#/lab">Open the Tuning Lab<span class="btn-icon"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></span></a>
+              <a class="text-link" href="#/guide">Learn how EQ works</a>
+            </div>
+          </div>
+          <dl class="hero-spec-list sr-only">
+            <dt>Faceplate</dt><dd>Black lacquer with a brass inlay</dd>
+            <dt>Shell</dt><dd>Smoked resin, sealed like an earplug</dd>
+            <dt>Driver</dt><dd>10 mm dynamic driver for the bass</dd>
+            <dt>Armatures</dt><dd>Two balanced armatures for mids and treble</dd>
+            <dt>Nozzle</dt><dd>Stainless steel with acoustic damping</dd>
+            <dt>Tip</dt><dd>Silicone, three sizes</dd>
+          </dl>
         </div>
-        <p class="hint">Press <strong>System audio</strong> in the dock, play a song anywhere, and the silk behind this page moves with it.</p>
       </div>
+
       <div class="marquee" aria-hidden="true" data-velocity>
         <div class="marquee-track">
           <span>Sub-bass</span><span>Bass</span><span>Low mids</span><span>Presence</span><span>Brilliance</span><span>Air</span>
@@ -110,40 +128,61 @@
         </div>
       </div>
 
-      <div class="bento">
-        <article class="card feature reveal">
-          <h2>8,800+ measured headphone profiles</h2>
-          <p>Corrections come from <a href="https://github.com/jaakkopasanen/AutoEq" target="_blank" rel="noopener">AutoEq</a>, the open-source project behind most headphone EQ presets, measured by crinacle, oratory1990, Rtings and others.</p>
-          <svg class="curve-art" viewBox="0 0 400 130" aria-hidden="true">
-            <path class="curve-target" d="M0 74 C60 70 120 76 180 73 S300 62 340 60 S390 84 400 100"/>
-            <path class="curve-raw" d="M0 96 C40 62 80 84 120 76 S170 66 200 78 S250 38 290 54 S330 82 360 62 S390 112 400 118"/>
-          </svg>
-        </article>
-        <article class="card reveal">
-          <h2>Listens to your whole computer</h2>
-          <p>Share system audio and the lab analyses the music you actually play: how bass-heavy, how bright, whether it clips. Audio never leaves your browser.</p>
-        </article>
-        <article class="card reveal">
-          <h2>Take it everywhere</h2>
-          <p>Export to Equalizer APO and Peace (Windows), Wavelet (Android), SoundSource and EasyEffects, so the tuning works in every app.</p>
-        </article>
-      </div>
+      <section class="promises" aria-labelledby="promises-title">
+        <header class="section-intro">
+          <p class="eyebrow">What Oura does</p>
+          <h2 id="promises-title" data-split>A listening room in a <em>browser tab.</em></h2>
+        </header>
+        <ol class="promise-list">
+          <li class="promise reveal">
+            <span class="promise-n">01</span>
+            <div>
+              <h3>8,800+ measured headphone profiles</h3>
+              <p>Corrections come from <a href="https://github.com/jaakkopasanen/AutoEq" target="_blank" rel="noopener">AutoEq</a>, the open-source project behind most headphone EQ presets, measured by crinacle, oratory1990, Rtings and others.</p>
+            </div>
+            <svg class="curve-art" viewBox="0 0 400 130" aria-hidden="true">
+              <path class="curve-target" d="M0 74 C60 70 120 76 180 73 S300 62 340 60 S390 84 400 100"/>
+              <path class="curve-raw" d="M0 96 C40 62 80 84 120 76 S170 66 200 78 S250 38 290 54 S330 82 360 62 S390 112 400 118"/>
+            </svg>
+          </li>
+          <li class="promise reveal">
+            <span class="promise-n">02</span>
+            <div>
+              <h3>Listens to your whole computer</h3>
+              <p>Share system audio and the Lab analyses the music you actually play: how bass-heavy, how bright, whether it clips. Audio never leaves your browser.</p>
+            </div>
+            <p class="hint">Press <strong>System audio</strong> in the dock and play a song anywhere: the silk at the bottom of this page moves with it.</p>
+          </li>
+          <li class="promise reveal">
+            <span class="promise-n">03</span>
+            <div>
+              <h3>Take it everywhere</h3>
+              <p>Export to Equalizer APO and Peace (Windows), Wavelet (Android), SoundSource and EasyEffects, or write it straight into a DSP dongle.</p>
+            </div>
+          </li>
+        </ol>
+      </section>
+
+      <section class="room" aria-labelledby="room-title">
+        <header class="section-intro">
+          <p class="eyebrow">The listening room</p>
+          <h2 id="room-title" data-split>Made for people who <em>close their eyes</em> at the good part.</h2>
+        </header>
+        <div id="room-strip" class="room-strip"></div>
+      </section>
+
       <section class="teaser" aria-labelledby="teaser-history">
-        <figure class="teaser-media" data-clip>
-          <img src="/history/shoegaze.webp" alt="" loading="lazy" decoding="async" data-speed="0.12">
-        </figure>
+        <div id="teaser-history-media" class="teaser-media" data-clip></div>
         <div class="teaser-copy">
-          <p class="eyebrow">New · History of sound</p>
+          <p class="eyebrow">History of sound</p>
           <h2 id="teaser-history" data-split>From tinfoil to <em>808s.</em></h2>
-          <p class="lede">Ten stops through 150 years of recorded sound, from Edison's phonograph to shoegaze, blackgaze and trap. Hear each era's fidelity on the same track.</p>
-          <a class="btn primary has-icon" href="#/history">Travel through time<span class="btn-icon"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></span></a>
+          <p class="lede">Ten machines from 150 years of recorded sound, taken apart piece by piece. Hover a part for its story and drop the needle to hear each era on the same track.</p>
+          <a class="btn primary has-icon" href="#/history">Take them apart<span class="btn-icon"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></span></a>
         </div>
       </section>
 
       <section class="teaser flip" aria-labelledby="teaser-guide">
-        <figure class="teaser-media" data-clip>
-          <img src="/history/trap.webp" alt="" loading="lazy" decoding="async" data-speed="0.12">
-        </figure>
+        <div id="teaser-guide-media" class="teaser-media" data-clip></div>
         <div class="teaser-copy">
           <p class="eyebrow">The Guide</p>
           <h2 id="teaser-guide" data-split>Turn a knob. <em>Hear it.</em></h2>
@@ -587,36 +626,20 @@
       </details>
     </section>
     <!-- ================= HISTORY ================= -->
-    <section id="view-history" class="view" hidden>
-      <header class="tl-hero">
-        <p class="eyebrow">1877 — 2026 · Ten stops</p>
+    <section id="view-history" class="view hx" hidden>
+      <header class="hx-hero">
+        <p class="eyebrow">1877 — 2026 · Ten objects, taken apart</p>
         <h1 tabindex="-1" data-split>Every sound has a <em>history.</em></h1>
-        <p class="lede">From a needle scratching tinfoil to an 808 shaking a car: how recorded sound grew up, and what each era actually sounded like. Put on headphones and press <strong>Hear it</strong> at any stop.</p>
-        <p class="tl-cue" aria-hidden="true"><span></span>Scroll to travel through time</p>
+        <p class="lede">From a needle scratching tinfoil to an 808 shaking a car. Hover any part to read how it changed the sound of music, and drop the needle to hear each era on the same track.</p>
+        <p class="hx-cue caps" aria-hidden="true"><span></span>Scroll to begin</p>
       </header>
-
-      <section id="tl" class="tl" aria-label="Timeline of recorded sound">
-        <canvas id="tl-gl" class="tl-gl" aria-hidden="true"></canvas>
-        <div class="tl-hud" aria-hidden="true">
-          <p class="tl-count"><span id="tl-index">01</span> / <span id="tl-total">10</span></p>
-          <p id="tl-place" class="tl-place"></p>
-        </div>
-        <p class="tl-year" aria-hidden="true"><span id="tl-year">1877</span></p>
-        <div id="tl-track" class="tl-track"></div>
-        <div class="tl-rail-wrap">
-          <div class="tl-progress-track" aria-hidden="true"><span id="tl-progress" class="tl-progress"></span></div>
-          <nav id="tl-rail" class="tl-rail" aria-label="Jump to an era"></nav>
-        </div>
-      </section>
-
-      <section class="tl-outro">
-        <h2 data-split>The next era is <em>yours.</em></h2>
-        <p class="lede">Every stop on this timeline was shaped by its medium. Today the medium is transparent, so the last variable is your headphones and your ears.</p>
-        <div class="row">
-          <a class="btn primary" href="#/lab">Tune your sound</a>
-          <a class="text-link" href="#/guide">Learn by ear first</a>
-        </div>
-      </section>
+      <nav id="hx-rail" class="hx-rail" aria-label="Chapters"></nav>
+      <div class="hx-hudbar" aria-hidden="true">
+        <span id="hx-count" class="mono">01 / 10</span>
+        <span id="hx-year" class="hx-roll mono" data-label="Year">1877</span>
+        <span id="hx-place" class="caps"></span>
+      </div>
+      <div id="hx-chapters"></div>
     </section>
   </main>
 
