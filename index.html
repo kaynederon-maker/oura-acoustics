@@ -47,6 +47,10 @@
     <symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 7 4.5 4.5L15 16"/><path d="M19 11.5H9.5a5 5 0 0 0 0 10H13"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/></symbol>
   </svg>
+  <svg class="defs" aria-hidden="true" focusable="false"><defs>
+    <radialGradient id="g-knob" cx="38%" cy="30%" r="80%"><stop offset="0" stop-color="#5a544c"/><stop offset=".45" stop-color="#2a2622"/><stop offset="1" stop-color="#100e0c"/></radialGradient>
+    <linearGradient id="g-skirt" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e6cf98"/><stop offset=".5" stop-color="#9b7a40"/><stop offset="1" stop-color="#5d451c"/></linearGradient>
+  </defs></svg>
   <canvas id="aura" aria-hidden="true"></canvas>
   <div id="intro" class="intro" role="status" aria-label="Loading Oura Acoustics" hidden>
     <div class="intro-inner">
@@ -241,11 +245,21 @@
 
     <!-- ================= TUNING LAB ================= -->
     <section id="view-lab" class="view" hidden>
-      <header class="page-head">
-        <h1 tabindex="-1" data-split>Tune like a <em>studio</em></h1>
-        <p class="lede">Load a measured correction, then shape it with a full parametric EQ, crossover and time alignment. What you hear is exactly what the graph shows: both run the same filter maths.</p>
+      <header class="page-head lab-head">
+        <div class="lab-head-copy">
+          <p class="eyebrow">The Tuning Lab</p>
+          <h1 tabindex="-1" data-split>Tune like a <em>studio.</em></h1>
+          <p class="lede">Load a measured correction, then shape it with a full parametric EQ, crossover and time alignment. What you hear is exactly what the graph shows: both run the same filter maths.</p>
+        </div>
+        <div data-photo="l-console" class="lab-head-photo" data-sizes="(max-width: 900px) 100vw, 40vw"></div>
       </header>
 
+      <ol class="lab-steps" aria-label="Setup progress">
+        <li data-step="1"><button type="button" data-target="step-device"><span class="ls-n">01</span><span class="ls-t">Your headphones</span></button></li>
+        <li data-step="2"><button type="button" data-target="step-listen"><span class="ls-n">02</span><span class="ls-t">Listen</span></button></li>
+        <li data-step="3"><button type="button" data-target="step-hearing"><span class="ls-n">03</span><span class="ls-t">Hearing check</span></button></li>
+        <li data-step="4"><button type="button" data-target="step-export"><span class="ls-n">04</span><span class="ls-t">Take it home</span></button></li>
+      </ol>
       <div class="lab-grid">
         <article class="card" id="step-device">
           <h2><span class="step">1</span> Your headphones</h2>
@@ -258,7 +272,7 @@
           <div id="hp-selected" class="selected" aria-live="polite">No profile loaded yet.</div>
         </article>
 
-        <article class="card wide peq-card" id="step-graph">
+        <article class="card wide peq-card faceplate" id="step-graph">
           <div class="card-head">
             <h2>Parametric EQ</h2>
             <ul id="fr-legend" class="legend">
@@ -274,9 +288,9 @@
             <label class="select"><span class="sr-only">Target curve</span><select id="peq-target"></select></label>
             <label class="toggle"><input id="peq-correction" type="checkbox"><span id="peq-correction-label">AutoEq correction</span></label>
             <label class="toggle pro-only"><input id="peq-phase" type="checkbox"><span>Show phase</span></label>
-            <label class="pro-switch"><input id="peq-pro" type="checkbox" role="switch"><span>Advanced settings</span></label>
+            <label class="pro-switch"><input id="peq-pro" class="lever" type="checkbox" role="switch"><span>Advanced</span></label>
             <span class="spacer"></span>
-            <span id="peq-preamp" class="tag"></span>
+            <span id="peq-preamp" class="tag preamp-tag" data-label="Preamp"></span>
             <button id="peq-undo" type="button" class="icon-btn" aria-label="Undo"><svg class="icon" aria-hidden="true"><use href="#i-undo"/></svg></button>
             <button id="peq-redo" type="button" class="icon-btn" aria-label="Redo"><svg class="icon" aria-hidden="true"><use href="#i-redo"/></svg></button>
             <button id="peq-reset" type="button" class="btn small ghost">Reset</button>
@@ -380,6 +394,7 @@
           </div>
           <details class="howto">
             <summary>How to use it system-wide</summary>
+            <div data-photo="m-studio" class="howto-photo" data-sizes="(max-width: 900px) 100vw, 30vw"></div>
             <ul>
               <li><strong>Windows:</strong> install <a href="https://sourceforge.net/projects/equalizerapo/" target="_blank" rel="noopener">Equalizer APO</a> and paste the APO config into its <code>config.txt</code> (or <em>Import</em> it in <a href="https://sourceforge.net/projects/peace-equalizer-apo-extension/" target="_blank" rel="noopener">Peace</a>). It is the only export that carries crossover, delay and polarity.</li>
               <li><strong>Android:</strong> in <a href="https://play.google.com/store/apps/details?id=com.pittvandewitt.wavelet" target="_blank" rel="noopener">Wavelet</a>, open Graphic equalizer, then <em>Import</em> the GraphicEQ file.</li>
@@ -403,6 +418,7 @@
         <div id="mission-sweep" class="g-sweep card"></div>
       </header>
 
+      <div data-photo="m-neve" class="guide-band" data-sizes="100vw"></div>
       <section class="missions" aria-labelledby="missions-title">
         <div class="section-intro">
           <p class="eyebrow">Pro missions</p>
@@ -463,7 +479,14 @@
         <div id="j-steps" class="j-steps"></div>
       </section>
 
-      <h2 class="handbook-title">Practice: eight hands-on lessons</h2>
+      <div class="lessons-head">
+        <div data-photo="h2026-studio" class="lessons-photo" data-sizes="(max-width: 900px) 100vw, 40vw"></div>
+        <div>
+          <p class="eyebrow">Practice</p>
+          <h2 class="handbook-title">Eight hands-on lessons</h2>
+          <p class="lede">Two tracks built in your browser, an A/B switch, and one small job per lesson. Headphones on.</p>
+        </div>
+      </div>
 
       <div class="coach card">
         <ol id="coach-steps" class="coach-steps" aria-label="Lessons"></ol>

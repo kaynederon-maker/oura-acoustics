@@ -15,7 +15,7 @@ import { $, $$, toast } from './ui.js';
 import { initSound } from './sound.js';
 import { initCursor } from './cursor.js';
 import { runIntro } from './intro.js';
-import { loadCredits } from './img.js';
+import { loadCredits, hydratePhotos } from './img.js';
 
 const VIEWS = { '': 'home', store: 'store', lab: 'lab', guide: 'guide', history: 'history' };
 const ALL_VIEWS = [...Object.values(VIEWS), 'product'];
@@ -145,6 +145,7 @@ function initReveals() {
 }
 
 await loadCredits();
+hydratePhotos();
 try {
   startBackground($('#aura'));
 } catch (err) {

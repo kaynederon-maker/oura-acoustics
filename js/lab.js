@@ -17,6 +17,7 @@ import { initPeqPanel } from './peq-panel.js';
 import { initHardware } from './hardware.js';
 import { attachGraphHover } from './freq-hover.js';
 import { $, $$, h, toast, download, fmtHz, fmtDb, store } from './ui.js';
+import { photo } from './img.js';
 
 const ANALYZE_MS = 20000;
 const STEP_MS = 100;
@@ -109,6 +110,7 @@ async function selectEntry(entry) {
         h('a', { class: 'chip link', href: AUTOEQ_TREE + entry.path, target: '_blank', rel: 'noopener' }, `AutoEq · ${entry.source}`)),
       h('button', { type: 'button', class: 'btn ghost small', onclick: clearEntry }, 'Remove'));
     store.set('aura.lab', { entry });
+    markStep(1);
   } catch (err) {
     clearEntry();
     selected.replaceChildren(`Could not load that profile: ${err.message}.`);
@@ -120,6 +122,21 @@ function clearEntry() {
   setCorrection(null);
   store.set('aura.lab', {});
   $('#hp-selected').replaceChildren('No profile loaded. The EQ only has your own bands.');
+  markStep(1, false);
+}
+
+// The guided setup rail: each step lights brass when done; the first open one is current.
+function markStep(n, done = true) {
+  const li = $(`.lab-steps [data-step="${n}"]`);
+  if (li) li.dataset.done = String(done);
+  const items = $$('.lab-steps li');
+  const current = items.find((x) => x.dataset.done !== 'true');
+  for (const x of items) {
+    const btn = x.querySelector('button');
+    if (x === current) btn.setAttribute('aria-current', 'step');
+    else btn.removeAttribute('aria-current');
+    btn.setAttribute('aria-label', `Step ${x.dataset.step}: ${x.querySelector('.ls-t').textContent}${x.dataset.done === 'true' ? ', done' : ''}`);
+  }
 }
 
 // ---------- graph model (D3) ----------
@@ -241,6 +258,7 @@ async function analyze() {
     if (lab.content.silent) toast('That was nearly silent. Turn the music up and analyze again.', 'error');
     renderStats();
     renderRecs();
+    markStep(2);
   } catch (err) {
     toast(err.message, 'error');
   } finally {
@@ -319,6 +337,7 @@ async function hearingCheck() {
       ? `Done. You heard ${flagged.join(', ')} later than expected. See the recommendations below.`
       : 'Done. Every band was within the expected range for this quick check.';
     renderRecs();
+    markStep(3);
   } finally {
     start.hidden = false;
     start.textContent = 'Run again';
@@ -342,7 +361,8 @@ function renderRecs() {
   const empty = lab.content
     ? 'Your setup looks balanced for what you play. Nothing to change.'
     : 'Analyze some music in step 2 to get personal recommendations.';
-  $('#recs').replaceChildren(...(items.length ? items : [h('li', { class: 'rec empty' }, empty)]));
+  $('#recs').replaceChildren(...(items.length ? items : [h('li', { class: 'rec empty' },
+    photo('m-pads', { className: 'rec-photo', sizes: '160px', caption: false }), h('p', {}, empty))]));
 }
 
 async function askAi() {
@@ -398,11 +418,20 @@ export function initLab() {
     try {
       await navigator.clipboard.writeText(toApoConfig({ preamp: preamp(), specs: eqSpecs(), crossover: peq.crossover, alignment: peq.alignment }));
       toast('Copied as an Equalizer APO config.');
+      markStep(4);
     } catch {
       toast('Clipboard is blocked here. Use the download buttons instead.', 'error');
     }
   });
-  $$('[data-export]').forEach((b) => b.addEventListener('click', () => exportEq(b.dataset.export)));
+  $$('[data-export]').forEach((b) => b.addEventListener('click', () => { exportEq(b.dataset.export); markStep(4); }));
+  for (const b of $$('.lab-steps button')) {
+    b.addEventListener('click', () => {
+      const card = $(`#${b.dataset.target}`);
+      card.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+      card.querySelector('input, button')?.focus({ preventScroll: true });
+    });
+  }
+  markStep(1, false);
   $('#peq-phase').addEventListener('change', (e) => { lab.showPhase = e.target.checked; graph?.relayout(); });
 
   initPeqPanel();
