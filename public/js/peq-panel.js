@@ -6,6 +6,7 @@ import {
   TYPES, GAIN_TYPES, PASS_TYPES, TEMPLATES, TARGETS, applyTemplate, distanceToMs, DEFAULT_ALIGNMENT, DEFAULT_CROSSOVER,
 } from './peq.js';
 import { $, $$, h, icon, fmtDb, toast, haptic, store } from './ui.js';
+import { rollNumber } from './img.js';
 
 const MAX_BANDS = 16;
 const num = (v) => Number.parseFloat(v);
@@ -53,7 +54,7 @@ function renderBands() {
   }
   $('#peq-empty').hidden = peq.bands.length > 0;
   $('#peq-add').disabled = peq.bands.length >= MAX_BANDS;
-  $('#peq-preamp').textContent = `Preamp ${fmtDb(preamp())}`;
+  rollNumber($('#peq-preamp'), fmtDb(preamp()));
   $('#peq-undo').disabled = !canUndo();
   $('#peq-redo').disabled = !canRedo();
 }

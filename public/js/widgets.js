@@ -1,9 +1,15 @@
 // Hands-on controls for the Guide: a rotary knob and a tiny frequency-response plot.
 import { h, haptic, fmtHz } from './ui.js';
+import { rollNumber } from './img.js';
+import { play } from './sound.js';
 
 const SVG = 'http://www.w3.org/2000/svg';
 const ARC_DEG = 270;
 const DRAG_PX_FULL_RANGE = 220; // pixels of vertical drag to sweep min..max
+const SCALE_TICKS = 24;
+const DETENTS = 48; // clicks per full turn
+const FLICK_FRICTION = 0.9;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const s = (tag, attrs = {}) => {
   const el = document.createElementNS(SVG, tag);
   for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
@@ -19,7 +25,9 @@ function arcPath(r, from, to) {
 }
 
 // Rotary knob. Drag up/down (Shift = fine), wheel, arrows/PageUp/Home/End, double-click resets.
-// log: true sweeps logarithmically (frequencies). detent: value that gives a stronger haptic tick.
+// It feels weighted: the pointer trails the value slightly, a flick keeps it turning, and it clicks
+// through engraved detents (sound + haptics). log: true sweeps logarithmically (frequencies).
+// detent: value that gives a stronger tick.
 export function knob({ label, min, max, value, step = 1, log = false, format = String, onInput, detent = null }) {
   const initial = value;
   const toT = (v) => (log ? Math.log(v / min) / Math.log(max / min) : (v - min) / (max - min));
@@ -30,21 +38,33 @@ export function knob({ label, min, max, value, step = 1, log = false, format = S
   };
   const start = -ARC_DEG / 2;
   const fill = s('path', { class: 'knob-fill' });
-  const pointer = s('line', { class: 'knob-pointer', x1: 50, y1: 50, x2: 50, y2: 24 });
-  const svg = s('svg', { viewBox: '0 0 100 100', class: 'knob-svg', 'aria-hidden': 'true' });
-  svg.append(s('path', { class: 'knob-track', d: arcPath(42, start, start + ARC_DEG) }), fill, s('circle', { class: 'knob-cap', cx: 50, cy: 50, r: 31 }), pointer);
+  const pointer = s('g', { class: 'knob-pointer' });
+  pointer.append(s('line', { x1: 50, y1: 50, x2: 50, y2: 26 }), s('circle', { class: 'knob-dot', cx: 50, cy: 30, r: 2.2 }));
+  const ticks = s('g', { class: 'knob-ticks' });
+  for (let i = 0; i <= SCALE_TICKS; i++) {
+    const a = ((start + (i / SCALE_TICKS) * ARC_DEG - 90) * Math.PI) / 180;
+    const long = i % 4 === 0;
+    ticks.append(s('line', {
+      class: long ? 'major' : '', x1: (50 + 46 * Math.cos(a)).toFixed(2), y1: (50 + 46 * Math.sin(a)).toFixed(2),
+      x2: (50 + (long ? 50 : 48.5) * Math.cos(a)).toFixed(2), y2: (50 + (long ? 50 : 48.5) * Math.sin(a)).toFixed(2),
+    }));
+  }
+  const svg = s('svg', { viewBox: '-4 -4 108 108', class: 'knob-svg', 'aria-hidden': 'true' });
+  svg.append(ticks, s('path', { class: 'knob-track', d: arcPath(41, start, start + ARC_DEG) }), fill,
+    s('circle', { class: 'knob-skirt', cx: 50, cy: 50, r: 34 }), s('circle', { class: 'knob-cap', cx: 50, cy: 50, r: 29 }), pointer);
   const out = h('output', { class: 'knob-value' });
   const el = h('div', {
-    class: 'knob', role: 'slider', tabindex: '0', 'aria-label': label, 'data-lenis-prevent': '',
+    class: 'knob', role: 'slider', tabindex: '0', 'aria-label': label, 'data-lenis-prevent': '', 'data-cursor': 'drag',
     'aria-valuemin': String(min), 'aria-valuemax': String(max),
   }, svg, out, h('span', { class: 'knob-label' }, label));
 
+  let tick = Math.round(toT(value) * DETENTS);
   function render() {
     const deg = start + toT(value) * ARC_DEG;
     const z = start + toT(detent ?? min) * ARC_DEG;
-    fill.setAttribute('d', arcPath(42, Math.min(z, deg), Math.max(z, deg) + 0.01));
-    pointer.setAttribute('transform', `rotate(${deg.toFixed(2)} 50 50)`);
-    out.textContent = format(value);
+    fill.setAttribute('d', arcPath(41, Math.min(z, deg), Math.max(z, deg) + 0.01));
+    pointer.style.transform = `rotate(${deg.toFixed(2)}deg)`;
+    rollNumber(out, format(value));
     el.setAttribute('aria-valuenow', String(value));
     el.setAttribute('aria-valuetext', format(value));
   }
@@ -55,27 +75,52 @@ export function knob({ label, min, max, value, step = 1, log = false, format = S
     const crossedDetent = detent !== null && (value - detent) * (next - detent) <= 0;
     value = next;
     render();
-    if (emit) {
+    if (!emit) return;
+    const t = Math.round(toT(value) * DETENTS);
+    if (t !== tick || crossedDetent) {
+      tick = t;
+      play('detent');
       haptic(crossedDetent ? 14 : 3);
-      onInput?.(value);
     }
+    onInput?.(value);
   }
 
   // Vertical drag maps to the knob's travel, independent of where you grab it.
+  let spin = 0;
   el.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
     e.preventDefault();
+    cancelAnimationFrame(spin);
     el.setPointerCapture(e.pointerId);
     el.focus();
-    const y0 = e.clientY;
-    const t0 = toT(value);
+    let lastY = e.clientY;
+    let lastT = performance.now();
+    let vel = 0;
+    let pos = toT(value);
     el.classList.add('turning');
-    const move = (ev) => set(fromT(t0 + ((y0 - ev.clientY) / DRAG_PX_FULL_RANGE) * (ev.shiftKey ? 0.2 : 1)));
+    const move = (ev) => {
+      const now = performance.now();
+      const dt = (lastY - ev.clientY) / DRAG_PX_FULL_RANGE * (ev.shiftKey ? 0.2 : 1);
+      pos = Math.min(1, Math.max(0, pos + dt));
+      vel = dt / Math.max(1, now - lastT) * 16;
+      lastY = ev.clientY;
+      lastT = now;
+      set(fromT(pos));
+    };
     const up = () => {
       el.classList.remove('turning');
       el.removeEventListener('pointermove', move);
       el.removeEventListener('pointerup', up);
       el.removeEventListener('pointercancel', up);
+      if (REDUCED || performance.now() - lastT > 60) return;
+      // A flick keeps turning and slows down, like a weighted knob.
+      const coast = () => {
+        vel *= FLICK_FRICTION;
+        pos = Math.min(1, Math.max(0, pos + vel));
+        set(fromT(pos));
+        if (Math.abs(vel) > 0.0008 && pos > 0 && pos < 1) spin = requestAnimationFrame(coast);
+      };
+      spin = requestAnimationFrame(coast);
     };
     el.addEventListener('pointermove', move);
     el.addEventListener('pointerup', up);

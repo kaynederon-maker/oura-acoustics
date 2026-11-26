@@ -26,6 +26,9 @@ const KEY_OCTAVE = 1 / 24;
 const COMMIT_AFTER_WHEEL_MS = 350;
 const TOUCH_TIP_MS = 2500;
 const BAND_COLORS = ['--plot-1', '--plot-2', '--accent', '--aura-1', '--aura-3', '--aura-2'];
+const REDRAW_MS = 420;
+const OVERLAY_MS = 900;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const tick = (f) => (f >= 1000 ? `${f / 1000}k` : String(f));
@@ -89,10 +92,17 @@ export function createPeqGraph(host, model, { yDomain = [-20, 20], phase = () =>
     if (!x) layout();
     const bands = model.bands();
     const data = model.layers(FREQS);
-    layers.selectAll('path').data(data.series, (d) => d.cls).join('path')
+    // Overlays (measurement, target, correction) fade in like transparent sheets laid on the plot.
+    layers.selectAll('path').data(data.series, (d) => d.cls).join(
+      (enter) => enter.append('path').attr('opacity', 0).call((e) => e.transition().duration(OVERLAY_MS).ease(d3.easeCubicOut).attr('opacity', 1)),
+      (update) => update,
+      (exit) => exit.transition().duration(OVERLAY_MS / 2).attr('opacity', 0).remove(),
+    )
       .attr('class', (d) => `peq-series ${d.cls}`)
       .attr('d', (d) => line(d.values, y, d.freqs));
-    curve.attr('d', line(data.curve));
+    // While dragging the curve follows the hand; any other change glides to its new shape.
+    const glide = !dragging && !REDUCED && curve.attr('d');
+    (glide ? curve.transition('shape').duration(REDRAW_MS).ease(d3.easeCubicOut) : curve.interrupt('shape')).attr('d', line(data.curve));
     phasePath.attr('d', phase() && data.phase ? line(data.phase, yPhase) : null);
 
     const sel = bands.find((b) => b.id === model.selected());
@@ -112,7 +122,8 @@ export function createPeqGraph(host, model, { yDomain = [-20, 20], phase = () =>
       g.call(dragBehaviour).on('wheel', onWheel).on('keydown', onKey).on('focus', (e, b) => model.select(b.id));
       return g;
     })
-      .attr('transform', (b) => `translate(${x(b.fc)},${y(GAIN_TYPES.has(b.type) ? b.gain : 0)})`)
+      .call((sel) => (glide ? sel.transition('shape').duration(REDRAW_MS).ease(d3.easeCubicOut) : sel.interrupt('shape'))
+        .attr('transform', (b) => `translate(${x(b.fc)},${y(GAIN_TYPES.has(b.type) ? b.gain : 0)})`))
       .classed('selected', (b) => b.id === model.selected())
       .classed('disabled', (b) => !b.enabled)
       .attr('aria-label', (b, i) => describe(b, i))

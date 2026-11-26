@@ -36,6 +36,13 @@ export function photo(id, { sizes = '(max-width: 760px) 100vw, 50vw', className 
   return h('figure', { class: `photo ${className}`.trim(), style: c.ratio ? `--ratio:${c.ratio}` : null }, pic, cap);
 }
 
+// Declarative photos: <div data-photo="id" data-sizes="…" class="…"> becomes a credited <figure>.
+export function hydratePhotos(root = document) {
+  for (const el of root.querySelectorAll('[data-photo]')) {
+    el.replaceWith(photo(el.dataset.photo, { className: el.className, sizes: el.dataset.sizes ?? '(max-width: 760px) 100vw, 50vw' }));
+  }
+}
+
 // Mechanical counter: each digit rolls on its own drum. Text stays readable for screen readers.
 export function rollNumber(el, value) {
   const text = String(value);
