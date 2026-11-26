@@ -10,5 +10,14 @@
   },
   "engines": {
     "node": ">=20.12"
+  },
+  "devDependencies": {
+    "@gltf-transform/core": "^4.5.1",
+    "@gltf-transform/extensions": "^4.5.1",
+    "@gltf-transform/functions": "^4.5.1",
+    "acorn": "^8.19.0",
+    "meshoptimizer": "^1.3.0",
+    "sharp": "^0.35.5",
+    "three": "^0.187.0"
   }
 }

@@ -96,8 +96,7 @@ function toggleFav(p) {
 
 function card(p, index) {
   const href = `#/product/${p.id}`;
-  const el = h('article', { class: 'product-card vng-spot' },
-    h('span', { class: 'vng-beam', 'aria-hidden': 'true' }),
+  const el = h('article', { class: 'product-card sweep' },
     h('a', { class: `product-media fit-${p.fit}`, href, tabindex: '-1', 'aria-hidden': 'true' }, media(p)),
     p.badge ? h('span', { class: 'badge' }, p.badge) : null,
     favButton(p),

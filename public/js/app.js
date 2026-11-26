@@ -11,11 +11,16 @@ import { attachElementHover } from './freq-hover.js';
 import { initThemePicker } from './theme.js';
 import { initStore, showProduct } from './store.js';
 import { $, $$, toast } from './ui.js';
+import { initSound } from './sound.js';
+import { initCursor } from './cursor.js';
+import { runIntro } from './intro.js';
 
 const VIEWS = { '': 'home', store: 'store', lab: 'lab', guide: 'guide', history: 'history' };
 const ALL_VIEWS = [...Object.values(VIEWS), 'product'];
 const TITLES = { home: 'Oura Acoustics', store: 'Store', lab: 'Tuning Lab', guide: 'Tuning Guide', history: 'History of Sound' };
-const AURA_INTENSITY = { home: 0.62, store: 0.3, product: 0.3, lab: 0.34, guide: 0.26, history: 0.2 }; // calmer where people read or shop
+const AURA_INTENSITY = { home: 0.5, store: 0, product: 0, lab: 0, guide: 0, history: 0 }; // the silk is a Home-only backdrop
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
+const CURTAIN_MS = 340;
 
 function route() {
   const path = location.hash.replace(/^#\/?/, '');
@@ -29,6 +34,7 @@ function route() {
     else link.removeAttribute('aria-current');
   }
   document.title = view === 'home' ? title : `${title} · Oura Acoustics`;
+  document.body.dataset.view = view;
   setIntensity(AURA_INTENSITY[view]);
   scrollTop();
   $(`#view-${view} h1`).focus({ preventScroll: true });
@@ -96,14 +102,30 @@ function initDock() {
   requestAnimationFrame(meterLoop);
 }
 
-// Vengeance cursor spotlight: one delegated listener feeds --mx/--my to whichever card is hovered.
-addEventListener('pointermove', (e) => {
-  const card = e.target.closest?.('.vng-spot');
-  if (!card || e.pointerType !== 'mouse') return;
-  const r = card.getBoundingClientRect();
-  card.style.setProperty('--mx', `${e.clientX - r.left}px`);
-  card.style.setProperty('--my', `${e.clientY - r.top}px`);
-}, { passive: true });
+// Route change: a curtain falls with a brass hairline, the page swaps underneath, the curtain lifts.
+let firstRoute = true;
+let curtainTimer;
+function navigate() {
+  const curtain = $('.curtain');
+  if (firstRoute || REDUCED) {
+    firstRoute = false;
+    route();
+    return;
+  }
+  clearTimeout(curtainTimer);
+  curtain.className = 'curtain in';
+  curtainTimer = setTimeout(() => {
+    route();
+    curtain.className = 'curtain out';
+  }, CURTAIN_MS);
+}
+
+function initTopbar() {
+  const bar = $('.topbar');
+  const sync = () => bar.classList.toggle('scrolled', scrollY > 24);
+  addEventListener('scroll', sync, { passive: true });
+  sync();
+}
 
 // Content eases in once as it first scrolls into view (CSS owns the motion).
 function initReveals() {
@@ -126,6 +148,9 @@ try {
   document.body.classList.add('no-webgl');
 }
 initMotion();
+initSound();
+initCursor();
+initTopbar();
 initDock();
 initLab();
 initGuide();
@@ -136,5 +161,6 @@ attachElementHover(document);
 initThemePicker();
 initStore();
 initReveals();
-addEventListener('hashchange', route);
-route();
+addEventListener('hashchange', navigate);
+navigate();
+runIntro(document.fonts.ready);

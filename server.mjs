@@ -25,18 +25,22 @@ const MIME = {
   '.png': 'image/png',
   '.jpg': 'image/jpeg',
   '.webp': 'image/webp',
+  '.avif': 'image/avif',
+  '.glb': 'model/gltf-binary',
+  '.woff2': 'font/woff2',
+  '.txt': 'text/plain; charset=utf-8',
   '.ico': 'image/x-icon',
 };
 
 const SECURITY_HEADERS = {
   'content-security-policy': [
     "default-src 'self'",
-    "script-src 'self'",
+    "script-src 'self' 'wasm-unsafe-eval'",
     // devicePEQ (hardware bridge) styles its injected UI inline; scripts stay 'self'-only.
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src https://fonts.gstatic.com",
+    "style-src 'self' 'unsafe-inline'",
+    "font-src 'self'",
     "connect-src 'self' https://raw.githubusercontent.com",
-    "img-src 'self' data:",
+    "img-src 'self' data: blob:",
     "media-src 'self' blob:",
   ].join('; '),
   'x-content-type-options': 'nosniff',
