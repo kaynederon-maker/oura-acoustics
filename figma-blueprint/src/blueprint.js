@@ -128,7 +128,13 @@ async function newPage(name) {
   return page;
 }
 
-async function imageFill(url) {
+const PENDING = [];
+
+async function imageFill(node, url) {
+  if (DATA.mcp) {
+    PENDING.push([node.id, url.slice(DATA.base.length + 1)]);
+    return node.fills;
+  }
   const img = await figma.createImageAsync(url);
   return [{ type: 'IMAGE', imageHash: img.hash, scaleMode: 'FILL' }];
 }
@@ -435,7 +441,7 @@ async function buildPrototype() {
     await step(`screen ${id}`, async () => {
       const s = DATA.hotspots.screens[id];
       const f = put(page, frame(s.title, W, H, { fill: '#0e0d0c' }), (i % cols) * (W + 240), Math.floor(i / cols) * (H + 320));
-      f.fills = await imageFill(`${DATA.base}/figma-blueprint/shots/${id}.jpg`);
+      f.fills = await imageFill(f, `${DATA.base}/figma-blueprint/shots/${id}.jpg`);
       frames[id] = f;
     });
   }
@@ -474,14 +480,14 @@ async function buildPrototype() {
 async function buildGallery() {
   const page = await newPage('04 · Themes & devices');
   const themes = ['dark', 'light', 'burgundy', 'earth', 'soft'];
-  const views = ['home', 'store', 'product', 'lab', 'guide', 'history', 'history-stage'];
+  const views = DATA.mcp ? ['home', 'store', 'product', 'history-stage'] : ['home', 'store', 'product', 'lab', 'guide', 'history', 'history-stage'];
   const scale = 0.5;
   for (const [r, t] of themes.entries()) {
     caption(page, `${t} theme`, 0, r * (H * scale + 120) - 30, 400);
     for (const [c, v] of views.entries()) {
       await step(`theme ${t}-${v}`, async () => {
         const f = put(page, frame(`${t} · ${v}`, W * scale, H * scale), c * (W * scale + 40), r * (H * scale + 120));
-        f.fills = await imageFill(`${DATA.base}/screenshots/${t}-${v}.jpg`);
+        f.fills = await imageFill(f, `${DATA.base}/screenshots/${t}-${v}.jpg`);
       });
     }
   }
@@ -492,7 +498,7 @@ async function buildGallery() {
     for (const [c, v] of views.entries()) {
       await step(`${device}-${v}`, async () => {
         const f = put(page, frame(`${device} · ${v}`, w * 0.5, h * 0.5, { radius: device === 'phone' ? 22 : 14 }), c * (w * 0.5 + 40), rowY);
-        f.fills = await imageFill(`${DATA.base}/screenshots/dark-${device}-${v}.jpg`);
+        f.fills = await imageFill(f, `${DATA.base}/screenshots/dark-${device}-${v}.jpg`);
       });
     }
   }
@@ -512,6 +518,7 @@ async function main() {
   const msg = REPORT.errors.length
     ? `Built with ${REPORT.errors.length} issue(s): ${REPORT.errors.slice(0, 3).join(' | ')}`
     : `Built ${REPORT.ok.length} steps. Open "03 · Prototype" and press Present.`;
+  if (DATA.mcp) return { message: msg, errors: REPORT.errors, prototypePageId: proto ? proto.id : null, uploads: PENDING };
   figma.closePlugin(msg);
 }
 
