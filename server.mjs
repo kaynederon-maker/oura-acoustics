@@ -42,7 +42,7 @@ const SECURITY_HEADERS = {
     "script-src 'self' 'wasm-unsafe-eval'",
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
-    "connect-src 'self' https://raw.githubusercontent.com",
+    "connect-src 'self' https://raw.githubusercontent.com https://text.pollinations.ai",
     "img-src 'self' data: blob:",
     "media-src 'self' blob:",
   ].join('; '),

@@ -7,6 +7,8 @@ import { $, $$, h, icon, toast, store } from './ui.js';
 import { tuneFor } from './lab.js';
 import { photo } from './img.js';
 import { play } from './sound.js';
+import { openAssistant } from './assistant.js';
+import { inspector, openLightbox } from './inspector.js';
 
 const ADDED_FEEDBACK_MS = 1400;
 const CHECKOUT_DELAY_MS = 1100;
@@ -109,7 +111,6 @@ const EDITORIAL = [
   { at: 11, photo: 's-iems', kicker: 'In-ear monitors', title: 'A whole studio, in your ear', category: 'iems' },
   { at: 20, photo: 'm-tube', kicker: 'DACs & amps', title: 'Warm valves, quiet nights', category: 'dacs' },
 ];
-const MAX_TILT = 26;
 
 function card(p, index, { feature = false } = {}) {
   const href = `#/product/${p.id}`;
@@ -142,56 +143,28 @@ function editorialTile(t) {
     }, h('span', { class: 'caps' }, t.kicker), h('span', { class: 'editorial-title' }, t.title), h('span', { class: 'text-link' }, 'Shop the edit')));
 }
 
-function turntable(p, { eager = false } = {}) {
-  const img = media(p, { eager });
-  const stageEl = h('div', {
-    class: `turntable fit-${p.fit}`, tabindex: '0', role: 'img', 'data-cursor': 'drag',
-    'aria-label': `${p.brand} ${p.name}. Drag or use the arrow keys to tilt it.`,
-  }, h('span', { class: 'plinth', 'aria-hidden': 'true' }), img);
-  let ry = 0;
-  let rx = 0;
-  let drag = null;
-  const apply = () => {
-    stageEl.style.setProperty('--ry', `${ry}deg`);
-    stageEl.style.setProperty('--rx', `${rx}deg`);
-  };
-  const clamp = (v) => Math.max(-MAX_TILT, Math.min(MAX_TILT, v));
-  stageEl.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, ry, rx }; stageEl.setPointerCapture(e.pointerId); stageEl.classList.add('dragging'); });
-  stageEl.addEventListener('pointermove', (e) => {
-    if (!drag) return;
-    ry = clamp(drag.ry + (e.clientX - drag.x) * 0.25);
-    rx = clamp(drag.rx - (e.clientY - drag.y) * 0.15) / 2;
-    apply();
-  });
-  const end = () => { drag = null; stageEl.classList.remove('dragging'); };
-  stageEl.addEventListener('pointerup', end);
-  stageEl.addEventListener('pointercancel', end);
-  stageEl.addEventListener('keydown', (e) => {
-    const d = { ArrowLeft: -6, ArrowRight: 6 }[e.key];
-    const t = { ArrowUp: 4, ArrowDown: -4 }[e.key];
-    if (!d && !t) return;
-    e.preventDefault();
-    ry = clamp(ry + (d ?? 0));
-    rx = clamp(rx + (t ?? 0)) / 1.2;
-    apply();
-  });
-  return stageEl;
+function photoShots(p) {
+  return [
+    { src: imgSrc(p), alt: `${p.brand} ${p.name}`, fit: p.fit, label: 'Photo' },
+    { src: `products/detail/${p.id}-a.webp`, alt: `Detail of the ${p.brand} ${p.name}`, fit: 'cover', label: 'Detail' },
+    { src: `products/detail/${p.id}-b.webp`, alt: `Close-up of the ${p.brand} ${p.name}`, fit: 'cover', label: 'Close-up' },
+  ];
 }
 
 function viewer(p) {
   const main = h('div', { class: 'viewer-main' });
-  const shots = [
-    ...(STUDIES[p.id] ? [{ kind: '3d', label: '3D study' }] : []),
-    { kind: 'photo', label: 'Photo' },
-    { kind: 'img', src: `products/detail/${p.id}-a.webp`, label: 'Detail' },
-    { kind: 'img', src: `products/detail/${p.id}-b.webp`, label: 'Close-up' },
-  ];
+  const photos = photoShots(p);
+  const shots = [...(STUDIES[p.id] ? [{ kind: '3d', label: '3D study' }] : []), ...photos.map((s) => ({ ...s, kind: 'img' }))];
+  const offset = shots.length - photos.length;
   let stage3d = null;
+  let photoView = null;
   async function show(i) {
     const s = shots[i];
     for (const [n, b] of [...thumbs.children].entries()) b.setAttribute('aria-pressed', String(n === i));
     stage3d?.dispose();
     stage3d = null;
+    photoView?.dispose();
+    photoView = null;
     if (s.kind === '3d') {
       const host = h('div', { class: 'viewer-3d', tabindex: '0', role: 'img', 'data-cursor': 'drag', 'aria-label': `3D study of the ${p.brand} ${p.name}. Drag or use the arrow keys to turn it.` },
         h('span', { class: 'plinth', 'aria-hidden': 'true' }), h('span', { class: 'viewer-note caps' }, 'Interpretive 3D study'));
@@ -207,24 +180,23 @@ function viewer(p) {
         console.error('[product 3d]', err);
         show(1);
       }
-    } else if (s.kind === 'photo') {
-      main.replaceChildren(turntable(p, { eager: true }));
     } else {
-      main.replaceChildren(h('div', { class: 'viewer-detail' }, h('img', { src: s.src, alt: `${s.label} of the ${p.brand} ${p.name}`, width: '800', height: '600', decoding: 'async' })));
+      photoView = inspector({ ...s, onExpand: () => openLightbox(photos, i - offset) });
+      main.replaceChildren(photoView.el);
     }
   }
   const thumbs = h('div', { class: 'viewer-thumbs', role: 'group', 'aria-label': 'Views' }, shots.map((s, i) => h('button', {
     type: 'button', class: 'viewer-thumb', 'aria-pressed': 'false', 'aria-label': `Show ${s.label.toLowerCase()}`, onclick: () => show(i),
   }, s.kind === '3d' ? h('span', { class: 'thumb-3d' }, '3D')
-    : h('img', { src: s.kind === 'photo' ? imgSrc(p) : s.src, alt: '', loading: 'lazy', width: '120', height: '90' }))));
+    : h('img', { src: s.src, alt: '', loading: 'lazy', width: '120', height: '90' }))));
   show(0);
-  return { el: h('div', { class: 'viewer' }, main, thumbs), dispose: () => stage3d?.dispose() };
+  return { el: h('div', { class: 'viewer' }, main, thumbs), dispose: () => { stage3d?.dispose(); photoView?.dispose(); } };
 }
 
 function quickView(p) {
   const href = `#/product/${p.id}`;
   $('#qv-body').replaceChildren(
-    h('div', { class: 'qv-media' }, turntable(p, { eager: true }), p.badge ? h('span', { class: 'badge' }, p.badge) : null),
+    h('div', { class: 'qv-media' }, inspector({ ...photoShots(p)[0], onExpand: () => openLightbox(photoShots(p), 0) }).el, p.badge ? h('span', { class: 'badge' }, p.badge) : null),
     h('div', { class: 'qv-info' },
       h('p', { class: 'product-brand' }, `${p.brand} · ${CATEGORIES.find((c) => c.id === p.category).label}`),
       h('h2', { id: 'qv-title' }, p.name),
@@ -340,6 +312,8 @@ export function showProduct(id) {
           class: 'tune-link', href: '#/lab',
           onclick: () => requestAnimationFrame(() => tuneFor(p.autoeq)),
         }, h('span', { class: 'tune-icon' }, icon('wave')), h('span', {}, h('strong', {}, 'Tune it in the Lab'), h('small', {}, 'Load the measured correction for this exact model')), icon('arrow')) : null,
+        h('button', { type: 'button', class: 'tune-link ask-link', onclick: () => openAssistant(p) },
+          h('span', { class: 'tune-icon' }, icon('search')), h('span', {}, h('strong', {}, 'Ask Oura about it'), h('small', {}, 'Compare it, check if it suits you, find alternatives')), icon('arrow')),
         h('div', { class: 'buy-row' },
           h('div', { class: 'qty', role: 'group', 'aria-label': 'Quantity' },
             h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Decrease quantity', onclick: () => step(-1) }, icon('minus')),
