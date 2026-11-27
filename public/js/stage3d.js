@@ -3,44 +3,15 @@ const COARSE = matchMedia('(pointer: coarse)').matches;
 const DRAG_SPEED = 0.008;
 const FRICTION = 0.92;
 const KEY_STEP = 0.18;
-const EDGE_ANGLE = 28;
+const EDGE_ANGLE = 30;
+const FINE_EDGE_ANGLE = 55;
+
+import { makeMaterial, studioEnvironment } from './materials3d.js';
 
 let lib = null;
-export const loadThree = () => (lib ??= import('../vendor/three/three.js'));
+export const loadThree = () => (lib ??= import('../vendor/three/three.js?v=3d2'));
 
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-
-const PRESETS = {
-  brass: { color: '#b8945c', metalness: 1, roughness: 0.3 },
-  steel: { color: '#a9aeb3', metalness: 1, roughness: 0.36 },
-  chrome: { color: '#eceef0', metalness: 1, roughness: 0.07 },
-  aluminium: { color: '#c9ccd0', metalness: 1, roughness: 0.26 },
-  foil: { color: '#dcdee0', metalness: 1, roughness: 0.16 },
-  copper: { color: '#b9744e', metalness: 1, roughness: 0.3 },
-  iron: { color: '#2a2a2a', metalness: 0.7, roughness: 0.55 },
-  lacquer: { color: '#0e0d0d', roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.04 },
-  resin: { color: '#2a2530', roughness: 0.18, clearcoat: 1, clearcoatRoughness: 0.06, transmission: 0.35, thickness: 0.6, ior: 1.5 },
-  glass: { color: '#f3f6f8', roughness: 0.04, transmission: 1, thickness: 0.2, ior: 1.5, transparent: true },
-  walnut: { color: '#5c3a22', roughness: 0.5, clearcoat: 0.5, clearcoatRoughness: 0.3 },
-  rubber: { color: '#131313', roughness: 0.9 },
-  paper: { color: '#211f1c', roughness: 0.85 },
-  silicone: { color: '#2b2b2e', roughness: 0.55, sheen: 0.4, sheenColor: '#666666' },
-  plastic: { color: '#f1efea', roughness: 0.3, clearcoat: 0.6 },
-  black: { color: '#151515', roughness: 0.45, clearcoat: 0.3 },
-  felt: { color: '#2b2826', roughness: 1 },
-  pcb: { color: '#18321f', roughness: 0.6 },
-  velour: { color: '#1b1a1a', roughness: 1, sheen: 1, sheenColor: '#4a4a4a', sheenRoughness: 0.8 },
-  vinyl: { color: '#0a0a0a', roughness: 0.22, clearcoat: 0.8 },
-  label: { color: '#c8a465', roughness: 0.6 },
-  tolex: { color: '#161616', roughness: 0.8 },
-  cloth: { color: '#3b332b', roughness: 1, sheen: 0.6, sheenColor: '#6b5a48' },
-  ivory: { color: '#ebe6dc', roughness: 0.45 },
-  ceramic: { color: '#ece7dd', roughness: 0.32, clearcoat: 0.4 },
-  'key-red': { color: '#d23c2a', roughness: 0.4, clearcoat: 0.5 },
-  'key-orange': { color: '#e07b26', roughness: 0.4, clearcoat: 0.5 },
-  'key-yellow': { color: '#e5c43a', roughness: 0.4, clearcoat: 0.5 },
-  'key-white': { color: '#e8e4da', roughness: 0.4, clearcoat: 0.5 },
-};
 
 const modelCache = new Map();
 async function fetchModel(T, name) {
@@ -52,14 +23,17 @@ async function fetchModel(T, name) {
 }
 
 export async function createStage(container, {
-  look = 'lux', model, label = '', interactive = true, autoTurn = 0, tilt = 0.18, distance = 1, onHover = null, onReady = null,
+  look = 'lux', model, label = '', interactive = true, autoTurn = 0, tilt = 0.18, yaw = -0.5, distance = 1, onHover = null, onReady = null,
 } = {}) {
   const T = await loadThree();
   const renderer = new T.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(devicePixelRatio, COARSE ? 1.5 : 2));
   renderer.outputColorSpace = T.SRGBColorSpace;
-  renderer.toneMapping = T.NeutralToneMapping;
-  renderer.toneMappingExposure = 1.05;
+  const lux = look !== 'line';
+  renderer.toneMapping = lux ? T.ACESFilmicToneMapping : T.NeutralToneMapping;
+  renderer.toneMappingExposure = lux ? 1.12 : 1.05;
+  renderer.shadowMap.enabled = lux;
+  renderer.shadowMap.type = T.VSMShadowMap;
   const canvas = renderer.domElement;
   canvas.className = 'stage-canvas';
   canvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;display:block';
@@ -68,22 +42,35 @@ export async function createStage(container, {
   const scene = new T.Scene();
   const camera = new T.PerspectiveCamera(30, 1, 0.1, 100);
   const pmrem = new T.PMREMGenerator(renderer);
-  scene.environment = pmrem.fromScene(new T.RoomEnvironment(), 0.04).texture;
-  const key = new T.DirectionalLight('#fff4e0', 1.4);
-  key.position.set(3, 5, 4);
-  const rim = new T.DirectionalLight('#dfe8ff', 0.8);
+  scene.environment = pmrem.fromScene(lux ? studioEnvironment(T) : new T.RoomEnvironment(), 0.02).texture;
+  const key = new T.DirectionalLight('#fff4e0', lux ? 1.6 : 1.4);
+  key.position.set(2.5, 6, 3.5);
+  const rim = new T.DirectionalLight('#dfe8ff', lux ? 0.9 : 0.8);
   rim.position.set(-4, 2, -3);
-  scene.add(key, rim);
+  scene.add(key, key.target, rim);
+  const floor = new T.Mesh(new T.PlaneGeometry(1, 1), new T.ShadowMaterial({ opacity: 0.24, transparent: true, depthWrite: false }));
+  floor.rotation.x = -Math.PI / 2;
+  floor.receiveShadow = true;
+  floor.visible = lux;
+  if (lux) {
+    key.castShadow = true;
+    key.shadow.mapSize.set(COARSE ? 1024 : 2048, COARSE ? 1024 : 2048);
+    key.shadow.radius = 14;
+    key.shadow.blurSamples = 24;
+    key.shadow.bias = -0.0006;
+    scene.add(floor);
+  }
 
   const pivot = new T.Group();
   scene.add(pivot);
 
   const state = {
-    yaw: -0.5, pitch: tilt, vyaw: 0, vpitch: 0, scrollYaw: 0, explode: 0, explodeShown: 0,
+    yaw, pitch: tilt, vyaw: 0, vpitch: 0, scrollYaw: 0, explode: 0, explodeShown: 0,
     hovered: null, highlighted: null, dirty: true, visible: false, dragging: false, alive: true,
   };
   let parts = new Map();
   let fitRadius = 1;
+  let maxDrop = 0;
   let host = null;
 
   const lines = { line: new T.LineBasicMaterial({ color: css('--text-lo') }), lineHi: new T.LineBasicMaterial({ color: css('--accent') }) };
@@ -110,16 +97,22 @@ export async function createStage(container, {
     for (const o of meshes) {
       const name = o.material?.name ?? '';
       if (look === 'line') {
+        const fine = name.endsWith('~fine');
         o.material = fillMat;
-        const edges = new T.LineSegments(new T.EdgesGeometry(o.geometry, EDGE_ANGLE), lines.line);
-        const shell = new T.Mesh(o.geometry, hullMat);
+        const edges = new T.LineSegments(new T.EdgesGeometry(o.geometry, fine ? FINE_EDGE_ANGLE : EDGE_ANGLE), lines.line);
         edges.raycast = () => {};
-        shell.raycast = () => {};
-        o.add(edges, shell);
+        o.add(edges);
         o.userData.edges = edges;
-        o.userData.hull = shell;
+        if (!fine) {
+          const shell = new T.Mesh(o.geometry, hullMat);
+          shell.raycast = () => {};
+          o.add(shell);
+          o.userData.hull = shell;
+        }
       } else {
-        o.material = new T.MeshPhysicalMaterial({ ...(PRESETS[name] ?? { color: '#888888', roughness: 0.5 }) });
+        o.material = makeMaterial(T, name);
+        o.castShadow = true;
+        o.receiveShadow = true;
       }
     }
   }
@@ -140,6 +133,14 @@ export async function createStage(container, {
       p.node.position.copy(p.home);
     }
     fitRadius = bounds.getBoundingSphere(new T.Sphere()).radius;
+    maxDrop = Math.max(0, ...[...parts.values()].map((p) => p.explode.length()));
+    const cam = key.shadow.camera;
+    const ext = fitRadius * 2.2;
+    Object.assign(cam, { left: -ext, right: ext, top: ext, bottom: -ext, near: 0.1, far: fitRadius * 16 });
+    cam.updateProjectionMatrix();
+    key.position.set(2.5, 6, 3.5).setLength(fitRadius * 6);
+    key.shadow.normalBias = fitRadius * 0.004;
+    floor.scale.setScalar(fitRadius * 8);
     pivot.add(root);
     state.explodeShown = -1;
     applyExplode(state.explode);
@@ -151,6 +152,7 @@ export async function createStage(container, {
     if (Math.abs(t - state.explodeShown) < 1e-4) return;
     state.explodeShown = t;
     for (const p of parts.values()) p.node.position.copy(p.home).addScaledVector(p.explode, t);
+    floor.position.y = -fitRadius * 1.0 - maxDrop * t * 0.6;
     state.dirty = true;
   }
 
@@ -165,8 +167,13 @@ export async function createStage(container, {
           if (o.userData.edges) o.userData.edges.material = on ? lines.lineHi : lines.line;
           if (o.userData.hull) o.userData.hull.material = on ? hullHi : hullMat;
         } else if (o.material.emissive) {
-          o.material.emissive.set(on ? css('--accent') : '#000000');
-          o.material.emissiveIntensity = on ? 0.18 : 0;
+          if (on) {
+            o.material.emissive.set(css('--accent'));
+            o.material.emissiveIntensity = 0.18;
+          } else {
+            o.material.emissive.copy(o.material.userData.baseEmissive ?? new T.Color(0));
+            o.material.emissiveIntensity = o.material.userData.baseEmissiveIntensity ?? 0;
+          }
         }
       });
     }
