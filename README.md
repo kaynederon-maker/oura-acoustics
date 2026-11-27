@@ -9,6 +9,10 @@ npm start              # http://localhost:3000
 npm test               # maths, store logic, AA contrast for all five themes, image/model/font credits
 ```
 
+**Live prototype:** https://kaynederon-maker.github.io/oura-acoustics/ (GitHub Pages, served from the `gh-pages` branch).
+Everything runs in the browser except the AI Sommelier, which needs the Node server (`npm start`). To republish after
+changing `public/`: `git subtree split --prefix public -b gh-pages && git push -f origin gh-pages`.
+
 Design direction, decisions, validation results and open questions: [DESIGN_NOTES.md](DESIGN_NOTES.md).
 Screenshots of every page in every theme: [`screenshots/`](screenshots).
 
