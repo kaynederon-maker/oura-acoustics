@@ -1,0 +1,16 @@
+{
+  "name": "Oura Blueprint v3",
+  "id": "oura-blueprint-v3",
+  "api": "1.0.0",
+  "main": "code.js",
+  "editorType": [
+    "figma"
+  ],
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": [
+      "https://raw.githubusercontent.com"
+    ],
+    "reasoning": "Loads the prototype screenshots from the project repository."
+  }
+}
