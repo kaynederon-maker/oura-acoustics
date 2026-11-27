@@ -1,4 +1,3 @@
-/* Tuning Guide journey: sticky analyzer stage beside long scrolling chapters. */
 .journey {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);

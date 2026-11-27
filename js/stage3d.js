@@ -1,8 +1,3 @@
-// One 3D stage for the whole site. Lazy-loads three.js, shows one .glb object at a time and offers:
-//   look 'lux'   physical materials (brass, lacquer, glass...) under a soft studio environment
-//   look 'line'  a brass line engraving (History): faces fill with the background, edges draw the object
-// plus drag-to-turn with inertia, keyboard turning, part hover/highlight and an explode amount.
-// Frames render only while the canvas is on screen and something moved.
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const COARSE = matchMedia('(pointer: coarse)').matches;
 const DRAG_SPEED = 0.008;
@@ -15,7 +10,6 @@ export const loadThree = () => (lib ??= import('/vendor/three/three.js'));
 
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
-// Physical presets by material name (names come from tools/build-models.mjs).
 const PRESETS = {
   brass: { color: '#b8945c', metalness: 1, roughness: 0.3 },
   steel: { color: '#a9aeb3', metalness: 1, roughness: 0.36 },
@@ -92,19 +86,16 @@ export async function createStage(container, {
   let fitRadius = 1;
   let host = null;
 
-  // ---------- materials ----------
   const lines = { line: new T.LineBasicMaterial({ color: css('--text-lo') }), lineHi: new T.LineBasicMaterial({ color: css('--accent') }) };
   const fillColor = () => new T.Color(css('--bg')).lerp(new T.Color(css('--text-hi')), 0.035);
   const fillMat = new T.MeshBasicMaterial({ color: fillColor(), polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
   const fillHiColor = () => new T.Color(css('--bg')).lerp(new T.Color(css('--accent')), 0.22);
   const fillHi = new T.MeshBasicMaterial({ color: fillHiColor(), polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
-  // Silhouettes: an inverted hull pushed out along the normals, so smooth shapes still get an outline.
   const hull = { value: 0.0035 };
   const outline = (color) => {
     const m = new T.MeshBasicMaterial({ color, side: T.BackSide });
     m.onBeforeCompile = (shader) => {
       shader.uniforms.uHull = hull;
-      // Screen-constant thickness: push the hull out in view space, scaled by depth.
       shader.vertexShader = `uniform float uHull;\n${shader.vertexShader}`.replace('#include <project_vertex>',
         '#include <project_vertex>\nmvPosition.xyz += normalize(normalMatrix * normal) * uHull * -mvPosition.z;\ngl_Position = projectionMatrix * mvPosition;');
     };
@@ -182,7 +173,6 @@ export async function createStage(container, {
     state.dirty = true;
   }
 
-  // ---------- sizing + camera ----------
   function resize() {
     if (!host) return;
     const r = host.getBoundingClientRect();
@@ -210,7 +200,6 @@ export async function createStage(container, {
     resize();
   }
 
-  // ---------- interaction ----------
   const raycaster = new T.Raycaster();
   const ndc = new T.Vector2();
   function pick(e) {
@@ -270,7 +259,6 @@ export async function createStage(container, {
     state.dirty = true;
   }
 
-  // ---------- loop ----------
   function frame() {
     if (!state.alive) return;
     requestAnimationFrame(frame);
@@ -330,7 +318,6 @@ export async function createStage(container, {
       state.highlighted = id;
       paintHighlight();
     },
-    // Screen position of a part's centre inside the canvas, for HTML labels and leader lines.
     project(id) {
       const p = parts.get(id);
       if (!p) return null;

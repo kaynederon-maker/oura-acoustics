@@ -1,4 +1,3 @@
-// Entry: hash router (one page, so captured audio survives navigation), audio dock, background.
 import * as engine from './audio-engine.js';
 import { startBackground, setIntensity } from './background.js';
 import { initLab, redrawLab } from './lab.js';
@@ -20,7 +19,7 @@ import { loadCredits, hydratePhotos } from './img.js';
 const VIEWS = { '': 'home', store: 'store', lab: 'lab', guide: 'guide', history: 'history' };
 const ALL_VIEWS = [...Object.values(VIEWS), 'product'];
 const TITLES = { home: 'Oura Acoustics', store: 'Store', lab: 'Tuning Lab', guide: 'Tuning Guide', history: 'History of Sound' };
-const AURA_INTENSITY = { home: 0.5, store: 0, product: 0, lab: 0, guide: 0, history: 0 }; // the silk is a Home-only backdrop
+const AURA_INTENSITY = { home: 0.5, store: 0, product: 0, lab: 0, guide: 0, history: 0 };
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const CURTAIN_MS = 340;
 
@@ -86,7 +85,7 @@ function meterLoop() {
 }
 
 function initDock() {
-  if (!engine.canCaptureSystem()) $('[data-source="system"]').hidden = true; // phones: mic instead
+  if (!engine.canCaptureSystem()) $('[data-source="system"]').hidden = true;
   for (const btn of $$('[data-source]')) btn.addEventListener('click', () => startSource(btn.dataset.source));
   $('#file-input').addEventListener('change', async (e) => {
     const [file] = e.target.files;
@@ -105,7 +104,6 @@ function initDock() {
   requestAnimationFrame(meterLoop);
 }
 
-// Route change: a curtain falls with a brass hairline, the page swaps underneath, the curtain lifts.
 let firstRoute = true;
 let curtainTimer;
 function navigate() {
@@ -130,7 +128,6 @@ function initTopbar() {
   sync();
 }
 
-// Content eases in once as it first scrolls into view (CSS owns the motion).
 function initReveals() {
   const items = $$('.reveal');
   if (!('IntersectionObserver' in window)) return items.forEach((el) => el.classList.add('in'));

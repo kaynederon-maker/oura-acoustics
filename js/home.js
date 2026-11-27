@@ -1,6 +1,3 @@
-// Home: the reference in-ear as a gallery piece. Drag to turn it; scrolling through the pinned hero
-// turns it and takes it apart, and engraved spec labels follow each part. Below: an editorial strip
-// of listening-room photos and the History / Guide teasers.
 import { createStage } from './stage3d.js';
 import { peekLevels } from './audio-engine.js';
 import { motionReady, reducedMotion } from './motion.js';
@@ -50,7 +47,6 @@ function initHeroScroll() {
   gsap.fromTo('.hero-word', { yPercent: 0 }, { yPercent: -18, ease: 'none', scrollTrigger: { trigger: '.hero-pin', start: 'top top', end: 'bottom top', scrub: true } });
 }
 
-// The hairline ring breathes with whatever is playing.
 function ringLoop() {
   requestAnimationFrame(ringLoop);
   if ($('#view-home').hidden || document.hidden) return;
@@ -77,7 +73,6 @@ async function initStage() {
   addEventListener('resize', placeSpecs, { passive: true });
 }
 
-// Returns a promise that settles when the hero object is ready (the intro loader waits for it).
 export function initHome() {
   $('.hero-specs').replaceChildren(...SPECS.map((s, i) => h('div', { class: `hero-spec${i % 2 ? ' flip' : ''}`, 'data-part': s.part },
     h('span', { class: 'hero-spec-dot' }),

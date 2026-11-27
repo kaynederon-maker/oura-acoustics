@@ -1,4 +1,3 @@
-// Full-screen "silk aurora" fragment shader driven by eased audio band levels.
 import { levels } from './audio-engine.js';
 
 const VERTEX = `attribute vec2 p; void main() { gl_Position = vec4(p, 0.0, 1.0); }`;
@@ -29,14 +28,13 @@ void main() {
   c = mix(c, uC3, uHigh * 0.7 * folds);
   float glow = smoothstep(0.15, 1.0, folds * silk) * (0.55 + uBass * 1.4);
   float vignette = smoothstep(1.25, 0.2, length(uv - 0.5) * 1.4);
-  // Mix (not add) so the silk reads on light themes as well as dark ones.
   gl_FragColor = vec4(mix(uBase, c, clamp(glow * vignette * uIntensity, 0.0, 1.0)), 1.0);
 }`;
 
 const MOBILE = matchMedia('(max-width: 760px), (pointer: coarse)').matches;
 const FRAME_MS = MOBILE ? 1000 / 30 : 0;
-const RESOLUTION = MOBILE ? 0.5 : Math.min(devicePixelRatio, 1.5) * 0.6; // soft shader, low res is invisible
-const AUDIO_GAIN = 0.9; // how much audio can push the look; 0 = static aurora
+const RESOLUTION = MOBILE ? 0.5 : Math.min(devicePixelRatio, 1.5) * 0.6;
+const AUDIO_GAIN = 0.9;
 
 let intensity = 0.35;
 export const setIntensity = (v) => (intensity = v);
@@ -52,7 +50,7 @@ function compile(gl, type, source) {
 export function startBackground(canvas) {
   const gl = canvas.getContext('webgl', { antialias: false, powerPreference: 'low-power' });
   if (!gl) {
-    document.body.classList.add('no-webgl'); // CSS gradient fallback
+    document.body.classList.add('no-webgl');
     return;
   }
   const program = gl.createProgram();
@@ -70,7 +68,6 @@ export function startBackground(canvas) {
       .map((n) => [n, gl.getUniformLocation(program, n)]),
   );
 
-  // Palette comes from the active theme's CSS tokens.
   const applyPalette = () => {
     const style = getComputedStyle(document.documentElement);
     const rgb = (name) => {
@@ -98,11 +95,11 @@ export function startBackground(canvas) {
 
   function frame(now) {
     requestAnimationFrame(frame);
-    if (document.hidden || intensity === 0 || now - last < FRAME_MS) return; // hidden off Home: no GPU work
+    if (document.hidden || intensity === 0 || now - last < FRAME_MS) return;
     const dt = Math.min(0.1, (now - last) / 1000);
     last = now;
     const { bass, mid, high } = levels();
-    if (!reduced.matches) flow += dt * (0.3 + mid * 0.8 * AUDIO_GAIN); // music speeds the silk a little
+    if (!reduced.matches) flow += dt * (0.3 + mid * 0.8 * AUDIO_GAIN);
     gl.uniform2f(u.uRes, canvas.width, canvas.height);
     gl.uniform1f(u.uTime, flow);
     gl.uniform1f(u.uBass, Math.min(bass * 1.6, 1) * 0.5 * AUDIO_GAIN);

@@ -1,6 +1,3 @@
-/* Guide: sweep hero, pro missions, rotary knobs, mini plots and exploded hardware. */
-
-/* ---------- hero ---------- */
 .g-hero {
   min-height: 86svh;
   display: grid;
@@ -13,7 +10,7 @@
 .g-sweep { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 28px; align-items: center; padding: 30px; }
 .sw-dial { display: grid; justify-items: center; gap: 10px; }
 .sw-dial .knob { --size: 190px; }
-.sw-dial .knob-value, .sw-dial .knob-label { display: none; } /* the big readout beside it says the same */
+.sw-dial .knob-value, .sw-dial .knob-label { display: none; }
 .sw-read { text-align: center; }
 .sw-hz { margin: 0; font: 500 clamp(36px, 4vw, 52px)/1 var(--font-display); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .sw-region { margin: 6px 0 0; color: var(--accent); font: 600 13px var(--font-ui); letter-spacing: 0.12em; text-transform: uppercase; }
@@ -24,7 +21,6 @@
 .section-intro { margin: 96px 0 32px; display: grid; gap: 10px; }
 .section-intro h2 { font-size: var(--fs-72); line-height: 0.98; letter-spacing: -0.035em; margin: 0; max-width: 16ch; }
 
-/* ---------- missions ---------- */
 .missions { display: grid; gap: 28px; }
 .mission {
   --score: 0;
@@ -68,7 +64,6 @@
 .m-transport { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 .m-play.on { box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 30%, transparent); }
 
-/* Score dial: a conic ring filled by --score (0..1). */
 .m-score { grid-area: score; position: relative; width: 108px; height: 108px; display: grid; place-content: center; text-align: center; }
 .m-score-ring {
   position: absolute; inset: 0; border-radius: 50%;
@@ -78,7 +73,6 @@
 .m-score-num { font: 500 30px/1 var(--font-display); font-variant-numeric: tabular-nums; }
 .m-score small { color: var(--text-lo); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; }
 
-/* ---------- knob: a weighted, machined control ---------- */
 .knob { --size: 108px; display: grid; justify-items: center; gap: 6px; cursor: ns-resize; touch-action: none; user-select: none; outline: none; }
 .knob-svg { width: var(--size); height: var(--size); overflow: visible; transition: transform 400ms var(--ease-lux); }
 .knob.turning .knob-svg { transform: scale(1.03); }
@@ -98,7 +92,6 @@
 .knob-label { font: 500 var(--fs-11) var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-lo); text-align: center; max-width: 16ch; }
 @media (prefers-reduced-motion: reduce) { .knob-pointer { transition: none; } }
 
-/* ---------- mini plot ---------- */
 .mini-plot { display: block; width: 100%; height: 150px; border-radius: 14px; background: var(--well); }
 .sw-plot .mini-plot { height: 120px; }
 .mp-grid { stroke: var(--grid); stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -110,7 +103,6 @@
 .mp-line.sub { stroke: var(--plot-1); stroke-dasharray: 3 4; }
 .mp-ticks { display: flex; justify-content: space-between; margin-top: 4px; font: 11px var(--font-mono); color: var(--text-lo); }
 
-/* ---------- exploded hardware ---------- */
 .ex { margin: 0; display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 16px; align-items: center; }
 .ex-stage { position: relative; aspect-ratio: 1; perspective: 1400px; }
 .ex-model {
@@ -119,7 +111,6 @@
   position: absolute; inset: 14%;
   transform-style: preserve-3d;
   --layers: 6;
-  /* centre the stack on its own height so it explodes both ways */
   transform: rotateX(58deg) rotateZ(var(--rz)) translateZ(calc(var(--gap) * (var(--layers) - 1) / -2));
 }
 .ex-layer { position: absolute; inset: 0; transform: translateZ(calc(var(--i) * var(--gap))); }
@@ -141,7 +132,6 @@
 .ex-legend strong { color: var(--text-hi); }
 .ex-legend span { color: var(--text-lo); }
 
-/* ---------- handbook as a closed reference ---------- */
 .handbook { margin: 72px 0 24px; }
 .handbook > summary { display: grid; gap: 4px; padding: 28px; border-radius: var(--radius-lg); background: var(--card); box-shadow: 0 0 0 1px var(--hairline); cursor: pointer; list-style: none; }
 .handbook > summary::-webkit-details-marker { display: none; }
@@ -164,4 +154,4 @@
   .m-readout { grid-template-columns: 1fr; grid-template-areas: 'score' 'plot' 'legend' 'verdict'; justify-items: center; }
   .m-readout .m-plot { width: 100%; }
 }
-button.text-link { padding: 0; border: 0; background: none; font: inherit; font-weight: 500; cursor: pointer; } /* a button that reads as a link */
+button.text-link { padding: 0; border: 0; background: none; font: inherit; font-weight: 500; cursor: pointer; }

@@ -1,5 +1,3 @@
-// A brass ring that follows the pointer and names what an object does ("Drag", "View", "Play").
-// Decoration only: the native cursor stays visible, and touch / reduced motion skip it entirely.
 const FINE = matchMedia('(hover: hover) and (pointer: fine)').matches;
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FOLLOW = 0.22;

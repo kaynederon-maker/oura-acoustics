@@ -1,5 +1,3 @@
-// Tuning Lab: AutoEq correction + a full parametric EQ (D3 graph, crossover, time & phase)
-// + listening analysis + hearing check + advice + exports + hardware push.
 import * as engine from './audio-engine.js';
 import {
   AUTOEQ_INDEX, parseIndex, profileUrls, parseParametricEq, parseFrCsv, responseDb, searchIndex, matchDevices,
@@ -36,14 +34,11 @@ async function fetchText(url) {
   return res.text();
 }
 
-// Value at 1 kHz → 0 dB, so a headphone and a target line up on the graph.
 function normalize(freqs, values) {
   let i = 0;
   while (i < freqs.length - 1 && freqs[i + 1] <= 1000) i++;
   return values.map((v) => v - values[i]);
 }
-
-// ---------- step 1: headphones ----------
 
 async function loadIndex() {
   lab.index ??= fetchText(AUTOEQ_INDEX).then(parseIndex);
@@ -125,7 +120,6 @@ function clearEntry() {
   markStep(1, false);
 }
 
-// The guided setup rail: each step lights brass when done; the first open one is current.
 function markStep(n, done = true) {
   const li = $(`.lab-steps [data-step="${n}"]`);
   if (li) li.dataset.done = String(done);
@@ -139,11 +133,9 @@ function markStep(n, done = true) {
   }
 }
 
-// ---------- graph model (D3) ----------
-
 async function ensureTarget(id) {
   if (!id || lab.targets.has(id)) return;
-  lab.targets.set(id, null); // in flight
+  lab.targets.set(id, null);
   try {
     const fr = parseFrCsv(await fetchText(targetUrl(id)));
     lab.targets.set(id, { freqs: fr.frequency, values: normalize(fr.frequency, fr.raw) });
@@ -209,8 +201,6 @@ function renderSummary() {
   $('#eq-summary').textContent = parts.join(' · ');
 }
 
-// ---------- exports ----------
-
 const fileName = (suffix) => `${(lab.entry?.name ?? 'Oura').replace(/[\\/:*?"<>|]/g, '')} ${suffix}.txt`;
 
 function exportEq(kind) {
@@ -229,8 +219,6 @@ function exportEq(kind) {
   download(fileName('ParametricEQ'), toParametricText({ preamp: preamp(), filters: portable }));
 }
 
-// ---------- step 2: listen & analyze ----------
-
 let analyzing = false;
 async function analyze() {
   if (analyzing) return;
@@ -245,7 +233,6 @@ async function analyze() {
   const listener = createListener(engine.measureAnalyser(), engine.context().sampleRate);
   const started = performance.now();
   try {
-    // Time-based, so throttled background timers only mean fewer frames, not a longer wait.
     for (let elapsed = 0; elapsed < ANALYZE_MS; elapsed = performance.now() - started) {
       if (engine.state.source === 'none') throw new Error('The sound source stopped before the analysis finished.');
       listener.step();
@@ -288,19 +275,17 @@ function spectrumLoop() {
   drawSpectrum($('#spectrum'), analyser, spectrum, engine.context().sampleRate);
 }
 
-// ---------- step 3: hearing check ----------
-
 function toneRamp(ctx, freq, button) {
   return new Promise((resolve) => {
     const osc = new OscillatorNode(ctx, { frequency: freq });
     const gain = new GainNode(ctx, { gain: 0 });
-    osc.connect(gain).connect(ctx.destination); // ponytail: bypasses the EQ; route via eqIn to test "as tuned"
+    osc.connect(gain).connect(ctx.destination);
     osc.start();
     let db = TONE.startDb;
     const set = () => gain.gain.setTargetAtTime(10 ** (db / 20), ctx.currentTime, 0.03);
     const timer = setInterval(() => {
       db += TONE.stepDb;
-      if (db > TONE.maxDb) finish(TONE.maxDb + TONE.stepDb * 3); // never heard: flag it
+      if (db > TONE.maxDb) finish(TONE.maxDb + TONE.stepDb * 3);
       else set();
     }, TONE.stepMs);
     const heard = () => finish(db);
@@ -344,8 +329,6 @@ async function hearingCheck() {
     tap.hidden = true;
   }
 }
-
-// ---------- recommendations + AI ----------
 
 function applyBand(band, message) {
   upsertBand(band);
@@ -399,8 +382,6 @@ async function askAi() {
   }
 }
 
-// ---------- wiring ----------
-
 export function initLab() {
   let debounce;
   const search = $('#hp-search');
@@ -446,16 +427,15 @@ export function initLab() {
   attachGraphHover($('#spectrum'));
   initPeqState();
 
-  const entry = store.get('aura.lab', {}).entry; // the last model (older Lab versions saved it here too)
+  const entry = store.get('aura.lab', {}).entry;
   if (entry?.path) selectEntry(entry);
   renderRecs();
   renderSummary();
   requestAnimationFrame(spectrumLoop);
 }
 
-export const redrawLab = () => graph?.relayout(); // the graph has no size while its view is hidden
+export const redrawLab = () => graph?.relayout();
 
-// Store → Lab hand-off: search the AutoEq index for a model and let the user pick the measurement.
 export function tuneFor(model) {
   const search = $('#hp-search');
   search.value = model;

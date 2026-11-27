@@ -1,19 +1,9 @@
-// One AudioContext for the whole site.
-//
-//   file / pink ─► eqIn ─► preamp ═eqChain═► eqTail ═xoChain(HPF)═► splitter ─► delay/polarity L,R ─► merger ─► eqOut ─┐
-//                   │                          └─► subIn ═subChain(LPF)═► subGain ─► subDelay ─► merger (mixed)        │
-//                   └──────────────────────────────► dry (EQ off, level-matched) ──────────────────────────────────────┴► monitor
-//   guide loop ─► guideIn ─► guidePre ═guideChain═► guideWet ─┬► monitor        (A/B for the Tuning Guide)
-//                   └──────────────────────────────► guideDry ─┘
-//   monitor ─► speakers + bus;  system audio / mic ─► bus;  bus ─► visual + measure analysers
-//
-// Captured audio is analysed only, never played back, so nothing echoes or doubles.
 import { biquadCoefficients } from './eq.js';
 
 let ctx = null;
 let nodes = null;
 let current = null;
-let starts = 0; // bumped by every source start, so slow async starts can tell they were overtaken
+let starts = 0;
 export const startCount = () => starts;
 let pinkBuffer = null;
 let mediaEl = null;
@@ -21,17 +11,16 @@ let mediaNode = null;
 
 const listeners = new Set();
 const level = { bass: 0, mid: 0, high: 0 };
-const EASE = 0.08; // lower = calmer background
-const RAMP = 0.012; // seconds: param changes glide instead of clicking
+const EASE = 0.08;
+const RAMP = 0.012;
 const MAX_DELAY_S = 0.1;
 const WEB_TYPES = { PK: 'peaking', LSC: 'lowshelf', HSC: 'highshelf', HPF: 'highpass', LPF: 'lowpass', NOTCH: 'notch', AP: 'allpass' };
-const NATIVE_SHELF_Q = Math.SQRT1_2; // Web Audio shelves are fixed at this slope
+const NATIVE_SHELF_Q = Math.SQRT1_2;
 
 const EMPTY_EQ = {
   preamp: 0, eq: [], xoMain: [], sub: null,
   align: { delayL: 0, delayR: 0, invertL: false, invertR: false },
 };
-// owner: which guide feature started a 'guide' loop (coach, journey, history, mission).
 export const state = { source: 'none', label: 'Silent', owner: null, eqOn: true, eq: EMPTY_EQ };
 
 export const onChange = (fn) => (listeners.add(fn), () => listeners.delete(fn));
@@ -39,14 +28,11 @@ const emit = () => listeners.forEach((fn) => fn(state));
 const db = (v) => 10 ** (v / 20);
 const glide = (param, value) => param.setTargetAtTime(value, ctx.currentTime, RAMP);
 
-// ---------- filter chains that update in place ----------
-
 const usesIir = (s) => (s.type === 'LSC' || s.type === 'HSC') && Math.abs(s.q - NATIVE_SHELF_Q) > 0.02;
 const signature = (specs) => specs.map((s) => (usesIir(s) ? 'iir' : s.type)).join();
 const sameSpec = (a, b) => a && b && a.fc === b.fc && a.gain === b.gain && a.q === b.q;
 
 function setBiquad(node, s, immediate) {
-  // Web Audio lowpass/highpass Q is a resonance in dB; the rest take the cookbook's linear Q.
   const q = s.type === 'HPF' || s.type === 'LPF' ? 20 * Math.log10(s.q) : s.q;
   const set = immediate ? (p, v) => (p.value = v) : glide;
   set(node.frequency, s.fc);
@@ -56,7 +42,6 @@ function setBiquad(node, s, immediate) {
 
 function makeNode(s) {
   if (usesIir(s)) {
-    // ponytail: IIR coefficients can't be automated, so a shelf with a custom Q is rebuilt on change.
     const { b, a } = biquadCoefficients(s, ctx.sampleRate);
     return new IIRFilterNode(ctx, { feedforward: b, feedback: a });
   }
@@ -129,7 +114,7 @@ export function context() {
   n.eqTail.connect(n.subIn);
   n.subChain = new FilterChain(n.subIn, n.subTail);
   n.subTail.connect(n.subGain).connect(n.subDelay);
-  n.subDelay.connect(n.merger, 0, 0); // ponytail: sub is previewed mixed into L/R; the APO export routes it to SUB
+  n.subDelay.connect(n.merger, 0, 0);
   n.subDelay.connect(n.merger, 0, 1);
   n.subGain.gain.value = 0;
   n.merger.connect(n.eqOut).connect(n.monitor);
@@ -169,11 +154,9 @@ function applyEq() {
 
 function applyBypass() {
   glide(nodes.eqOut.gain, state.eqOn ? 1 : 0);
-  glide(nodes.dry.gain, state.eqOn ? 0 : db(state.eq.preamp)); // level-matched A/B
+  glide(nodes.dry.gain, state.eqOn ? 0 : db(state.eq.preamp));
 }
 
-// cfg: { preamp, eq: specs, xoMain: specs, sub: { specs, gainDb, delayMs, invert } | null, align }
-// (the older { preamp, filters } shape still works). Same filter layout = smooth in-place update.
 export function setEq(cfg) {
   state.eq = { ...EMPTY_EQ, ...cfg, eq: cfg.eq ?? cfg.filters ?? [], align: { ...EMPTY_EQ.align, ...cfg.align } };
   if (ctx) applyEq();
@@ -186,8 +169,6 @@ export function setEqOn(on) {
   emit();
 }
 
-// ---------- Tuning Guide A/B path ----------
-
 let guidePreamp = 0;
 export function setGuideEq(specs, preamp = 0) {
   context();
@@ -196,7 +177,6 @@ export function setGuideEq(specs, preamp = 0) {
   nodes.guideChain.set(specs);
 }
 
-// tuned = true plays the EQ'd path, false the untouched one (level-matched to the same preamp).
 export function setGuideBypass(tuned) {
   context();
   glide(nodes.guideWet.gain, tuned ? 1 : 0);
@@ -234,9 +214,9 @@ export async function captureSystem() {
   if (!canCaptureSystem()) {
     throw new Error('System audio capture needs desktop Chrome or Edge. On phones, use the microphone instead.');
   }
-  const resumed = ready(); // start resuming inside the click, before awaiting the picker
+  const resumed = ready();
   const stream = await navigator.mediaDevices.getDisplayMedia({
-    video: true, // Chrome only offers audio alongside a video surface
+    video: true,
     audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
     systemAudio: 'include',
     selfBrowserSurface: 'include',
@@ -276,7 +256,6 @@ export async function playFile(file) {
 
 function pink() {
   if (pinkBuffer) return pinkBuffer;
-  // Paul Kellet's refined pink-noise filter, 4 s loop.
   pinkBuffer = ctx.createBuffer(1, ctx.sampleRate * 4, ctx.sampleRate);
   const out = pinkBuffer.getChannelData(0);
   let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
@@ -306,7 +285,6 @@ export async function playPink() {
 }
 
 const SWEEP_LEVEL_DB = -24;
-// Exponential sine sweep 20 Hz → 20 kHz. Returns frequencyNow() for a live readout.
 export async function playSweep(seconds = 14) {
   await ready();
   const t0 = ctx.currentTime;
@@ -319,7 +297,7 @@ export async function playSweep(seconds = 14) {
   osc.start();
   osc.stop(t0 + seconds);
   const session = begin('sweep', 'Frequency sweep', amp, nodes.monitor, () => {
-    try { osc.stop(); } catch { /* already stopped */ }
+    try { osc.stop(); } catch {  }
   });
   osc.onended = () => current === session && stopSource();
   return {
@@ -328,7 +306,6 @@ export async function playSweep(seconds = 14) {
   };
 }
 
-// A synthesized practice track for the Tuning Guide, through the guide's own A/B chain.
 export async function playGuideLoop(buffer, label, owner = 'coach') {
   await ready();
   const src = new AudioBufferSourceNode(ctx, { buffer, loop: true });
@@ -336,7 +313,6 @@ export async function playGuideLoop(buffer, label, owner = 'coach') {
   begin('guide', label, src, nodes.guideIn, () => src.stop(), owner);
 }
 
-// Third-octave band of pink noise, straight to the monitor (no EQ) for the guide.
 export async function playBand(freq, label) {
   await ready();
   const src = noiseSource();
@@ -344,12 +320,11 @@ export async function playBand(freq, label) {
   band.frequency.value = freq;
   band.Q.value = 4.32;
   const boost = ctx.createGain();
-  boost.gain.value = 2.5; // a narrow band of pink noise is quiet; bring it to a similar loudness
+  boost.gain.value = 2.5;
   src.connect(band).connect(boost);
   begin('band', label, boost, nodes.monitor, () => src.stop());
 }
 
-// Output-device names, e.g. "AirPods Pro". Labels only appear after a media permission.
 export async function deviceNames() {
   const list = async () => (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.label);
   let devices = await list();
@@ -372,10 +347,8 @@ function band(lo, hi) {
   return sum / ((b - a + 1) * 255);
 }
 
-// Last eased levels without advancing them (the background owns the per-frame step).
 export const peekLevels = () => level;
 
-// Smoothed 0..1 band energies; call once per frame.
 export function levels() {
   if (!ctx || state.source === 'none') {
     for (const k in level) level[k] -= level[k] * EASE;

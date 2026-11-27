@@ -1,5 +1,3 @@
-// Pure store logic (no DOM): filtering, sorting, bag and favourites. Unit-tested.
-
 export const FREE_SHIPPING_MIN = 199;
 export const SHIPPING_FEE = 9.99;
 export const MAX_QTY = 10;
@@ -25,7 +23,6 @@ export function filterProducts(products, { category = 'all', query = '', favorit
     .sort(SORTS[sort] ?? SORTS.featured);
 }
 
-// bag: [{ id, qty }] — every helper returns a new array.
 export function addToBag(bag, id, qty = 1) {
   const line = bag.find((l) => l.id === id);
   if (!line) return [...bag, { id, qty: Math.min(qty, MAX_QTY) }];
@@ -63,7 +60,6 @@ export const toggleFavorite = (favorites, id) =>
   favorites.includes(id) ? favorites.filter((f) => f !== id) : [...favorites, id];
 
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-// Returns { field: message } for every invalid field; empty object means valid.
 export function validateCheckout({ name = '', email = '', address = '', city = '', postal = '' }) {
   const errors = {};
   if (name.trim().length < 2) errors.name = 'Enter your full name.';

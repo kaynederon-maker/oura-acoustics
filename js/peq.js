@@ -1,4 +1,3 @@
-// Parametric EQ model (pure): bands, crossover, time/phase alignment, templates, exports.
 import { complexResponse, toDb, toPhaseDeg, AUTOEQ_RAW } from './eq.js';
 
 export const TYPES = {
@@ -14,13 +13,12 @@ export const GAIN_TYPES = new Set(['PK', 'LSC', 'HSC']);
 export const PASS_TYPES = new Set(['HPF', 'LPF']);
 export const DEFAULT_Q = { PK: 1.41, LSC: 0.71, HSC: 0.71, HPF: 0.71, LPF: 0.71, NOTCH: 4, AP: 0.71 };
 export const LIMITS = { fc: [20, 20000], gain: [-18, 18], q: [0.1, 12], delayMs: [0, 50] };
-export const SPEED_OF_SOUND = 343; // m/s at ~20 °C
+export const SPEED_OF_SOUND = 343;
 const BUTTERWORTH_Q = Math.SQRT1_2;
-// Linkwitz-Riley = two cascaded Butterworth filters of half the order.
 const LR_STAGES = { 12: [0.5], 24: [BUTTERWORTH_Q, BUTTERWORTH_Q], 48: [0.5412, 1.3066, 0.5412, 1.3066] };
 
 const clamp = (v, [lo, hi]) => Math.min(hi, Math.max(lo, Number(v) || 0));
-const round = (v, step) => Number((Math.round(v / step) * step).toFixed(4)); // no 1.4000000001
+const round = (v, step) => Number((Math.round(v / step) * step).toFixed(4));
 let seq = 0;
 export const newId = () => `b${Date.now().toString(36)}${(seq++).toString(36)}`;
 
@@ -36,7 +34,6 @@ export function makeBand({ id = newId(), type = 'PK', fc = 1000, gain = 0, q, sl
   };
 }
 
-// Bands -> engine/graph biquad specs. A 24 dB/oct pass filter is two Butterworth stages.
 export function expandBands(bands) {
   return bands.filter((b) => b.enabled).flatMap((b) => {
     if (PASS_TYPES.has(b.type) && b.slope === 24) {
@@ -58,8 +55,6 @@ export const distanceToMs = (cm) => (Math.max(0, cm) / 100 / SPEED_OF_SOUND) * 1
 const cmul = (a, b) => ({ re: a.re * b.re - a.im * b.im, im: a.re * b.im + a.im * b.re });
 const cscale = (a, k) => ({ re: a.re * k, im: a.im * k });
 
-// What leaves the system: EQ (+ preamp), and with a crossover the main (HPF) and sub (LPF,
-// gain, delay, polarity) branches plus their acoustic sum. Phase is the sum's phase.
 export function systemResponse({ eqSpecs, preamp, crossover }, freqs, fs) {
   const pre = 10 ** (preamp / 20);
   const eq = complexResponse(eqSpecs, freqs, fs).map((h) => cscale(h, pre));
@@ -78,8 +73,6 @@ export function systemResponse({ eqSpecs, preamp, crossover }, freqs, fs) {
   const sum = main.map((m, i) => ({ re: m.re + sub[i].re, im: m.im + sub[i].im }));
   return { eq: eq.map(toDb), main: main.map(toDb), sub: sub.map(toDb), sum: sum.map(toDb), phase: sum.map(toPhaseDeg) };
 }
-
-// ---------- reference targets (AutoEq) and starter templates ----------
 
 export const TARGETS = {
   'harman-ie-2019': { name: 'Harman in-ear 2019', file: 'Harman in-ear 2019.csv' },
@@ -136,8 +129,6 @@ export function applyTemplate(template) {
   };
 }
 
-// ---------- exports ----------
-
 const fmt = (v, d = 1) => Number(v).toFixed(d);
 function apoFilter(s) {
   switch (s.type) {
@@ -151,7 +142,6 @@ function apoFilter(s) {
   }
 }
 
-// Full Equalizer APO config: EQ, a 2.1 crossover routed to the SUB channel, per-channel delay/polarity.
 export function toApoConfig({ preamp, specs, crossover = DEFAULT_CROSSOVER, alignment = DEFAULT_ALIGNMENT }) {
   const lines = [`Preamp: ${fmt(preamp)} dB`];
   let n = 1;
@@ -178,7 +168,6 @@ export function toApoConfig({ preamp, specs, crossover = DEFAULT_CROSSOVER, alig
   return lines.join('\n') + '\n';
 }
 
-// devicePEQ (hardware push) uses its own type codes; 24 dB pass filters go as one 12 dB stage.
 const TO_DEVICE = { PK: 'PK', LSC: 'LSQ', HSC: 'HSQ', HPF: 'HP', LPF: 'LP', NOTCH: 'NOTCH', AP: 'AP' };
 const FROM_DEVICE = Object.fromEntries(Object.entries(TO_DEVICE).map(([k, v]) => [v, k]));
 export const toDeviceFilters = (bands) => bands.filter((b) => b.enabled).map((b) => ({

@@ -1,13 +1,12 @@
-// Hands-on controls for the Guide: a rotary knob and a tiny frequency-response plot.
 import { h, haptic, fmtHz } from './ui.js';
 import { rollNumber } from './img.js';
 import { play } from './sound.js';
 
 const SVG = 'http://www.w3.org/2000/svg';
 const ARC_DEG = 270;
-const DRAG_PX_FULL_RANGE = 220; // pixels of vertical drag to sweep min..max
+const DRAG_PX_FULL_RANGE = 220;
 const SCALE_TICKS = 24;
-const DETENTS = 48; // clicks per full turn
+const DETENTS = 48;
 const FLICK_FRICTION = 0.9;
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const s = (tag, attrs = {}) => {
@@ -24,10 +23,6 @@ function arcPath(r, from, to) {
   return `M ${p(from)} A ${r} ${r} 0 ${to - from > 180 ? 1 : 0} 1 ${p(to)}`;
 }
 
-// Rotary knob. Drag up/down (Shift = fine), wheel, arrows/PageUp/Home/End, double-click resets.
-// It feels weighted: the pointer trails the value slightly, a flick keeps it turning, and it clicks
-// through engraved detents (sound + haptics). log: true sweeps logarithmically (frequencies).
-// detent: value that gives a stronger tick.
 export function knob({ label, min, max, value, step = 1, log = false, format = String, onInput, detent = null }) {
   const initial = value;
   const toT = (v) => (log ? Math.log(v / min) / Math.log(max / min) : (v - min) / (max - min));
@@ -85,7 +80,6 @@ export function knob({ label, min, max, value, step = 1, log = false, format = S
     onInput?.(value);
   }
 
-  // Vertical drag maps to the knob's travel, independent of where you grab it.
   let spin = 0;
   el.addEventListener('pointerdown', (e) => {
     if (e.button !== 0) return;
@@ -113,7 +107,6 @@ export function knob({ label, min, max, value, step = 1, log = false, format = S
       el.removeEventListener('pointerup', up);
       el.removeEventListener('pointercancel', up);
       if (REDUCED || performance.now() - lastT > 60) return;
-      // A flick keeps turning and slows down, like a weighted knob.
       const coast = () => {
         vel *= FLICK_FRICTION;
         pos = Math.min(1, Math.max(0, pos + vel));
@@ -145,7 +138,6 @@ export function knob({ label, min, max, value, step = 1, log = false, format = S
   return { el, get: () => value, set };
 }
 
-// Small response plot: log frequency x (20 Hz to 20 kHz), dB y. series: [{ db: number[], cls }].
 export function miniPlot(host, freqs, { yMin = -12, yMax = 12 } = {}) {
   const W = 400;
   const H = 160;

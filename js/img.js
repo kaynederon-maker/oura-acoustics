@@ -1,4 +1,3 @@
-// Credited, responsive photos from the image pipeline (public/img, credits.json).
 import { h } from './ui.js';
 
 let credits = {};
@@ -8,7 +7,6 @@ export async function loadCredits() {
     const res = await fetch('/img/credits.json');
     if (res.ok) credits = await res.json();
   } catch {
-    // offline or missing: photos still render, without credits
   }
 }
 
@@ -19,7 +17,6 @@ function srcset(id, ext) {
   return widths.map((w) => `/img/${id}-${w}.${ext} ${w}w`).join(', ');
 }
 
-// <figure class="photo"><picture>…</picture><figcaption>Author · Licence</figcaption></figure>
 export function photo(id, { sizes = '(max-width: 760px) 100vw, 50vw', className = '', eager = false, alt, caption = true } = {}) {
   const c = credits[id] ?? {};
   const widths = c.widths ?? [480, 960];
@@ -36,14 +33,12 @@ export function photo(id, { sizes = '(max-width: 760px) 100vw, 50vw', className 
   return h('figure', { class: `photo ${className}`.trim(), style: c.ratio ? `--ratio:${c.ratio}` : null }, pic, cap);
 }
 
-// Declarative photos: <div data-photo="id" data-sizes="…" class="…"> becomes a credited <figure>.
 export function hydratePhotos(root = document) {
   for (const el of root.querySelectorAll('[data-photo]')) {
     el.replaceWith(photo(el.dataset.photo, { className: el.className, sizes: el.dataset.sizes ?? '(max-width: 760px) 100vw, 50vw' }));
   }
 }
 
-// Mechanical counter: each digit rolls on its own drum. Screen readers get the plain value.
 export function rollNumber(el, value) {
   const text = String(value);
   const mask = text.replace(/\d/g, '0');
