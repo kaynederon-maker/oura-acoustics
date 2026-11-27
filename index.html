@@ -37,6 +37,7 @@
     <symbol id="i-wave" viewBox="0 0 24 24"><path d="M2.5 12h2.2l2.1-5.5 3.1 11 3.2-14 3.1 12.5 2-4h3.3"/></symbol>
     <symbol id="i-heart" viewBox="0 0 24 24"><path d="M12 20s-7.5-4.6-7.5-10.1A4.3 4.3 0 0 1 12 7.4a4.3 4.3 0 0 1 7.5 2.5C19.5 15.4 12 20 12 20Z"/></symbol>
     <symbol id="i-bag" viewBox="0 0 24 24"><path d="M5.5 8h13l-1 12.5h-11L5.5 8Z"/><path d="M9 10V6.5a3 3 0 0 1 6 0V10"/></symbol>
+    <symbol id="i-expand" viewBox="0 0 24 24"><path d="M14 5h5v5M10 19H5v-5M19 5l-6 6M5 19l6-6"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 6v12M6 12h12"/></symbol>
     <symbol id="i-minus" viewBox="0 0 24 24"><path d="M6 12h12"/></symbol>
     <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5 10 17.5 19 7"/></symbol>
@@ -373,7 +374,7 @@
           <ul id="recs" class="recs"></ul>
           <div class="row">
             <button id="ai-advice" type="button" class="btn">Ask the AI Sommelier</button>
-            <span class="muted">Sends a short summary (model, EQ, 30 band levels). Never audio.</span>
+            <span class="muted">Sends a short summary (model, EQ, 30 band levels) to the AI. Never audio.</span>
           </div>
           <div id="ai-out" aria-live="polite"></div>
         </article>
@@ -698,6 +699,26 @@
     </header>
     <div id="fav-body" class="sheet-body"></div>
   </dialog>
+  <dialog id="assistant-sheet" class="sheet assistant-sheet" aria-labelledby="as-title">
+    <header class="sheet-head">
+      <div>
+        <h2 id="as-title">Ask Oura</h2>
+        <p id="as-context" class="caps as-context">Store assistant</p>
+      </div>
+      <button type="button" class="icon-btn" data-close aria-label="Close assistant"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </header>
+    <div id="as-log" class="sheet-body as-log" role="log" aria-live="polite" aria-relevant="additions" data-lenis-prevent></div>
+    <footer class="sheet-foot as-foot">
+      <div id="as-suggest" class="as-suggest" role="group" aria-label="Suggested questions"></div>
+      <form id="as-form" class="as-form">
+        <label class="sr-only" for="as-input">Ask about our products</label>
+        <input id="as-input" type="text" autocomplete="off" maxlength="400" placeholder="Ask about any product">
+        <button id="as-send" type="submit" class="btn primary">Ask</button>
+      </form>
+      <p id="as-credit" class="muted small as-credit"></p>
+    </footer>
+  </dialog>
+  <button type="button" id="assistant-fab" class="assistant-fab" aria-haspopup="dialog"><svg class="icon" aria-hidden="true"><use href="#i-wave"/></svg><span>Ask Oura</span></button>
 
   <dialog id="quick-view" class="qv" aria-labelledby="qv-title">
     <button type="button" class="icon-btn qv-close" data-close aria-label="Close quick view"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg></button>

@@ -14,6 +14,8 @@ import { createPeqGraph } from './peq-graph.js';
 import { initPeqPanel } from './peq-panel.js';
 import { initHardware } from './hardware.js';
 import { attachGraphHover } from './freq-hover.js';
+import { complete, parseJson, AI_CREDIT } from './ai.js';
+import { SYSTEM_PROMPT, JSON_SHAPE, sanitizeInput, sanitizeOutput } from './advice-core.js';
 import { $, $$, h, toast, download, fmtHz, fmtDb, store } from './ui.js';
 import { photo } from './img.js';
 
@@ -348,7 +350,32 @@ function renderRecs() {
     photo('m-pads', { className: 'rec-photo', sizes: '160px', caption: false }), h('p', {}, empty))]));
 }
 
-const OFFLINE_AI = 'it runs on the local Node server (npm start), not on this static preview.';
+const SERVER_UNAVAILABLE = new Set([404, 405, 501, 503]);
+
+async function serverAdvice(body) {
+  if (location.hostname.endsWith('github.io')) return null;
+  try {
+    const res = await fetch('api/advice', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    if (SERVER_UNAVAILABLE.has(res.status)) return null;
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+    return data;
+  } catch (err) {
+    if (err instanceof TypeError) return null;
+    throw err;
+  }
+}
+
+async function browserAdvice(body) {
+  const reply = await complete({
+    system: `${SYSTEM_PROMPT}
+${JSON_SHAPE}`,
+    messages: [{ role: 'user', content: JSON.stringify(sanitizeInput(body)) }],
+    json: true,
+    onWait: (s) => { $('#ai-advice').textContent = s ? `Free AI cooldown: ${s} s` : 'Thinking…'; },
+  });
+  return sanitizeOutput(parseJson(reply));
+}
 
 async function askAi() {
   const btn = $('#ai-advice');
@@ -356,30 +383,25 @@ async function askAi() {
   btn.disabled = true;
   btn.textContent = 'Thinking…';
   try {
-    if (location.hostname.endsWith('github.io')) throw new Error(OFFLINE_AI);
-    const res = await fetch('api/advice', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        device: lab.entry?.name,
-        correction: peq.correction,
-        taste: { bass: 0, treble: 0 },
-        content: lab.content && { ...lab.content, rmsDb: lab.listening.rmsDb, clipFrames: lab.listening.clipFrames, bands: lab.listening.bands },
-        hearing: lab.hearing,
-      }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if ([404, 405, 501].includes(res.status)) throw new Error(OFFLINE_AI);
-    if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+    const body = {
+      device: lab.entry?.name,
+      correction: peq.correction,
+      taste: { bass: 0, treble: 0 },
+      content: lab.content && { ...lab.content, rmsDb: lab.listening.rmsDb, clipFrames: lab.listening.clipFrames, bands: lab.listening.bands },
+      hearing: lab.hearing,
+    };
+    const data = (await serverAdvice(body)) ?? (await browserAdvice(body));
+    if (!data.summary && !data.adjustments.length) throw new Error('The AI did not return any advice.');
     const toBand = (a) => ({ id: `ai-${a.type}-${a.fc}`, type: a.type, fc: a.fc, gain: a.gain, q: a.q });
     out.replaceChildren(
       h('p', { class: 'ai-summary' }, data.summary),
       h('ul', { class: 'recs' }, data.adjustments.map((a) => h('li', { class: 'rec' },
         h('div', {}, h('strong', {}, `${TYPES[a.type]} · ${fmtHz(a.fc)} · ${fmtDb(a.gain)}`), h('p', {}, a.reason)),
         h('button', { type: 'button', class: 'btn small', onclick: () => applyBand(toBand(a)) }, 'Apply')))),
-      data.tips.length ? h('ul', { class: 'tips' }, data.tips.map((t) => h('li', {}, t))) : null);
+      data.tips.length ? h('ul', { class: 'tips' }, data.tips.map((t) => h('li', {}, t))) : null,
+      h('p', { class: 'muted small' }, AI_CREDIT));
   } catch (err) {
-    out.replaceChildren(h('p', { class: 'muted' }, `AI Sommelier unavailable: ${err.message} The built-in recommendations still work.`));
+    out.replaceChildren(h('p', { class: 'muted' }, `AI Sommelier unavailable: ${err.message} The built-in recommendations above still work.`));
   } finally {
     btn.disabled = false;
     btn.textContent = 'Ask the AI Sommelier';
