@@ -94,7 +94,17 @@ async function initStage() {
   addEventListener('resize', placeSpecs, { passive: true });
 }
 
+function trackCopyHeight() {
+  const hero = $('.hero');
+  const copy = $('.hero-copy');
+  if (!hero || !copy) return;
+  const set = () => hero.style.setProperty('--copy-h', `${Math.ceil(copy.getBoundingClientRect().height)}px`);
+  new ResizeObserver(set).observe(copy);
+  set();
+}
+
 export function initHome() {
+  trackCopyHeight();
   $('.hero-specs').replaceChildren(...SPECS.map((s, i) => h('div', { class: `hero-spec${i % 2 ? ' flip' : ''}`, 'data-part': s.part },
     h('span', { class: 'hero-spec-dot' }),
     h('span', { class: 'hero-spec-line' }),

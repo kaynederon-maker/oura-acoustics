@@ -680,3 +680,13 @@ body[data-view='store'] .assistant-fab, body[data-view='product'] .assistant-fab
 .as-typing { flex-wrap: wrap; align-items: center; }
 .as-wait { flex-basis: 100%; color: var(--text-lo); font-size: var(--fs-12); }
 .as-wait:empty { display: none; }
+
+.product-page > *, .viewer { min-width: 0; }
+.viewer-thumb { flex: 0 1 84px; min-width: 0; }
+.crumbs a { padding: 12px 0; margin: -12px 0; }
+@media (max-width: 720px) {
+  .assistant-fab { width: 52px; height: 52px; min-height: 52px; padding: 0; justify-content: center; }
+  .assistant-fab .icon { width: 22px; height: 22px; }
+  .assistant-fab span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+}
+.viewer { grid-template-columns: minmax(0, 1fr); }
