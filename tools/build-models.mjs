@@ -1,7 +1,3 @@
-// Builds every 3D object on the site from three.js geometry and writes meshopt-compressed .glb
-// files to public/models/. Each part is a named node whose extras carry its explode offset, so the
-// exploded views and the material presets (applied at runtime by material name) need no other data.
-//   node tools/build-models.mjs [name ...]
 import * as THREE from 'three';
 import { mergeGeometries, toCreasedNormals } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { RoundedBoxGeometry } from 'three/examples/jsm/geometries/RoundedBoxGeometry.js';
@@ -15,7 +11,6 @@ import { fileURLToPath } from 'node:url';
 const OUT = fileURLToPath(new URL('../public/models/', import.meta.url));
 const D = Math.PI / 180;
 
-// Fallback colours; the site swaps these for physical material presets by name.
 const COLORS = {
   brass: [0.69, 0.55, 0.34], steel: [0.6, 0.62, 0.65], chrome: [0.85, 0.87, 0.89], aluminium: [0.76, 0.78, 0.79],
   lacquer: [0.05, 0.05, 0.05], resin: [0.16, 0.15, 0.18], glass: [0.9, 0.92, 0.94], walnut: [0.42, 0.26, 0.15],
@@ -28,7 +23,6 @@ const COLORS = {
 };
 const METALS = new Set(['brass', 'steel', 'chrome', 'aluminium', 'foil', 'copper', 'iron']);
 
-// ---------- geometry helpers ----------
 function place(geo, { p = [0, 0, 0], r = [0, 0, 0], s = 1 } = {}) {
   const m = new THREE.Matrix4().compose(
     new THREE.Vector3(...p),
@@ -62,13 +56,9 @@ function roundedRect(w, h, r) {
   return s;
 }
 
-// part(id, explode offset, { materialName: [geometries] })
 const part = (id, explode, groups) => ({ id, explode, groups });
 
-// ---------- models ----------
-
 function iem() {
-  // Kidney-shaped custom shell: one 2D outline, extruded twice (faceplate and shell).
   const k = new THREE.Shape();
   k.moveTo(-0.55, -0.1);
   k.bezierCurveTo(-0.6, 0.45, -0.15, 0.62, 0.2, 0.55);
@@ -281,7 +271,6 @@ const MODELS = {
   'tr-808': tr808,
 };
 
-// ---------- export ----------
 function toPrimitive(doc, buffer, geometries) {
   const merged = mergeGeometries(geometries.map((g) => {
     const ng = toCreasedNormals(g.index ? g.toNonIndexed() : g, 35 * D);

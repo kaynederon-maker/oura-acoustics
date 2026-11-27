@@ -1,8 +1,3 @@
-// History of recorded sound, told by taking ten objects apart (1877 to now).
-// Each chapter: a cinematic opener, a sticky stage where the object separates into parts you can
-// hover, focus or tap for their story, a photo set, and a needle-drop player that plays the practice
-// track "through" that era's fidelity, with a brass Then/Today switch.
-// One WebGL stage is shared: it moves into whichever chapter is on screen.
 import * as engine from './audio-engine.js';
 import { playTrack } from './synth.js';
 import { makeBand, expandBands } from './peq.js';
@@ -16,7 +11,6 @@ import { $, $$, h, icon, toast, haptic } from './ui.js';
 
 const B = (type, fc, gain, q, slope) => makeBand({ type, fc, gain, q, slope });
 
-// filters: what "Then" sounds like. Bandwidth figures are typical for the medium, not lab specs.
 const ERAS = [
   {
     year: 1877, place: 'Menlo Park · New Jersey', title: 'The phonograph', model: 'phonograph', track: 'hiphop',
@@ -180,9 +174,6 @@ const era = () => ERAS[Math.max(0, T.index)];
 const pad = (n) => String(n).padStart(2, '0');
 const slugYear = (e) => `ch-${e.year}`;
 
-// ---------- audio ----------
-
-// The last stop plays your own Lab tuning instead of a historical medium.
 const eraSpecs = (e) => (e.personal ? eqSpecs() : expandBands(e.filters));
 
 function applyEq() {
@@ -234,8 +225,6 @@ function syncPlayers() {
   }
 }
 
-// ---------- HUD ----------
-
 function setEra(index) {
   if (index === T.index) return;
   const previous = T.index >= 0 ? era() : null;
@@ -248,12 +237,9 @@ function setEra(index) {
     if (i === index) b.setAttribute('aria-current', 'step');
     else b.removeAttribute('aria-current');
   }
-  // Scrolling while listening carries the music into the next era.
   if (playing()) (previous?.track === e.track ? Promise.resolve(applyEq()) : startTrack()).catch((err) => toast(err.message, 'error'));
   syncPlayers();
 }
-
-// ---------- parts ----------
 
 function showPart(index, id, { from = 'list' } = {}) {
   const e = ERAS[index];
@@ -278,7 +264,6 @@ function showPart(index, id, { from = 'list' } = {}) {
   drawLeader(index, id);
 }
 
-// A hairline from the selected label to the part on the canvas.
 function drawLeader(index, id) {
   const ch = index >= 0 ? $(`#${slugYear(ERAS[index])}`) : null;
   const svg = ch?.querySelector('.hx-leader');
@@ -305,8 +290,6 @@ function drawLeader(index, id) {
   dot.setAttribute('r', '3.5');
   svg.replaceChildren(path, dot);
 }
-
-// ---------- the shared stage ----------
 
 async function stageInto(index) {
   if (T.stageIndex === index) return;
@@ -335,8 +318,6 @@ async function stageInto(index) {
     host.classList.add('no-3d');
   }
 }
-
-// ---------- markup ----------
 
 function partList(e, i) {
   return h('ol', { class: 'hx-parts', 'aria-label': `Parts of the ${e.title.replace(/^The /, '').toLowerCase()}` },
@@ -411,8 +392,6 @@ function chapter(e, i) {
           h('span', { class: 'btn-icon' }, icon('arrow'))) : null)));
 }
 
-// ---------- scroll ----------
-
 function initScroll() {
   const { gsap, ScrollTrigger } = globalThis;
   const ease = gsap.parseEase('power2.inOut');
@@ -459,7 +438,6 @@ function initScroll() {
   }
 }
 
-// Without scroll animation: chapters stack, objects sit exploded, the stage follows what is on screen.
 function initStatic() {
   $('#view-history').classList.add('static');
   const io = new IntersectionObserver((entries) => {

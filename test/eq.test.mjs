@@ -5,7 +5,6 @@ import {
   toParametricText, toGraphicEqText,
 } from '../public/js/eq.js';
 
-// Real lines from AutoEq results/INDEX.md and ParametricEQ.txt.
 const INDEX = `# Index
 - [Apple AirPods Pro 2 (51dB + ANC)](./crinacle/711%20in-ear/Apple%20AirPods%20Pro%202%20(51dB%20+%20ANC)) by crinacle on 711
 - [1MORE ComfoBuds Mini](./DHRME/in-ear/1MORE%20ComfoBuds%20Mini) by DHRME

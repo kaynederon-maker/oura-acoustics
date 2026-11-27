@@ -1,7 +1,4 @@
-// Gemini-backed tuning advice. The API key never leaves the server.
-
 const endpoint = (model) => `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-// Tried in order when the main model is overloaded (Google returns 503 "high demand" per model).
 const FALLBACK_MODELS = ['gemini-3.7-flash', 'gemini-3.1-flash-lite'];
 const RETRYABLE = new Set([429, 500, 503]);
 const RETRY_DELAY_MS = 800;
@@ -56,7 +53,6 @@ export function sanitizeFilter(f, maxGain = 20) {
   };
 }
 
-// Whitelist the client's summary; anything else is dropped.
 export function sanitizeInput(body) {
   const b = body && typeof body === 'object' ? body : {};
   return {
@@ -98,7 +94,6 @@ export async function getAdvice(body, apiKey = process.env.GEMINI_API_KEY) {
     contents: [{ role: 'user', parts: [{ text: JSON.stringify(sanitizeInput(body)) }] }],
     generationConfig: { responseMimeType: 'application/json', responseSchema: RESPONSE_SCHEMA, temperature: 0.4 },
   });
-  // Read at call time: server.mjs loads .env after this module is imported.
   const models = [...new Set([process.env.GEMINI_MODEL || 'gemini-3.8-flash', ...FALLBACK_MODELS])];
   let res;
   for (const [i, model] of models.entries()) {
@@ -124,7 +119,6 @@ export async function getAdvice(body, apiKey = process.env.GEMINI_API_KEY) {
   return sanitizeOutput(JSON.parse(reply));
 }
 
-// ponytail: in-memory per-IP limiter, resets on restart; use a shared store if this runs on several instances.
 const hits = new Map();
 export function rateLimited(ip, limit = 8, windowMs = 60_000) {
   const now = Date.now();

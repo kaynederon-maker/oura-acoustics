@@ -42,7 +42,7 @@ test('every photo id the pages ask for was built', () => {
   const html = readFileSync(pub('index.html'), 'utf8');
   const used = new Set([
     ...[...js.matchAll(/'((?:h\d{4}|m|s|l)-[a-z0-9-]+)'/g)].map((m) => m[1])
-      .filter((id) => !/^s-(raw|target|tuned|correction|main|sub)$/.test(id)), // graph series classes
+      .filter((id) => !/^s-(raw|target|tuned|correction|main|sub)$/.test(id)),
     ...[...html.matchAll(/data-photo="([^"]+)"/g)].map((m) => m[1]),
   ]);
   assert.ok(used.size > 60, 'pages reference the photo set');

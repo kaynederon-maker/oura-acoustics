@@ -1,15 +1,12 @@
-// Frequency tooltip: hover (or tap, or arrow keys) anywhere on the spectrum to learn
-// what that range does and what boosting or cutting it changes.
 import { tipFor } from './freq-tips.js';
 import { h, fmtHz, icon } from './ui.js';
 
 const MARGIN = 12;
 const OFFSET = 16;
-const KEY_STEP = 2 ** (1 / 6); // arrow keys move a sixth of an octave
+const KEY_STEP = 2 ** (1 / 6);
 const TOUCH_LINGER_MS = 2500;
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-// Two significant figures reads like an EQ knob: 1037 -> 1000, 437 -> 440.
 const snap = (f) => {
   const step = 10 ** (Math.floor(Math.log10(f)) - 1);
   return Math.round(f / step) * step;
@@ -47,7 +44,6 @@ export function hideTip(delay = 0) {
   hideTimer = setTimeout(() => tip && (tip.hidden = true), delay);
 }
 
-// Log-frequency canvas (20 Hz–20 kHz across the plot area between the paddings).
 export function attachGraphHover(canvas, { padLeft = 0, padRight = 0, readout = () => [] } = {}) {
   const line = canvas.parentElement.querySelector('.crosshair');
   const area = () => {
@@ -95,7 +91,6 @@ export function attachGraphHover(canvas, { padLeft = 0, padRight = 0, readout = 
   });
 }
 
-// Any element with data-freq (EQ rows, sliders) or data-band (guide buttons).
 export function attachElementHover(root = document) {
   const target = (e) => e.target.closest?.('[data-freq], [data-band]');
   const show = (e) => {

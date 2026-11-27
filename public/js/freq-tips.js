@@ -1,6 +1,3 @@
-// What each part of the spectrum does, and what boosting or cutting it changes.
-// Shown when hovering the Tuning Lab graphs, EQ rows and the guide's band buttons.
-
 export const FREQ_TIPS = [
   {
     lo: 20, hi: 40, name: 'Deep sub-bass',

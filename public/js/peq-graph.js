@@ -1,12 +1,3 @@
-// Interactive PEQ graph (D3): drag nodes for frequency/gain, scroll for Q, double-click to add,
-// keyboard for everything. The curve is computed with the same biquad maths the audio engine runs.
-//
-// model = {
-//   bands(): Band[]            selected(): id|null          select(id)
-//   change(id, changes, { live })   commit()   add(bandLike)   remove(id)
-//   layers(freqs): { curve: dB[], series: [{ cls, freqs, values }], phase?: deg[] }
-//   readout?(freq): string[]
-// }
 import { responseDb, logFreqs } from './eq.js';
 import { expandBands, GAIN_TYPES, TYPES } from './peq.js';
 import { showTip, hideTip } from './freq-hover.js';
@@ -16,7 +7,7 @@ const d3 = globalThis.d3;
 const FREQS = logFreqs(240);
 const GRID_FREQS = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000];
 const SNAP_FREQS = [20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
-  2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000]; // ISO third-octave centres
+  2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000];
 const MARGIN = { top: 14, right: 46, bottom: 28, left: 46 };
 const SNAP_PX = 6;
 const GAIN_STEP = 0.5;
@@ -92,7 +83,6 @@ export function createPeqGraph(host, model, { yDomain = [-20, 20], phase = () =>
     if (!x) layout();
     const bands = model.bands();
     const data = model.layers(FREQS);
-    // Overlays (measurement, target, correction) fade in like transparent sheets laid on the plot.
     layers.selectAll('path').data(data.series, (d) => d.cls).join(
       (enter) => enter.append('path').attr('opacity', 0).call((e) => e.transition().duration(OVERLAY_MS).ease(d3.easeCubicOut).attr('opacity', 1)),
       (update) => update,
@@ -100,7 +90,6 @@ export function createPeqGraph(host, model, { yDomain = [-20, 20], phase = () =>
     )
       .attr('class', (d) => `peq-series ${d.cls}`)
       .attr('d', (d) => line(d.values, y, d.freqs));
-    // While dragging the curve follows the hand; any other change glides to its new shape.
     const glide = !dragging && !REDUCED && curve.attr('d');
     (glide ? curve.transition('shape').duration(REDRAW_MS).ease(d3.easeCubicOut) : curve.interrupt('shape')).attr('d', line(data.curve));
     phasePath.attr('d', phase() && data.phase ? line(data.phase, yPhase) : null);
@@ -135,8 +124,6 @@ export function createPeqGraph(host, model, { yDomain = [-20, 20], phase = () =>
       });
   }
 
-  // ---------- interactions ----------
-
   let lastSnap = '';
   const dragBehaviour = d3.drag()
     .on('start', (event, b) => {
@@ -155,7 +142,7 @@ export function createPeqGraph(host, model, { yDomain = [-20, 20], phase = () =>
         changes.gain = gain;
       }
       const snapKey = `${snapF ?? ''}|${changes.gain === 0 ? 'zero' : ''}`;
-      if (snapKey !== '|' && snapKey !== lastSnap) haptic(8); // physical tick on each new snap
+      if (snapKey !== '|' && snapKey !== lastSnap) haptic(8);
       lastSnap = snapKey;
       model.change(b.id, changes, { live: true });
     })

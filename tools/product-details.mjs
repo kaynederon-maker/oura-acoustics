@@ -1,6 +1,3 @@
-// Detail shots for the store: two close crops of every product photo (where the eye goes first,
-// and the busiest texture), so cards can swap to a detail on hover and product pages get a gallery.
-//   node tools/product-details.mjs
 import sharp from 'sharp';
 import { mkdir, readdir } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -11,8 +8,6 @@ const W = 800;
 const H = 600;
 const ZOOM = 2.2;
 
-// Sharp only reports a focal crop when the aspect changes, so probe a square (for x) and a
-// letterbox (for y), then cut a 1/ZOOM window around that point.
 async function focus(src, width, height, strategy) {
   const sq = await sharp(src).resize(height, height, { fit: 'cover', position: strategy }).toBuffer({ resolveWithObject: true });
   const wide = await sharp(src).resize(width, Math.round(height / 2.2), { fit: 'cover', position: strategy }).toBuffer({ resolveWithObject: true });

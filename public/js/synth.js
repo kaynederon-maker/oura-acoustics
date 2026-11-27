@@ -1,7 +1,3 @@
-// Practice tracks for the Tuning Guide, synthesized offline in the browser (no samples, no
-// downloads, no copyright): a 140 BPM trap beat built on 808s, and a 180 BPM atmospheric
-// black-metal blast beat with tremolo-picked guitars drowned in reverb.
-
 import * as engine from './audio-engine.js';
 
 const SR = 44100;
@@ -62,8 +58,6 @@ function tone(ctx, dest, t, { from, to, glide, decay, level, type = 'sine' }) {
   osc.stop(t + decay + 0.05);
 }
 
-// ---------- 808 hip-hop ----------
-
 async function renderHipHop() {
   const beat = 60 / 140;
   const s16 = beat / 4;
@@ -76,15 +70,15 @@ async function renderHipHop() {
   subBus.connect(sat).connect(out);
   const E1 = 41.2;
   const G1 = 49;
-  const pattern = [[0, E1], [6, E1], [10, G1], [14, E1]]; // 16th-note positions
+  const pattern = [[0, E1], [6, E1], [10, G1], [14, E1]];
   for (let bar = 0; bar < BARS; bar++) {
     const t0 = bar * beat * 4;
     for (const [step, f] of pattern) {
       const t = t0 + step * s16;
-      tone(ctx, subBus, t, { from: f * 2.4, to: f, glide: 0.05, decay: 1.1, level: 0.9 }); // 808
-      tone(ctx, out, t, { from: 160, to: 55, glide: 0.03, decay: 0.12, level: 0.5 }); // kick click
+      tone(ctx, subBus, t, { from: f * 2.4, to: f, glide: 0.05, decay: 1.1, level: 0.9 });
+      tone(ctx, out, t, { from: 160, to: 55, glide: 0.03, decay: 0.12, level: 0.5 });
     }
-    for (const step of [4, 12]) { // claps on 2 and 4: three quick bursts
+    for (const step of [4, 12]) {
       for (const k of [0, 0.012, 0.024]) {
         noiseHit(ctx, out, t0 + step * s16 + k, { type: 'bandpass', freq: 1400, q: 0.8, decay: k ? 0.05 : 0.2, level: 0.55, noiseBuf: nb });
       }
@@ -96,7 +90,6 @@ async function renderHipHop() {
         noiseHit(ctx, out, t0 + (step + off) * s16, { type: 'highpass', freq: 8000, decay: 0.045, level: step % 2 ? 0.16 : 0.26, noiseBuf: nb });
       }
     }
-    // Soft pad (A minor 7) so the mids have something to show.
     const padLp = new BiquadFilterNode(ctx, { type: 'lowpass', frequency: 1800 });
     const padG = new GainNode(ctx, { gain: 0 });
     padG.gain.setValueAtTime(0, t0);
@@ -115,8 +108,6 @@ async function renderHipHop() {
   return ctx.startRendering();
 }
 
-// ---------- atmospheric black metal ----------
-
 async function renderMetal() {
   const s16 = 60 / 180 / 4;
   const barLen = s16 * 16;
@@ -128,7 +119,6 @@ async function renderMetal() {
   const verbGain = new GainNode(ctx, { gain: 0.55 });
   verb.connect(verbGain).connect(out);
 
-  // Guitars: detuned saws -> heavy drive -> cab-ish filtering, tremolo-picked on 16ths.
   const chords = [[82.4, 123.5, 185, 246.9], [65.4, 98, 164.8, 246.9], [98, 146.8, 196, 293.7], [73.4, 110, 185, 220]];
   const gtrDrive = drive(ctx, 9);
   const cab = new BiquadFilterNode(ctx, { type: 'lowpass', frequency: 5200, Q: 0.7 });
@@ -157,16 +147,16 @@ async function renderMetal() {
     root.start(t0);
     root.stop(t0 + barLen);
 
-    noiseHit(ctx, verb, t0, { type: 'highpass', freq: 5000, decay: 1.6, level: 0.4, noiseBuf: nb }); // crash wash
+    noiseHit(ctx, verb, t0, { type: 'highpass', freq: 5000, decay: 1.6, level: 0.4, noiseBuf: nb });
     for (let step = 0; step < 16; step++) {
       const t = t0 + step * s16;
       trem.gain.setValueAtTime(0.9, t);
       trem.gain.exponentialRampToValueAtTime(0.35, t + s16 * 0.9);
       if (step % 2 === 0) {
-        tone(ctx, out, t, { from: 110, to: 48, glide: 0.04, decay: 0.09, level: 0.85 }); // blast kick
-        noiseHit(ctx, out, t, { type: 'bandpass', freq: 7200, q: 3, decay: 0.22, level: 0.12, noiseBuf: nb }); // ride
+        tone(ctx, out, t, { from: 110, to: 48, glide: 0.04, decay: 0.09, level: 0.85 });
+        noiseHit(ctx, out, t, { type: 'bandpass', freq: 7200, q: 3, decay: 0.22, level: 0.12, noiseBuf: nb });
       } else {
-        noiseHit(ctx, out, t, { type: 'bandpass', freq: 1900, q: 0.7, decay: 0.11, level: 0.45, noiseBuf: nb }); // blast snare
+        noiseHit(ctx, out, t, { type: 'bandpass', freq: 1900, q: 0.7, decay: 0.11, level: 0.45, noiseBuf: nb });
         tone(ctx, out, t, { from: 220, to: 180, glide: 0.02, decay: 0.07, level: 0.2, type: 'triangle' });
       }
     }
@@ -185,8 +175,6 @@ export function getTrack(id) {
   return cache.get(id);
 }
 
-// Builds (or reuses) a track and loops it on the guide path. Returns false, without playing,
-// when the user started something else while the track was still rendering.
 let latest = 0;
 export async function playTrack(id, owner = 'coach') {
   const request = ++latest;

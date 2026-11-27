@@ -1,8 +1,3 @@
-// Image pipeline.
-//   node tools/images.mjs search "<commons query>"   numbered contact sheet of candidates
-//   node tools/images.mjs ov "<openverse query>"      same, from Openverse (Flickr and other CC sources)
-//   node tools/images.mjs build [id ...]              download, grade, encode everything in images.json
-// Only freely licensed files pass: public domain, CC0, CC BY, CC BY-SA. Credits go to public/img/credits.json.
 import sharp from 'sharp';
 import { mkdir, readFile, writeFile, access } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -139,7 +134,6 @@ async function search(kind, query) {
   console.log('sheet:', await contactSheet(items, `${kind}-${slug(query)}`));
 }
 
-// Shared grade: a touch less saturation, lifted blacks, a warm cast. Per-theme tint is CSS.
 function grade(pipeline, { mono = false } = {}) {
   let p = pipeline.modulate({ saturation: mono ? 0 : 0.84 }).linear(0.93, 10);
   if (!mono) p = p.recomb([[1.04, 0.02, 0], [0.01, 1.0, 0], [0, 0.02, 0.93]]);
@@ -154,7 +148,6 @@ async function build(only) {
   try {
     credits = JSON.parse(await readFile(`${OUT}credits.json`, 'utf8'));
   } catch {
-    // first build
   }
   const ids = only.length ? only : Object.keys(manifest);
   for (const id of ids) {
@@ -196,7 +189,6 @@ async function build(only) {
   }
 }
 
-// pick: node tools/images.mjs pick picks.txt   lines: id | commons|ov | query | index | alt
 async function pick(file) {
   const manifest = await readFile(MANIFEST, 'utf8').then(JSON.parse, () => ({}));
   const cache = new Map();

@@ -1,5 +1,3 @@
-// Tuning Guide: an interactive coach. Each lesson is heard (A/B on synthesized tracks), seen
-// (spectrogram + oscilloscope) and touched (drag a real EQ band, with haptic snaps on phones).
 import * as engine from './audio-engine.js';
 import { playTrack } from './synth.js';
 import { startVisualizers } from './viz.js';
@@ -75,8 +73,6 @@ function applyGuideEq() {
   engine.setGuideBypass(coach.tuned);
 }
 
-// ---------- transport ----------
-
 async function play(track = coach.track) {
   coach.track = track;
   syncTransport();
@@ -109,8 +105,6 @@ function syncTransport() {
   $('#ab-b').setAttribute('aria-pressed', String(coach.tuned));
   $('#coach-ab').hidden = !lesson().ab;
 }
-
-// ---------- lesson controls ----------
 
 function quizControl(quiz) {
   const result = h('p', { class: 'quiz-result', 'aria-live': 'polite' });
@@ -187,8 +181,6 @@ function templatesControl() {
   return h('div', {}, grid, note, h('div', { class: 'row' }, open));
 }
 
-// ---------- rendering ----------
-
 function renderSteps() {
   $('#coach-steps').replaceChildren(...LESSONS.map((l, i) => h('li', {},
     h('button', {
@@ -258,8 +250,6 @@ const miniModel = {
   layers: (freqs) => ({ curve: responseDb(expandBands(coach.bands), 0, freqs), series: [] }),
 };
 
-// ---------- handbook (reference) ----------
-
 const labelOf = (btn) => btn.dataset.label ?? `${btn.textContent.trim()} band`;
 function initHandbook() {
   const buttons = $$('[data-band]');
@@ -278,8 +268,6 @@ function initHandbook() {
     for (const btn of buttons) btn.setAttribute('aria-pressed', String(state.source === 'band' && state.label === labelOf(btn)));
   });
 }
-
-// ---------- wiring ----------
 
 export function initGuide() {
   $('#coach-play').addEventListener('click', () => (playing() ? engine.stopSource() : play()));

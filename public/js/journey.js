@@ -1,6 +1,3 @@
-// Tuning Guide "journey": a long scroll through the spectrum. A sticky stage holds a live
-// spectrum analyzer and an EQ curve that morphs as you scroll; every chapter has its own
-// photo, explanation and inline A/B player. GSAP ScrollTrigger drives the scroll-linked motion.
 import * as engine from './audio-engine.js';
 import { playTrack } from './synth.js';
 import { makeBand, expandBands } from './peq.js';
@@ -71,8 +68,6 @@ let graph = null;
 const chapter = () => CHAPTERS[J.chapter];
 const playing = () => engine.state.source === 'guide' && engine.state.owner === 'journey';
 
-// ---------- audio ----------
-
 function applyEq() {
   const specs = expandBands(chapter().bands);
   engine.setGuideEq(specs, safePreamp(specs));
@@ -89,7 +84,7 @@ async function togglePlay(index) {
   if (J.loading) return;
   if (playing() && index === J.chapter) return engine.stopSource();
   const wasPlaying = playing();
-  setChapter(index); // already carries running playback into the new chapter
+  setChapter(index);
   if (wasPlaying) return;
   J.loading = true;
   syncPlayers();
@@ -115,7 +110,7 @@ function syncPlayers() {
     const mine = Number(p.dataset.index) === J.chapter;
     const on = mine && playing();
     const btn = p.querySelector('.j-play');
-    btn.setAttribute('aria-disabled', String(J.loading)); // not disabled: keeps keyboard focus
+    btn.setAttribute('aria-disabled', String(J.loading));
     btn.classList.toggle('on', on);
     btn.replaceChildren(icon(on ? 'stop' : 'play'), on ? 'Stop' : J.loading && mine ? 'Building…' : 'Listen');
     p.querySelector('[data-ab="a"]').setAttribute('aria-pressed', String(!J.tuned));
@@ -123,8 +118,6 @@ function syncPlayers() {
   }
   $('#j-stage').dataset.live = String(playing());
 }
-
-// ---------- stage graph (D3 curve over a canvas spectrum) ----------
 
 function createGraph(host) {
   const { d3 } = globalThis;
@@ -172,7 +165,6 @@ function createGraph(host) {
     draw();
   }
 
-  // Live spectrum under the curve: log-spaced bins, filled up from the floor.
   const ctx = canvas.getContext('2d');
   let bins = null;
   function frame() {
@@ -215,13 +207,10 @@ function setChapter(index) {
   $('#j-title').textContent = c.title;
   $('#j-ab-note').textContent = c.ab;
   for (const [i, dot] of $$('#j-dots li').entries()) dot.classList.toggle('on', i === index);
-  // Scrolling while listening carries the music into the next chapter.
   if (playing()) (c.track === previousTrack ? Promise.resolve(applyEq()) : startTrack()).catch((err) => toast(err.message, 'error'));
   graph?.draw();
   syncPlayers();
 }
-
-// ---------- markup ----------
 
 function chapterEl(c, i) {
   return h('article', { class: 'j-step', 'data-index': String(i), id: `j-${c.id}` },
@@ -240,11 +229,9 @@ function chapterEl(c, i) {
       h('p', { class: 'muted small j-ab-text' }, c.ab)));
 }
 
-// ---------- scroll choreography ----------
-
 function initScroll() {
   const { gsap, ScrollTrigger } = globalThis;
-  if (!gsap || !ScrollTrigger) { // content still reads fine without motion
+  if (!gsap || !ScrollTrigger) {
     J.morph = 1;
     return;
   }
@@ -256,7 +243,7 @@ function initScroll() {
       onToggle: (self) => self.isActive && setChapter(index),
       onUpdate: (self) => {
         if (J.chapter !== index) return;
-        J.morph = Math.min(1, self.progress * 2.2); // the curve draws itself in over the first half
+        J.morph = Math.min(1, self.progress * 2.2);
         graph?.draw();
       },
     });

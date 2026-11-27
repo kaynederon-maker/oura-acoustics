@@ -1,9 +1,5 @@
-/* =========================================================================
-   Studio: the Tuning Lab as a piece of high-end hi-fi gear, plus the Guide coach.
-   ========================================================================= */
 .defs { position: absolute; width: 0; height: 0; overflow: hidden; }
 
-/* ---------- guided setup rail ---------- */
 .lab-steps {
   list-style: none;
   margin: 0 0 var(--sp-6);
@@ -49,11 +45,9 @@
 .lab-steps button[aria-current='step'] { color: var(--text-hi); }
 @media (hover: hover) and (pointer: fine) { .lab-steps button:hover { color: var(--text-hi); } }
 
-/* The PEQ workstation gets the whole row; the small step cards pack around it. */
 .lab-grid { grid-auto-flow: dense; }
 .lab-grid #step-graph { grid-column: 1 / -1; order: 0; }
 
-/* ---------- faceplate: brushed metal, engraved, screwed down ---------- */
 .faceplate {
   --plate: color-mix(in srgb, var(--surface) 92%, var(--text-hi));
   background:
@@ -79,7 +73,6 @@
 .faceplate::after { right: 14px; }
 .faceplate .card-head h2 { font: 500 var(--fs-12) var(--font-ui); letter-spacing: 0.22em; text-transform: uppercase; color: var(--text-hi); margin: 0; }
 
-/* Simple mode hides the pro controls; Advanced opens them like a hinged front panel. */
 .peq-card:not(.pro) .pro-only { display: none !important; }
 .peq-card:not(.pro) .peq-columns { grid-template-columns: 1fr; }
 @media (prefers-reduced-motion: no-preference) {
@@ -92,7 +85,6 @@
 @keyframes hinge { from { transform: perspective(900px) rotateX(-80deg); opacity: 0; } }
 .pro-switch { display: inline-flex; align-items: center; gap: 10px; min-height: 40px; font: 500 var(--fs-11) var(--font-ui); letter-spacing: 0.16em; text-transform: uppercase; cursor: pointer; }
 
-/* The graph sits recessed in the plate, like a meter window. */
 .peq-graph {
   position: relative;
   height: 380px;
@@ -148,7 +140,6 @@
 .adv-grid label > span { display: inline-flex; align-items: center; gap: 6px; color: var(--text-lo); }
 .adv input[type='checkbox'] { width: 18px; height: 18px; }
 
-/* ---------- Guide coach ---------- */
 .coach { display: grid; gap: 18px; margin-bottom: 32px; }
 .coach-steps { display: flex; flex-wrap: wrap; gap: 6px; list-style: none; margin: 0; padding: 0; }
 .step-dot { width: 36px; height: 36px; border-radius: 50%; border: 1px solid var(--hairline-strong); background: none; color: var(--text-lo); font: 400 12px var(--font-mono); cursor: pointer; display: grid; place-items: center; transition: color var(--t-ui) ease, border-color var(--t-ui) ease, background-color var(--t-ui) ease; }
@@ -177,7 +168,6 @@
   .lab-steps { grid-template-columns: repeat(2, 1fr); }
 }
 
-/* ---------- atmosphere: photos in headers, help panels and empty states ---------- */
 .lab-head { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr); gap: var(--sp-7); align-items: end; max-width: none; }
 .lab-head-copy { display: grid; gap: var(--sp-4); }
 .lab-head-photo { aspect-ratio: 4 / 3; border-radius: var(--radius-xs); }

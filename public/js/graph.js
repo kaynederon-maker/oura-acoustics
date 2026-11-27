@@ -1,5 +1,3 @@
-// Log-frequency line plots on a canvas (frequency response + live spectrum).
-
 const GRID_FREQS = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000];
 const PAD = { left: 52, right: 10, top: 10, bottom: 22 };
 export const GRAPH_PAD = PAD;
@@ -19,7 +17,6 @@ function setup(canvas) {
   return { g, w, h };
 }
 
-// series: [{ freqs, values, color, width?, dash? }]
 export function plot(canvas, series, { yMin = -15, yMax = 15, yStep = 5, unit = 'dB' } = {}) {
   const { g, w, h } = setup(canvas);
   const x = (f) => PAD.left + (Math.log10(f / 20) / 3) * (w - PAD.left - PAD.right);
@@ -53,7 +50,6 @@ export function plot(canvas, series, { yMin = -15, yMax = 15, yStep = 5, unit = 
   g.restore();
 }
 
-// Live spectrum from an AnalyserNode, drawn as a filled log-frequency curve.
 export function drawSpectrum(canvas, analyser, data, sampleRate) {
   analyser.getFloatFrequencyData(data);
   const { g, w, h } = setup(canvas);

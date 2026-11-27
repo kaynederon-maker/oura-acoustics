@@ -8,11 +8,8 @@ const dev = (p) => flatness(crossoverResponse(p, F).sum, F);
 
 test('crossover mission starts badly and has both real-world fixes', () => {
   assert.ok(dev(XO_START) > 4, 'the starting setup should be audibly wrong');
-  // Fix 1: speakers full range, sub extends below their natural roll-off.
   assert.ok(dev({ fc: 45, subGain: 4.5, phase: 0, invert: false, highPassMains: false }) < 1.5);
-  // Fix 2: high-pass the speakers, flip the late-arriving sub's polarity.
   assert.ok(dev({ fc: 95, subGain: 1, phase: 35, invert: true, highPassMains: true }) < 1.5);
-  // Polarity matters: the same setup without the flip cancels around the crossover.
   assert.ok(dev({ fc: 95, subGain: 1, phase: 35, invert: false, highPassMains: true }) > 4);
 });
 

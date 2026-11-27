@@ -1,6 +1,3 @@
-/* =========================================================================
-   History: ten objects taken apart (35mm storytelling, 60fps finish)
-   ========================================================================= */
 .hx-hero, .hx-ch { width: 100vw; margin-left: calc(50% - 50vw); }
 .hx { --hx-left: max(calc(var(--gutter) + 76px), calc(50vw - 620px)); --hx-right: max(var(--gutter), calc(50vw - 620px)); }
 
@@ -17,7 +14,6 @@
 .hx-cue span::after { content: ''; position: absolute; inset: 0; background: var(--accent); animation: cue-drop 2.2s var(--ease-glide) infinite; }
 @keyframes cue-drop { from { transform: translateY(-100%); } to { transform: translateY(100%); } }
 
-/* Chapter rail: years stacked down the left edge, like frame numbers on a contact sheet. */
 .hx-rail {
   position: fixed;
   left: max(12px, calc(var(--gutter) - 36px));
@@ -54,7 +50,6 @@ body[data-view='history'] .hx-rail { opacity: 1; pointer-events: auto; }
 .hx-rail a[aria-current]::before { width: 28px; background: var(--accent); }
 @media (hover: hover) and (pointer: fine) { .hx-rail a:hover { color: var(--text-hi); } }
 
-/* HUD bar: chapter count, a rolling year and the place. */
 .hx-hudbar {
   position: fixed;
   right: var(--gutter);
@@ -71,13 +66,11 @@ body[data-view='history'].hx-staging .hx-hudbar { opacity: 1; }
 #hx-count { color: var(--text-lo); font-size: var(--fs-11); letter-spacing: 0.1em; }
 .hx-roll { font-size: var(--fs-34); line-height: 1; color: var(--text-hi); letter-spacing: -0.02em; }
 
-/* Mechanical digits (shared): each digit rolls on a drum. */
 .drum { display: inline-block; height: 1em; overflow: hidden; vertical-align: top; }
 .drum-col { display: flex; flex-direction: column; transition: transform 900ms var(--ease-lux); }
 .drum-col span { display: block; height: 1em; line-height: 1; }
 @media (prefers-reduced-motion: reduce) { .drum-col { transition: none; } }
 
-/* ---------- chapter opener ---------- */
 .hx-open {
   position: relative;
   min-height: 100svh;
@@ -112,7 +105,6 @@ body[data-view='history'].hx-staging .hx-hudbar { opacity: 1; }
 .hx-title { margin: var(--sp-2) 0 0; font-size: var(--fs-72); line-height: 0.98; letter-spacing: -0.03em; }
 .hx-lead { margin: 0; max-width: 34ch; font: italic 300 var(--fs-27)/1.3 var(--font-display); color: var(--text-body); }
 
-/* ---------- sticky stage ---------- */
 .hx-stage-wrap { position: relative; height: 280vh; }
 .hx-stage {
   position: sticky;
@@ -215,7 +207,6 @@ body[data-view='history'].hx-staging .hx-hudbar { opacity: 1; }
 .hx-hint { position: absolute; left: 50%; bottom: calc(var(--dock-h) + var(--sp-6)); transform: translateX(-50%); transition: opacity 600ms ease; }
 .hx-ch.exploded .hx-hint { opacity: 0.4; }
 
-/* ---------- lore: photos, text, facts, player ---------- */
 .hx-lore {
   display: grid;
   grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
@@ -244,7 +235,6 @@ body[data-view='history'].hx-staging .hx-hudbar { opacity: 1; }
 .hx-facts dd { margin: 0; font: 400 var(--fs-13) var(--font-mono); text-align: right; }
 .hx-cta { justify-self: start; }
 
-/* Needle drop: a little record with a brass tonearm that swings on. */
 .hx-listen { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-4) 0; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
 .needle {
   display: inline-flex;
@@ -297,7 +287,6 @@ body[data-view='history'].hx-staging .hx-hudbar { opacity: 1; }
 .needle.on .needle-arm { transform: rotate(14deg); }
 @media (hover: hover) and (pointer: fine) { .needle:not(.on):hover .needle-arm { transform: rotate(-22deg); } }
 
-/* Then / Today: a brass lever in a slot. */
 .era-ab { display: inline-flex; align-items: center; gap: 12px; font: 400 var(--fs-11) var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-lo); }
 .era-switch {
   position: relative;
@@ -325,12 +314,10 @@ body[data-view='history'].hx-staging .hx-hudbar { opacity: 1; }
 .era-ab:has(.era-switch[aria-checked='true']) .era-ab-r { color: var(--accent); }
 .era-ab:has(.era-switch[aria-checked='false']) .era-ab-l { color: var(--text-hi); }
 
-/* ---------- no scroll animation: chapters stack, objects sit exploded ---------- */
 .hx.static .hx-stage-wrap { height: auto; }
 .hx.static .hx-stage { position: relative; height: min(88svh, 820px); padding-top: var(--sp-7); padding-bottom: var(--sp-7); }
 .hx.static .hx-hud { inset: var(--sp-4) var(--gutter); }
 
-/* ---------- smaller screens ---------- */
 @media (max-width: 1100px) {
   .hx { --hx-left: var(--gutter); --hx-right: var(--gutter); }
   .hx-rail { display: none; }

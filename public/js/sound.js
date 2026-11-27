@@ -1,5 +1,3 @@
-// Interface sounds, synthesized: needle drop, knob detent, switch click. Muted until the visitor
-// turns them on; the choice is remembered.
 import { $, store } from './ui.js';
 
 const KEY = 'aura.sound';
@@ -76,7 +74,6 @@ export function play(name) {
   try {
     SOUNDS[name]();
   } catch {
-    // audio not available yet (no gesture): sounds are decoration, skip quietly
   }
 }
 

@@ -1,4 +1,3 @@
-// Zero-dependency server: static files from ./public + POST /api/advice (Gemini, key stays here).
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { brotliCompressSync, gzipSync, constants as zlib } from 'node:zlib';
@@ -13,12 +12,12 @@ try {
 }
 
 const PORT = Number(process.env.PORT) || 3000;
-const PUBLIC_DIR = fileURLToPath(new URL('./public/', import.meta.url)); // ends with a separator
+const PUBLIC_DIR = fileURLToPath(new URL('./public/', import.meta.url));
 const MAX_BODY_BYTES = 32 * 1024;
 const COMPRESSIBLE = /^(text\/|application\/json|image\/svg)/;
 const ASSET_DIRS = /^(img|models|fonts|products|guide|vendor)[/\\]/;
-const ASSET_MAX_AGE = 7 * 24 * 3600; // media is never edited in place; the ETag still revalidates
-const compressed = new Map(); // file|mtime|encoding -> Buffer
+const ASSET_MAX_AGE = 7 * 24 * 3600;
+const compressed = new Map();
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -41,7 +40,6 @@ const SECURITY_HEADERS = {
   'content-security-policy': [
     "default-src 'self'",
     "script-src 'self' 'wasm-unsafe-eval'",
-    // devicePEQ (hardware bridge) styles its injected UI inline; scripts stay 'self'-only.
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
     "connect-src 'self' https://raw.githubusercontent.com",
@@ -51,7 +49,6 @@ const SECURITY_HEADERS = {
   'x-content-type-options': 'nosniff',
   'referrer-policy': 'strict-origin-when-cross-origin',
   'permissions-policy': 'microphone=(self), display-capture=(self)',
-  // Unhashed module files: always revalidate, or browsers mix old and new modules after an edit.
   'cache-control': 'no-cache',
 };
 

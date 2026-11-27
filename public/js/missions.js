@@ -1,5 +1,3 @@
-// Guide, hands-on: the boost-and-sweep hero and two pro missions (IEM drum monitoring,
-// desk speakers + subwoofer crossover). Every control is a knob or switch with live A/B audio.
 import * as engine from './audio-engine.js';
 import { playTrack } from './synth.js';
 import { safePreamp, logFreqs, complexResponse, toDb } from './eq.js';
@@ -13,8 +11,6 @@ const FLAT_ENOUGH_DB = 1.5;
 const SWEEP_GAIN_DB = 10;
 const SWEEP_Q = 4;
 const fmtDb = (v) => `${v > 0 ? '+' : ''}${v.toFixed(1)} dB`;
-
-// ---------- shared audio: each widget owns the guide path while it plays ----------
 
 const tuned = {};
 const owner = (id) => `mission:${id}`;
@@ -68,8 +64,6 @@ function transport(id, { track, labels = ['Flat', 'Yours'] }) {
   return h('div', { class: 'm-transport', role: 'group', 'aria-label': 'Listen and compare' },
     play, h('div', { class: 'seg', role: 'group', 'aria-label': 'Compare A and B' }, a, b));
 }
-
-// ---------- boost & sweep hero ----------
 
 const REGIONS = [
   [20, 'Sub-bass', 'Rumble you feel in your chest'],
@@ -137,8 +131,6 @@ function initSweep(host) {
   render();
 }
 
-// ---------- mission 1: IEM drum monitoring ----------
-
 function initIem(host) {
   const freqs = logFreqs(120);
   const gains = Object.fromEntries(IEM_BANDS.map((b) => [b.id, 0]));
@@ -186,10 +178,6 @@ function initIem(host) {
   render();
 }
 
-// ---------- mission 2: desk speakers + subwoofer ----------
-
-// ponytail: the audition fakes the in-room sum with a 6-band graphic EQ; exact enough to hear
-// boom and cancellation, swap for a real crossover graph in the audio engine if needed.
 const XO_AUDITION_HZ = [32, 45, 63, 90, 125, 180];
 
 function initXo(host) {
@@ -239,8 +227,6 @@ function initXo(host) {
     h('div', { class: 'm-actions' }, transport('xo', { track: 'hiphop', labels: ['Speakers only', 'With sub'] })));
   render();
 }
-
-// ---------- exploded hardware (CSS 3D, scrubbed by scroll) ----------
 
 const EXPLODED = {
   iem: [

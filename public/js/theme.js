@@ -1,4 +1,3 @@
-// Theme picker: five palettes, a circular reveal from the swatch you pick, remembered per browser.
 import { $, h, store } from './ui.js';
 
 export const THEMES = [

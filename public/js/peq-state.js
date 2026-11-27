@@ -1,5 +1,3 @@
-// Single source of truth for the Lab's tuning: user bands + AutoEq correction + crossover + alignment.
-// Live edits (dragging) reach the audio immediately; commits add an undo step and persist.
 import { makeBand, expandBands, crossoverStages, DEFAULT_CROSSOVER, DEFAULT_ALIGNMENT } from './peq.js';
 import { safePreamp } from './eq.js';
 import * as engine from './audio-engine.js';
@@ -8,7 +6,6 @@ import { store } from './ui.js';
 const STORE_KEY = 'aura.peq';
 const HISTORY_LIMIT = 60;
 
-// Old Lab versions stored bass/treble sliders and "extras"; turn them into bands once.
 function migrateLegacy() {
   const old = store.get('aura.lab', {});
   const bands = [];
@@ -59,7 +56,6 @@ function persist() {
   store.set(STORE_KEY, { bands: peq.bands, crossover: peq.crossover, alignment: peq.alignment, correctionOn: peq.correctionOn, target: peq.target });
 }
 
-// patch: any of { bands, crossover, alignment, target, selected, correctionOn }. live = mid-gesture.
 export function update(patch, { live = false } = {}) {
   Object.assign(peq, patch);
   pushToEngine();
@@ -67,7 +63,6 @@ export function update(patch, { live = false } = {}) {
   notify(live);
 }
 
-// End of a live gesture (drag, scroll): one undo step, then refresh listeners (undo button etc.).
 export function commit() {
   record();
   notify(false);
@@ -119,7 +114,6 @@ export function addBand(band) {
 export function removeBand(id) {
   update({ bands: peq.bands.filter((b) => b.id !== id), selected: peq.selected === id ? null : peq.selected });
 }
-// Insert or replace by id (used by recommendations, AI and the guide).
 export function upsertBand(band) {
   const exists = peq.bands.some((b) => b.id === band.id);
   update({ bands: exists ? peq.bands.map((b) => (b.id === band.id ? makeBand(band) : b)) : [...peq.bands, makeBand(band)] });

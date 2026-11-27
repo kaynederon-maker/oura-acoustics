@@ -1,6 +1,3 @@
-// Intro loader: a brass needle travels a single groove while fonts and the hero object load.
-// Once per browser session, at most ~2.4 s, skippable (button, Esc, click), and skipped
-// entirely under reduced motion.
 import { play } from './sound.js';
 
 const KEY = 'aura.introSeen';
@@ -22,7 +19,6 @@ export function runIntro(ready) {
   try {
     sessionStorage.setItem(KEY, '1');
   } catch {
-    // private mode: the intro may show again, which is harmless
   }
   el.hidden = false;
   const count = document.getElementById('intro-count');

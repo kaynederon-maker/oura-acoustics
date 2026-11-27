@@ -1,8 +1,3 @@
-/* =========================================================================
-   Oura Acoustics: tokens
-   Five themes remap the same semantic roles. One shared thread across all
-   of them: a brass accent. Hex values are read by WebGL, keep them #rrggbb.
-   ========================================================================= */
 :root {
   --font-display: 'Fraunces', 'Iowan Old Style', Georgia, serif;
   --font-ui: 'Instrument Sans', 'Helvetica Neue', system-ui, sans-serif;
@@ -62,7 +57,6 @@
   --z-intro: 80;
 }
 
-/* Obsidian: smoked walnut black, champagne brass */
 :root,
 [data-theme='dark'] {
   color-scheme: dark;
@@ -87,7 +81,6 @@
   --grain-opacity: 0.06;
 }
 
-/* Ivory: gallery paper, ink, aged brass */
 [data-theme='light'] {
   color-scheme: light;
   --bg: #f3eee5;
@@ -111,7 +104,6 @@
   --grain-opacity: 0.05;
 }
 
-/* Bordeaux: velvet wine, antique gold */
 [data-theme='burgundy'] {
   color-scheme: dark;
   --bg: #160a0e;
@@ -135,7 +127,6 @@
   --grain-opacity: 0.06;
 }
 
-/* Terra: linen, oiled teak, olive */
 [data-theme='earth'] {
   color-scheme: light;
   --bg: #e8ddca;
@@ -159,7 +150,6 @@
   --grain-opacity: 0.07;
 }
 
-/* Mist: cool porcelain, pewter, soft brass */
 [data-theme='soft'] {
   color-scheme: light;
   --bg: #efeef2;
@@ -183,7 +173,6 @@
   --grain-opacity: 0.04;
 }
 
-/* Derived roles: every theme gets these from its own primitives. */
 :root,
 [data-theme] {
   --text-body: color-mix(in srgb, var(--text-hi) 84%, var(--bg));
@@ -201,9 +190,6 @@
   accent-color: var(--accent);
 }
 
-/* =========================================================================
-   Base
-   ========================================================================= */
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
 html {
@@ -230,7 +216,6 @@ body {
 :focus-visible { outline: 1.5px solid var(--accent); outline-offset: 3px; border-radius: var(--radius-xs); }
 [tabindex='-1']:focus { outline: none; }
 
-/* Film grain: fixed, never on scrolling content. */
 body::after {
   content: '';
   position: fixed;
@@ -241,7 +226,6 @@ body::after {
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   mix-blend-mode: overlay;
 }
-/* Gallery light: one soft spotlight falling from the top of the room. */
 body::before {
   content: '';
   position: fixed;
@@ -310,7 +294,6 @@ output, .stats dd, td.num { font-variant-numeric: tabular-nums; }
   vertical-align: -0.2em;
 }
 
-/* Small engraved caption: the 60fps "tiny refined type" next to big things. */
 .eyebrow, .caps {
   margin: 0;
   color: var(--accent);
@@ -329,9 +312,6 @@ output, .stats dd, td.num { font-variant-numeric: tabular-nums; }
   background: currentColor;
 }
 
-/* =========================================================================
-   Top bar: a thin brass-ruled header, solid on scroll
-   ========================================================================= */
 .topbar {
   position: sticky;
   top: 0;
@@ -401,7 +381,6 @@ output, .stats dd, td.num { font-variant-numeric: tabular-nums; }
 }
 .head-tools { display: flex; align-items: center; gap: var(--sp-1); margin-left: var(--sp-3); }
 
-/* Sound switch: a tiny engraved toggle */
 .sound-toggle {
   display: inline-flex;
   align-items: center;
@@ -425,7 +404,6 @@ output, .stats dd, td.num { font-variant-numeric: tabular-nums; }
 @keyframes eq-bars { from { height: 3px; } to { height: 12px; } }
 @media (hover: hover) and (pointer: fine) { .sound-toggle:hover { color: var(--text-hi); } }
 
-/* Theme picker */
 .theme-picker { position: relative; }
 .theme-trigger {
   display: inline-flex;
@@ -496,9 +474,6 @@ output, .stats dd, td.num { font-variant-numeric: tabular-nums; }
 ::view-transition-old(root),
 ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
 
-/* =========================================================================
-   Layout
-   ========================================================================= */
 main { width: min(var(--page-w), calc(100% - 2 * var(--gutter))); margin: 0 auto; }
 .view { animation: view-in 900ms var(--ease-lux); }
 @keyframes view-in { from { opacity: 0; transform: translateY(14px); } }
@@ -516,7 +491,6 @@ main { width: min(var(--page-w), calc(100% - 2 * var(--gutter))); margin: 0 auto
 .hint { margin-top: var(--sp-5); color: var(--text-lo); font-size: var(--fs-13); max-width: 56ch; }
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 18px; }
 
-/* Panel: hairline-bordered surface. Quiet. */
 .card {
   position: relative;
   min-width: 0;
@@ -529,7 +503,6 @@ main { width: min(var(--page-w), calc(100% - 2 * var(--gutter))); margin: 0 auto
 .card-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; }
 .card p { color: var(--text-body); }
 
-/* Light sweep: a band of light crossing a surface once on hover. */
 .sweep { position: relative; overflow: hidden; isolation: isolate; }
 .sweep::after {
   content: '';
@@ -544,7 +517,6 @@ main { width: min(var(--page-w), calc(100% - 2 * var(--gutter))); margin: 0 auto
   .sweep:hover::after { transform: translateX(110%); transition: transform 1100ms var(--ease-glide); }
 }
 
-/* Photo treatment: build-time grade + per-theme tint + credit. */
 .photo { position: relative; margin: 0; overflow: hidden; background: var(--well); isolation: isolate; }
 .photo img { display: block; width: 100%; height: 100%; object-fit: cover; }
 .photo::after {
@@ -576,9 +548,6 @@ main { width: min(var(--page-w), calc(100% - 2 * var(--gutter))); margin: 0 auto
 .photo figcaption a, .credit a { display: inline-flex; align-items: center; min-height: 24px; color: inherit; text-decoration: none; }
 .photo figcaption { padding-block: 0; }
 
-/* =========================================================================
-   Controls
-   ========================================================================= */
 .btn {
   position: relative;
   display: inline-flex;
@@ -743,9 +712,6 @@ input[type='search']:focus { outline: none; border-color: var(--accent); box-sha
 .slider input { grid-column: 1 / -1; width: 100%; min-height: 32px; cursor: pointer; }
 progress { flex: 1; min-width: 120px; height: 4px; accent-color: var(--accent); }
 
-/* =========================================================================
-   Graphs + frequency tooltip
-   ========================================================================= */
 .graph-wrap { position: relative; margin-top: 10px; }
 .graph { display: block; width: 100%; height: 300px; cursor: crosshair; touch-action: pan-y; border-radius: var(--radius-sm); }
 .graph.small { height: 120px; background: var(--well); border: 1px solid var(--hairline); }
@@ -824,9 +790,6 @@ tr.preamp td { color: var(--accent); }
 .howto summary { cursor: pointer; color: var(--text-hi); font: 500 var(--fs-12) var(--font-ui); letter-spacing: 0.14em; text-transform: uppercase; min-height: 32px; }
 .howto li { margin: 6px 0; }
 
-/* =========================================================================
-   Guide handbook
-   ========================================================================= */
 .prose { margin-bottom: var(--sp-5); }
 .prose h2 { font-size: var(--fs-34); }
 .prose p, .prose li { color: var(--text-body); max-width: 68ch; }
@@ -876,9 +839,6 @@ tr.preamp td { color: var(--accent); }
 .spectrum-bar span:nth-child(7) { flex: 10; background: #6a4d1d; }
 .spectrum-bar span:nth-child(8) { flex: 16; background: #4a3615; }
 
-/* =========================================================================
-   Dock: a slim hi-fi front panel
-   ========================================================================= */
 .dock {
   position: fixed;
   left: 50%;
@@ -953,7 +913,6 @@ tr.preamp td { color: var(--accent); }
   cursor: pointer;
 }
 
-/* Physical toggle: a lever in a slot (EQ switch, Advanced, brass toggles). */
 .lever {
   appearance: none;
   position: relative;
@@ -1004,9 +963,6 @@ tr.preamp td { color: var(--accent); }
 #toast.show { opacity: 1; transform: translate(-50%, 0); }
 #toast[data-tone='error'] { border-left-color: var(--danger); }
 
-/* =========================================================================
-   Intro loader, route curtain, cursor
-   ========================================================================= */
 .intro {
   position: fixed;
   inset: 0;
@@ -1123,9 +1079,6 @@ tr.preamp td { color: var(--accent); }
 .cursor[data-state='pressing'] .cursor-ring { transform: scale(0.85); }
 @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) { .cursor { display: none; } }
 
-/* =========================================================================
-   Motion
-   ========================================================================= */
 @media (prefers-reduced-motion: no-preference) {
   .js .reveal { opacity: 0; transform: translateY(24px); }
   .js .reveal.in {
@@ -1142,9 +1095,6 @@ tr.preamp td { color: var(--accent); }
 }
 @keyframes view-fade { from { opacity: 0; } }
 
-/* =========================================================================
-   Responsive
-   ========================================================================= */
 .lab-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-5); }
 .lab-grid .wide { grid-column: 1 / -1; }
 @media (max-width: 1100px) {

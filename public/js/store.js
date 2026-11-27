@@ -1,5 +1,3 @@
-// Store: product grid, product pages, favourites + bag sheets, demo checkout.
-// Sheets are native <dialog>s (focus trap, Esc and inert page for free), styled after shadcn's Sheet.
 import { PRODUCTS, CATEGORIES, findProduct } from './catalog.js';
 import {
   filterProducts, addToBag, setQty, bagLines, bagTotals, toggleFavorite, validateCheckout,
@@ -11,7 +9,7 @@ import { photo } from './img.js';
 import { play } from './sound.js';
 
 const ADDED_FEEDBACK_MS = 1400;
-const CHECKOUT_DELAY_MS = 1100; // demo "processing" so the loading state is visible
+const CHECKOUT_DELAY_MS = 1100;
 const RELATED_COUNT = 4;
 const STAGGER_CAP = 8;
 const FEATURED_IDS = ['edifier-r1280t', 'sony-wh-1000xm5', 'airpods-pro-2', 'moondrop-blessing-3'];
@@ -31,12 +29,10 @@ function save() {
   renderCounts();
 }
 
-// ---------- shared pieces ----------
-
 function media(p, { eager = false } = {}) {
   return h('img', {
     src: imgSrc(p), alt: `${p.brand} ${p.name}`, loading: eager ? 'eager' : 'lazy', decoding: 'async',
-    width: '1200', height: '900', // every product image is reframed to 4:3 (see products/sources.json)
+    width: '1200', height: '900',
   });
 }
 
@@ -62,7 +58,6 @@ function favButton(p, extraClass = '') {
   }, icon('heart'));
 }
 
-// Grid cards get a quiet button; the product page keeps the accent for its single primary action.
 function addButton(p, qtyFn = () => 1, { primary = false, label = 'Add to bag' } = {}) {
   const btn = h('button', { type: 'button', class: `btn add-btn${primary ? ' primary' : ''}` }, icon('bag'), h('span', {}, label));
   btn.addEventListener('click', () => {
@@ -97,7 +92,6 @@ function toggleFav(p) {
   if ($('#fav-sheet').open) renderFavorites();
 }
 
-// Flagships get a 3D study; everything else gets a drag-to-tilt turntable of its photo.
 const STUDIES = { 'edifier-r1280t': 'speaker-walnut', 'yamaha-hs5': 'monitor-black', 'sennheiser-hd-600': 'headphone-open', 'moondrop-blessing-3': 'iem' };
 const CATEGORY_LOOK = {
   all: ['m-speakers', 'Everything on the shelf, from desk speakers to in-ear monitors.'],
@@ -148,7 +142,6 @@ function editorialTile(t) {
     }, h('span', { class: 'caps' }, t.kicker), h('span', { class: 'editorial-title' }, t.title), h('span', { class: 'text-link' }, 'Shop the edit')));
 }
 
-// A photo you can turn like an object on a turntable: drag, arrow keys, or just hover.
 function turntable(p, { eager = false } = {}) {
   const img = media(p, { eager });
   const stageEl = h('div', {
@@ -185,7 +178,6 @@ function turntable(p, { eager = false } = {}) {
   return stageEl;
 }
 
-// Product viewer: the 3D study or the turntable, plus a strip of angles and details.
 function viewer(p) {
   const main = h('div', { class: 'viewer-main' });
   const shots = [
@@ -229,7 +221,6 @@ function viewer(p) {
   return { el: h('div', { class: 'viewer' }, main, thumbs), dispose: () => stage3d?.dispose() };
 }
 
-// Quick view: the essentials and full spec sheet without leaving the grid.
 function quickView(p) {
   const href = `#/product/${p.id}`;
   $('#qv-body').replaceChildren(
@@ -250,12 +241,9 @@ function quickView(p) {
   $('#quick-view').showModal();
 }
 
-// Specs as engraved plates: the value slides out on hover.
 function specList(p) {
   return h('dl', { class: 'spec-list' }, Object.entries(p.specs).map(([k, v]) => h('div', { class: 'spec' }, h('dt', {}, k), h('dd', {}, v))));
 }
-
-// ---------- store grid ----------
 
 function categoryBanner() {
   const id = state.filters.category;
@@ -317,11 +305,8 @@ function initFilters() {
   $('#store-favs-only').addEventListener('change', (e) => { state.filters = { ...state.filters, favoritesOnly: e.target.checked }; renderGrid(); });
 }
 
-// ---------- product page ----------
-
 let currentViewer = null;
 
-// Renders #view-product and returns the page title.
 export function showProduct(id) {
   const p = findProduct(id);
   const view = $('#view-product');
@@ -373,8 +358,6 @@ export function showProduct(id) {
       h('div', { class: 'product-grid' }, related.map((x, i) => card(x, i)))) : null);
   return `${p.brand} ${p.name}`;
 }
-
-// ---------- favourites + bag sheets ----------
 
 function closeSheets() {
   for (const d of $$('dialog.sheet[open], dialog.qv[open]')) d.close();
@@ -513,8 +496,6 @@ async function placeOrder(form) {
   $('#bag-foot').replaceChildren();
 }
 
-// ---------- header counts ----------
-
 function renderCounts() {
   const count = bagTotals(bagLines(state.bag, PRODUCTS)).count;
   const bagBadge = $('#bag-count');
@@ -530,11 +511,9 @@ function renderCounts() {
 function bumpBag() {
   const badge = $('#bag-count');
   badge.classList.remove('bump');
-  void badge.offsetWidth; // restart the keyframe
+  void badge.offsetWidth;
   badge.classList.add('bump');
 }
-
-// ---------- wiring ----------
 
 export function initStore() {
   initFilters();
@@ -546,12 +525,11 @@ export function initStore() {
   for (const dialog of $$('dialog.sheet, dialog.qv')) {
     dialog.addEventListener('click', (e) => {
       if (e.target.closest('[data-close]')) return dialog.close();
-      const r = dialog.getBoundingClientRect(); // clicks on ::backdrop land on the dialog itself
+      const r = dialog.getBoundingClientRect();
       const outside = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
       if (e.target === dialog && outside) dialog.close();
     });
   }
-  // Another tab changed the bag or favourites: stay in sync.
   addEventListener('storage', (e) => {
     if (e.key !== 'aura.bag' && e.key !== 'aura.favorites') return;
     state.bag = store.get('aura.bag', []);

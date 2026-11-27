@@ -1,5 +1,3 @@
-// Tiny DOM helpers. Text always goes through textContent, never innerHTML.
-
 export const $ = (selector, root = document) => root.querySelector(selector);
 export const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
 
@@ -15,7 +13,6 @@ export function h(tag, attrs = {}, ...children) {
   return el;
 }
 
-// <svg class="icon"><use href="#i-name"/></svg> from the sprite in index.html.
 const SVG_NS = 'http://www.w3.org/2000/svg';
 export function icon(name) {
   const svg = document.createElementNS(SVG_NS, 'svg');
@@ -27,12 +24,10 @@ export function icon(name) {
   return svg;
 }
 
-// Physical tick on phones that support the Vibration API (Android Chrome); a no-op elsewhere.
 export function haptic(ms = 8) {
   try {
     navigator.vibrate?.(ms);
   } catch {
-    // vibration blocked (no user gesture yet); silent by design
   }
 }
 
@@ -67,7 +62,6 @@ export const store = {
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch {
-      // storage blocked (private mode); settings just won't persist
     }
   },
 };
