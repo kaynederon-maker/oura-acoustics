@@ -16,7 +16,7 @@ export const PRESETS = {
     color: '#4a4558', roughness: 0.05, clearcoat: 1, clearcoatRoughness: 0.02, transmission: 0.88, thickness: 0.35, ior: 1.5,
     attenuationColor: '#2a2134', attenuationDistance: 0.42, specularIntensity: 1,
   }, 8, { FLAKE_FREQ: '120.0', FLAKE_P: '0.985', FLAKE_GAIN: '1.2' }),
-  flake: P({ color: '#c2a06a', roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.015 }, 8, { FLAKE_FREQ: '60.0', FLAKE_P: '0.82', FLAKE_GAIN: '1.4' }),
+  flake: P({ color: '#c2a06a', roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.015 }, 8, { FLAKE_FREQ: '160.0', FLAKE_P: '0.86', FLAKE_GAIN: '0.9' }),
   glass: P({ color: '#f4f7f9', roughness: 0.03, transmission: 1, thickness: 0.12, ior: 1.5 }),
   'tube-glass': P({ color: '#f4f7f9', roughness: 0.02, transmission: 1, thickness: 0.04, ior: 1.5 }),
   walnut: P({ color: '#5b3a22', roughness: 0.42, clearcoat: 0.55, clearcoatRoughness: 0.18 }, 3),
