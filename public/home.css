@@ -9,11 +9,13 @@
 }
 .hero-word {
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
   top: 50%;
   z-index: -1;
   margin: 0;
-  transform: translate(-50%, -54%);
+  text-align: center;
+  transform: translateY(-54%);
   font: 200 clamp(150px, 33vw, 560px)/0.8 var(--font-display);
   letter-spacing: -0.065em;
   font-variation-settings: 'SOFT' 100, 'WONK' 0;
@@ -193,9 +195,10 @@
 
 @media (max-width: 900px) {
   .hero-pin { height: 200vh; }
-  .hero-word { font-size: 42vw; top: 40%; }
-  .hero-ring { width: 86vw; top: 40%; }
-  .hero-object { inset: var(--bar-h) 0 34% 0; }
+  .hero { --hero-area: calc(100svh - var(--bar-h) - var(--dock-h) - var(--sp-5) - var(--copy-h, 34vh) - var(--sp-3)); --hero-mid: calc(var(--bar-h) + var(--hero-area) / 2); }
+  .hero-word { font-size: min(42vw, calc(var(--hero-area) * 0.95)); top: var(--hero-mid); }
+  .hero-ring { width: min(86vw, calc(var(--hero-area) + 70px)); top: var(--hero-mid); }
+  .hero-object { inset: var(--bar-h) 0 calc(var(--dock-h) + var(--sp-5) + var(--copy-h, 34vh) + var(--sp-3)) 0; }
   .hero-meta { display: none; }
   .hero-copy { grid-template-columns: 1fr; bottom: calc(var(--dock-h) + var(--sp-5)); }
   .display { grid-row: auto; font-size: var(--fs-48); }
