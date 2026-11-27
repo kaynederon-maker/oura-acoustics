@@ -3,8 +3,8 @@ import { makeBand, toDeviceFilters, fromDeviceFilters } from './peq.js';
 import { safePreamp } from './eq.js';
 import { $, h, toast } from './ui.js';
 
-const PLUGIN_URL = '/vendor/devicePEQ/plugin.js';
-const CONSTRAINTS_URL = '/vendor/devicePEQ/peqConstraintsConfig.json';
+const PLUGIN_URL = '../vendor/devicePEQ/plugin.js';
+const CONSTRAINTS_URL = 'vendor/devicePEQ/peqConstraintsConfig.json';
 
 const supported = () => 'hid' in navigator || 'serial' in navigator || 'bluetooth' in navigator;
 

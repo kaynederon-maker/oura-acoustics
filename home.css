@@ -48,7 +48,7 @@
 .hero-object { position: absolute; inset: var(--bar-h) 8% 24% 8%; cursor: grab; outline-offset: -8px; opacity: 0; transition: opacity 1400ms var(--ease-lux); }
 .hero-object.ready { opacity: 1; }
 .hero-object:active { cursor: grabbing; }
-.hero-object.no-3d { opacity: 1; background: center / min(46svh, 46vw) no-repeat url('/img/h2026-iem1-960.webp'); }
+.hero-object.no-3d { opacity: 1; background: center / min(46svh, 46vw) no-repeat url('img/h2026-iem1-960.webp'); }
 
 .hero-specs { position: absolute; inset: 0; pointer-events: none; }
 .hero-spec { position: absolute; left: 0; top: 0; will-change: transform; }
