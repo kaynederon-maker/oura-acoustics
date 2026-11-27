@@ -6,7 +6,7 @@ const KEY_STEP = 0.18;
 const EDGE_ANGLE = 28;
 
 let lib = null;
-export const loadThree = () => (lib ??= import('/vendor/three/three.js'));
+export const loadThree = () => (lib ??= import('../vendor/three/three.js'));
 
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 
@@ -46,7 +46,7 @@ const modelCache = new Map();
 async function fetchModel(T, name) {
   if (!modelCache.has(name)) {
     const loader = new T.GLTFLoader().setMeshoptDecoder(T.MeshoptDecoder);
-    modelCache.set(name, loader.loadAsync(`/models/${name}.glb`).then((g) => g.scene));
+    modelCache.set(name, loader.loadAsync(`models/${name}.glb`).then((g) => g.scene));
   }
   return (await modelCache.get(name)).clone(true);
 }

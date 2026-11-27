@@ -21,7 +21,7 @@ const state = {
 };
 
 const fmtCount = (n) => n.toLocaleString('en-US');
-const imgSrc = (p) => `/products/${p.id}.webp`;
+const imgSrc = (p) => `products/${p.id}.webp`;
 
 function save() {
   store.set('aura.bag', state.bag);
@@ -117,7 +117,7 @@ function card(p, index, { feature = false } = {}) {
     h('a', { class: `product-media fit-${p.fit}`, href, tabindex: '-1', 'aria-hidden': 'true', 'data-cursor': 'view' },
       h('span', { class: 'plinth', 'aria-hidden': 'true' }),
       media(p),
-      h('img', { class: 'alt-shot', src: `/products/detail/${p.id}-a.webp`, alt: '', loading: 'lazy', decoding: 'async', width: '800', height: '600' })),
+      h('img', { class: 'alt-shot', src: `products/detail/${p.id}-a.webp`, alt: '', loading: 'lazy', decoding: 'async', width: '800', height: '600' })),
     p.badge ? h('span', { class: 'badge' }, p.badge) : null,
     STUDIES[p.id] ? h('span', { class: 'badge study' }, '3D') : null,
     favButton(p),
@@ -183,8 +183,8 @@ function viewer(p) {
   const shots = [
     ...(STUDIES[p.id] ? [{ kind: '3d', label: '3D study' }] : []),
     { kind: 'photo', label: 'Photo' },
-    { kind: 'img', src: `/products/detail/${p.id}-a.webp`, label: 'Detail' },
-    { kind: 'img', src: `/products/detail/${p.id}-b.webp`, label: 'Close-up' },
+    { kind: 'img', src: `products/detail/${p.id}-a.webp`, label: 'Detail' },
+    { kind: 'img', src: `products/detail/${p.id}-b.webp`, label: 'Close-up' },
   ];
   let stage3d = null;
   async function show(i) {

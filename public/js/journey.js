@@ -215,7 +215,7 @@ function setChapter(index) {
 function chapterEl(c, i) {
   return h('article', { class: 'j-step', 'data-index': String(i), id: `j-${c.id}` },
     h('figure', { class: 'j-figure' },
-      h('img', { src: `/guide/${c.img}.webp`, alt: c.alt, loading: 'lazy', decoding: 'async' }),
+      h('img', { src: `guide/${c.img}.webp`, alt: c.alt, loading: 'lazy', decoding: 'async' }),
       h('figcaption', {}, IMG_CREDITS[c.img])),
     h('p', { class: 'j-kicker' }, c.kicker),
     h('h3', { class: 'j-step-title' }, c.title),

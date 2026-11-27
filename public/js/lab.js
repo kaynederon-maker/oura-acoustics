@@ -348,13 +348,16 @@ function renderRecs() {
     photo('m-pads', { className: 'rec-photo', sizes: '160px', caption: false }), h('p', {}, empty))]));
 }
 
+const OFFLINE_AI = 'it runs on the local Node server (npm start), not on this static preview.';
+
 async function askAi() {
   const btn = $('#ai-advice');
   const out = $('#ai-out');
   btn.disabled = true;
   btn.textContent = 'Thinking…';
   try {
-    const res = await fetch('/api/advice', {
+    if (location.hostname.endsWith('github.io')) throw new Error(OFFLINE_AI);
+    const res = await fetch('api/advice', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({
@@ -366,6 +369,7 @@ async function askAi() {
       }),
     });
     const data = await res.json().catch(() => ({}));
+    if ([404, 405, 501].includes(res.status)) throw new Error(OFFLINE_AI);
     if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
     const toBand = (a) => ({ id: `ai-${a.type}-${a.fc}`, type: a.type, fc: a.fc, gain: a.gain, q: a.q });
     out.replaceChildren(

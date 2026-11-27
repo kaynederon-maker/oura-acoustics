@@ -4,7 +4,7 @@ let credits = {};
 
 export async function loadCredits() {
   try {
-    const res = await fetch('/img/credits.json');
+    const res = await fetch('img/credits.json');
     if (res.ok) credits = await res.json();
   } catch {
   }
@@ -14,7 +14,7 @@ export const credit = (id) => credits[id];
 
 function srcset(id, ext) {
   const widths = credits[id]?.widths ?? [480, 960, 1600];
-  return widths.map((w) => `/img/${id}-${w}.${ext} ${w}w`).join(', ');
+  return widths.map((w) => `img/${id}-${w}.${ext} ${w}w`).join(', ');
 }
 
 export function photo(id, { sizes = '(max-width: 760px) 100vw, 50vw', className = '', eager = false, alt, caption = true } = {}) {
@@ -22,7 +22,7 @@ export function photo(id, { sizes = '(max-width: 760px) 100vw, 50vw', className 
   const widths = c.widths ?? [480, 960];
   const mid = widths.includes(960) ? 960 : widths.at(-1);
   const img = h('img', {
-    src: `/img/${id}-${mid}.webp`, srcset: srcset(id, 'webp'), sizes, alt: alt ?? c.alt ?? '',
+    src: `img/${id}-${mid}.webp`, srcset: srcset(id, 'webp'), sizes, alt: alt ?? c.alt ?? '',
     loading: eager ? 'eager' : 'lazy', decoding: 'async', fetchpriority: eager ? 'high' : null,
     width: '960', height: String(Math.round(960 / (c.ratio || 1.5))),
   });
