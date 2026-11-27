@@ -65,7 +65,7 @@
   <a class="skip" href="#/" data-scroll="main">Skip to content</a>
 
   <header class="topbar">
-    <a class="brand" href="#/" aria-label="Oura Acoustics home">Oura<span>Acoustics</span></a>
+    <a class="brand" href="#/">Oura<span> Acoustics</span><span class="sr-only">, home</span></a>
     <nav aria-label="Main">
       <a href="#/" data-nav="home">Home</a>
       <a href="#/store" data-nav="store">Store</a>
@@ -236,6 +236,7 @@
         </div>
       </div>
       <p id="store-count" class="muted small" aria-live="polite"></p>
+      <h2 class="sr-only">Products</h2>
       <div id="store-grid" class="product-grid"></div>
       <p class="muted small store-note">Prices are approximate list prices; ratings are demo data. Product photos via the manufacturers, RTINGS and retailers.</p>
     </section>
@@ -255,10 +256,10 @@
       </header>
 
       <ol class="lab-steps" aria-label="Setup progress">
-        <li data-step="1"><button type="button" data-target="step-device"><span class="ls-n">01</span><span class="ls-t">Your headphones</span></button></li>
-        <li data-step="2"><button type="button" data-target="step-listen"><span class="ls-n">02</span><span class="ls-t">Listen</span></button></li>
-        <li data-step="3"><button type="button" data-target="step-hearing"><span class="ls-n">03</span><span class="ls-t">Hearing check</span></button></li>
-        <li data-step="4"><button type="button" data-target="step-export"><span class="ls-n">04</span><span class="ls-t">Take it home</span></button></li>
+        <li data-step="1"><button type="button" data-target="step-device"><span class="ls-n">01</span><span class="ls-t">Your headphones</span><span class="ls-done sr-only"></span></button></li>
+        <li data-step="2"><button type="button" data-target="step-listen"><span class="ls-n">02</span><span class="ls-t">Listen</span><span class="ls-done sr-only"></span></button></li>
+        <li data-step="3"><button type="button" data-target="step-hearing"><span class="ls-n">03</span><span class="ls-t">Hearing check</span><span class="ls-done sr-only"></span></button></li>
+        <li data-step="4"><button type="button" data-target="step-export"><span class="ls-n">04</span><span class="ls-t">Take it home</span><span class="ls-done sr-only"></span></button></li>
       </ol>
       <div class="lab-grid">
         <article class="card" id="step-device">

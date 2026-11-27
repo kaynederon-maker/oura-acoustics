@@ -365,3 +365,4 @@ body[data-view='history'].hx-staging .hx-hudbar { opacity: 1; }
   .hx-mosaic .m0 { grid-column: 1 / -1 !important; grid-row: span 2 !important; }
   .hx.static .hx-stage { height: auto; min-height: 90svh; }
 }
+.drums { display: inline-flex; }

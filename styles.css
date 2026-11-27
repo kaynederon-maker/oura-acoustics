@@ -573,7 +573,8 @@ main { width: min(var(--page-w), calc(100% - 2 * var(--gutter))); margin: 0 auto
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.photo figcaption a, .credit a { color: inherit; }
+.photo figcaption a, .credit a { display: inline-flex; align-items: center; min-height: 24px; color: inherit; text-decoration: none; }
+.photo figcaption { padding-block: 0; }
 
 /* =========================================================================
    Controls
@@ -907,7 +908,7 @@ tr.preamp td { color: var(--accent); }
 .dock[data-live='true'] .meter .b { transform: scaleY(max(0.12, var(--bass, 0))); }
 .dock[data-live='true'] .meter .m { transform: scaleY(max(0.12, var(--mid, 0))); }
 .dock[data-live='true'] .meter .h { transform: scaleY(max(0.12, var(--high, 0))); }
-.dock-sources { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; }
+.dock-sources { display: flex; gap: 4px; min-width: 0; overflow-x: auto; scrollbar-width: none; }
 .chip-btn {
   display: inline-flex;
   align-items: center;
@@ -1150,6 +1151,8 @@ tr.preamp td { color: var(--accent); }
   .lab-grid { grid-template-columns: repeat(2, 1fr); }
   .topbar nav a { padding: 10px 9px; letter-spacing: 0.12em; }
   .theme-trigger-label, .sound-toggle .label { display: none; }
+  .dock-status small { display: none; }
+  .dock-status { flex: none; }
 }
 @media (max-width: 900px) {
   .lab-grid { grid-template-columns: 1fr; }

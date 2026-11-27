@@ -31,8 +31,8 @@ export function photo(id, { sizes = '(max-width: 760px) 100vw, 50vw', className 
   });
   const pic = h('picture', {}, h('source', { type: 'image/avif', srcset: srcset(id, 'avif'), sizes }), img);
   const cap = caption && c.author ? h('figcaption', {},
-    h('a', { href: c.source, target: '_blank', rel: 'noopener', 'aria-label': `Photo credit: ${c.author}, ${c.license} (opens the source)` },
-      `${c.author.replace(/\s+/g, ' ').slice(0, 48)} · ${c.license}`)) : null;
+    h('a', { href: c.source, target: '_blank', rel: 'noopener', title: `${c.title} · ${c.author} · ${c.license}` },
+      h('span', { class: 'sr-only' }, 'Photo credit: '), `${c.author.slice(0, 48)} · ${c.license}`, h('span', { class: 'sr-only' }, ' (opens the source)'))) : null;
   return h('figure', { class: `photo ${className}`.trim(), style: c.ratio ? `--ratio:${c.ratio}` : null }, pic, cap);
 }
 
@@ -43,19 +43,20 @@ export function hydratePhotos(root = document) {
   }
 }
 
-// Mechanical counter: each digit rolls on its own drum. Text stays readable for screen readers.
+// Mechanical counter: each digit rolls on its own drum. Screen readers get the plain value.
 export function rollNumber(el, value) {
   const text = String(value);
-  el.setAttribute('aria-label', el.dataset.label ? `${el.dataset.label} ${text}` : text);
   const mask = text.replace(/\d/g, '0');
   if (el.dataset.rolled !== mask) {
-    el.replaceChildren(...[...text].map((ch) => (/\d/.test(ch)
-      ? h('span', { class: 'drum', 'aria-hidden': 'true' }, h('span', { class: 'drum-col' }, ...'0123456789'.split('').map((d) => h('span', {}, d))))
-      : h('span', { class: 'drum-fixed', 'aria-hidden': 'true' }, ch))));
+    const drums = [...text].map((ch) => (/\d/.test(ch)
+      ? h('span', { class: 'drum' }, h('span', { class: 'drum-col' }, ...'0123456789'.split('').map((d) => h('span', {}, d))))
+      : h('span', { class: 'drum-fixed' }, ch)));
+    el.replaceChildren(h('span', { class: 'sr-only' }), h('span', { class: 'drums', 'aria-hidden': 'true' }, ...drums));
     el.dataset.rolled = mask;
   }
+  el.firstChild.textContent = el.dataset.label ? `${el.dataset.label} ${text}` : text;
   [...text].forEach((ch, i) => {
-    const col = el.children[i].querySelector('.drum-col');
+    const col = el.lastChild.children[i].querySelector('.drum-col');
     if (col) col.style.transform = `translateY(${-Number(ch) * 10}%)`;
   });
 }
