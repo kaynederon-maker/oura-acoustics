@@ -67,35 +67,38 @@
 }
 .hero-spec-line {
   position: absolute;
-  left: 3px;
-  bottom: 3px;
-  width: 70px;
+  left: 0;
+  top: 0;
+  width: var(--len, 70px);
   height: 1px;
   background: var(--accent);
-  transform-origin: left;
-  transform: rotate(-38deg) scaleX(0);
+  transform-origin: 0 50%;
+  transform: rotate(var(--ang, -0.66rad)) scaleX(0);
   transition: transform 800ms var(--ease-lux) 100ms;
 }
 .hero-spec-text {
   position: absolute;
-  left: 58px;
-  bottom: 44px;
+  left: var(--dx, 58px);
+  top: var(--dy, -44px);
   display: grid;
   gap: 2px;
   white-space: nowrap;
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter: blur(4px);
   font: 400 var(--fs-11) var(--font-mono);
   color: var(--text-lo);
   opacity: 0;
-  transform: translateY(6px);
+  transform: translate(8px, -50%) translateY(6px);
   transition: opacity 600ms var(--ease-lux) 250ms, transform 800ms var(--ease-lux) 250ms;
 }
 .hero-spec-text b { color: var(--text-hi); font: 500 var(--fs-11) var(--font-ui); letter-spacing: 0.16em; text-transform: uppercase; }
-.hero-spec.flip .hero-spec-line { left: auto; right: -3px; transform-origin: right; transform: rotate(38deg) scaleX(0); }
-.hero-spec.flip .hero-spec-text { left: auto; right: 58px; justify-items: end; text-align: right; }
-.hero-spec.flip.on .hero-spec-line { transform: rotate(38deg) scaleX(1); }
+.hero-spec.flip .hero-spec-text { justify-items: end; text-align: right; transform: translate(calc(-100% - 8px), -50%) translateY(6px); }
 .hero-spec.on .hero-spec-dot { opacity: 1; transform: none; }
-.hero-spec.on .hero-spec-line { transform: rotate(-38deg) scaleX(1); }
-.hero-spec.on .hero-spec-text { opacity: 1; transform: none; }
+.hero-spec.on .hero-spec-line { transform: rotate(var(--ang, -0.66rad)) scaleX(1); }
+.hero-spec.on .hero-spec-text { opacity: 1; transform: translate(8px, -50%); }
+.hero-spec.flip.on .hero-spec-text { transform: translate(calc(-100% - 8px), -50%); }
 
 .hero-meta {
   position: absolute;
@@ -196,8 +199,6 @@
   .hero-meta { display: none; }
   .hero-copy { grid-template-columns: 1fr; bottom: calc(var(--dock-h) + var(--sp-5)); }
   .display { grid-row: auto; font-size: var(--fs-48); }
-  .hero-spec-text { left: 30px; bottom: 26px; }
-  .hero-spec-line { width: 40px; }
   .promise { grid-template-columns: 1fr; gap: var(--sp-3); padding: var(--sp-6) 0; }
   .promise-n { font-size: var(--fs-27); }
   .home .section-intro h2, .section-head h2 { font-size: var(--fs-48); }

@@ -16,14 +16,35 @@ const ROOM = ['m-listen1', 'm-kef', 'm-tube', 'm-crowd', 'm-pads', 'm-neve', 'm-
 
 let stage = null;
 
+const SPEC_NARROW = 720;
+
 function placeSpecs() {
   if (!stage) return;
   const box = $('#hero-object').getBoundingClientRect();
   const host = $('.hero').getBoundingClientRect();
-  for (const el of document.querySelectorAll('.hero-spec')) {
-    const p = stage.project(el.dataset.part);
-    if (!p) continue;
+  const narrow = innerWidth < SPEC_NARROW;
+  const gap = narrow ? 38 : 48;
+  const reach = narrow ? 34 : 64;
+  const items = [...document.querySelectorAll('.hero-spec')]
+    .map((el) => ({ el, p: stage.project(el.dataset.part), left: el.classList.contains('flip') }))
+    .filter((it) => it.p);
+  const xs = items.map((it) => it.p.x);
+  const column = { true: Math.min(...xs) - reach, false: Math.max(...xs) + reach };
+  for (const side of [true, false]) {
+    let prev = -Infinity;
+    for (const it of items.filter((i) => i.left === side).sort((a, b) => a.p.y - b.p.y)) {
+      it.ty = Math.max(it.p.y - reach * 0.4, prev + gap);
+      prev = it.ty;
+    }
+  }
+  for (const { el, p, left, ty } of items) {
+    const dx = column[left] - p.x;
+    const dy = ty - p.y;
     el.style.transform = `translate(${(box.left - host.left + p.x).toFixed(1)}px, ${(box.top - host.top + p.y).toFixed(1)}px)`;
+    el.style.setProperty('--dx', `${dx}px`);
+    el.style.setProperty('--dy', `${dy.toFixed(1)}px`);
+    el.style.setProperty('--len', `${Math.hypot(dx, dy).toFixed(1)}px`);
+    el.style.setProperty('--ang', `${Math.atan2(dy, dx).toFixed(4)}rad`);
   }
 }
 
@@ -56,7 +77,7 @@ function ringLoop() {
 
 async function initStage() {
   const host = $('#hero-object');
-  stage = await createStage(host, { look: 'lux', model: 'iem', distance: 1.55, autoTurn: reducedMotion ? 0 : 0.0018, tilt: 0.25 });
+  stage = await createStage(host, { look: 'lux', model: 'iem', distance: 1.55, autoTurn: reducedMotion ? 0 : 0.0018, tilt: 0.25, yaw: -1.05 });
   host.classList.add('ready');
   if (reducedMotion || !motionReady) {
     stage.setExplode(0.55);
