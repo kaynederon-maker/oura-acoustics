@@ -5,7 +5,7 @@ import { Document, NodeIO } from '@gltf-transform/core';
 import { EXTMeshoptCompression, ALL_EXTENSIONS } from '@gltf-transform/extensions';
 import { weld, dedup, prune, meshopt } from '@gltf-transform/functions';
 import { MeshoptEncoder } from 'meshoptimizer';
-import { mkdir } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 
 const OUT = fileURLToPath(new URL('../public/models/', import.meta.url));
@@ -283,6 +283,23 @@ function toPrimitive(doc, buffer, geometries) {
   return doc.createPrimitive().setAttribute('POSITION', pos).setAttribute('NORMAL', nor);
 }
 
+function withoutGenerator(glb) {
+  const jsonLength = glb.readUInt32LE(12);
+  const json = JSON.parse(glb.toString('utf8', 20, 20 + jsonLength));
+  delete json.asset.generator;
+  let text = JSON.stringify(json);
+  text += ' '.repeat((4 - (Buffer.byteLength(text) % 4)) % 4);
+  const chunk = Buffer.from(text);
+  const rest = glb.subarray(20 + jsonLength);
+  const header = Buffer.alloc(20);
+  header.write('glTF', 0, 'ascii');
+  header.writeUInt32LE(2, 4);
+  header.writeUInt32LE(20 + chunk.length + rest.length, 8);
+  header.writeUInt32LE(chunk.length, 12);
+  header.writeUInt32LE(0x4e4f534a, 16);
+  return Buffer.concat([header, chunk, rest]);
+}
+
 async function build(name, make) {
   const doc = new Document();
   const buffer = doc.createBuffer();
@@ -307,7 +324,7 @@ async function build(name, make) {
   doc.createExtension(EXTMeshoptCompression).setRequired(true).setEncoderOptions({ method: EXTMeshoptCompression.EncoderMethod.QUANTIZE });
   await doc.transform(weld(), dedup(), prune(), meshopt({ encoder: MeshoptEncoder, level: 'medium' }));
   const io = new NodeIO().registerExtensions(ALL_EXTENSIONS).registerDependencies({ 'meshopt.encoder': MeshoptEncoder });
-  await io.write(`${OUT}${name}.glb`, doc);
+  await writeFile(`${OUT}${name}.glb`, withoutGenerator(Buffer.from(await io.writeBinary(doc))));
 }
 
 await mkdir(OUT, { recursive: true });
