@@ -380,6 +380,10 @@ ${JSON_SHAPE}`,
 async function askAi() {
   const btn = $('#ai-advice');
   const out = $('#ai-out');
+  if (!lab.entry && !lab.content) {
+    out.replaceChildren(h('p', { class: 'muted' }, 'Pick your headphones in step 1 first, and ideally analyze some music in step 2, so the Sommelier has something to tune.'));
+    return;
+  }
   btn.disabled = true;
   btn.textContent = 'Thinking…';
   try {
@@ -390,16 +394,17 @@ async function askAi() {
       content: lab.content && { ...lab.content, rmsDb: lab.listening.rmsDb, clipFrames: lab.listening.clipFrames, bands: lab.listening.bands },
       hearing: lab.hearing,
     };
-    const data = (await serverAdvice(body)) ?? (await browserAdvice(body));
+    const fromServer = await serverAdvice(body);
+    const data = fromServer ?? (await browserAdvice(body));
     if (!data.summary && !data.adjustments.length) throw new Error('The AI did not return any advice.');
     const toBand = (a) => ({ id: `ai-${a.type}-${a.fc}`, type: a.type, fc: a.fc, gain: a.gain, q: a.q });
-    out.replaceChildren(
+    out.replaceChildren(...[
       h('p', { class: 'ai-summary' }, data.summary),
       h('ul', { class: 'recs' }, data.adjustments.map((a) => h('li', { class: 'rec' },
         h('div', {}, h('strong', {}, `${TYPES[a.type]} · ${fmtHz(a.fc)} · ${fmtDb(a.gain)}`), h('p', {}, a.reason)),
         h('button', { type: 'button', class: 'btn small', onclick: () => applyBand(toBand(a)) }, 'Apply')))),
       data.tips.length ? h('ul', { class: 'tips' }, data.tips.map((t) => h('li', {}, t))) : null,
-      h('p', { class: 'muted small' }, AI_CREDIT));
+      fromServer ? null : h('p', { class: 'muted small' }, AI_CREDIT)].filter(Boolean));
   } catch (err) {
     out.replaceChildren(h('p', { class: 'muted' }, `AI Sommelier unavailable: ${err.message} The built-in recommendations above still work.`));
   } finally {
