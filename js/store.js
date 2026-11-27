@@ -171,7 +171,7 @@ function viewer(p) {
       main.replaceChildren(host);
       try {
         const { createStage } = await import('./stage3d.js');
-        stage3d = await createStage(host, { look: 'lux', model: STUDIES[p.id], distance: 1.3, autoTurn: 0.002, tilt: 0.2 });
+        stage3d = await createStage(host, { look: 'lux', model: STUDIES[p.id], distance: 1.3, autoTurn: 0.002, tilt: 0.2, yaw: STUDIES[p.id] === 'iem' ? -1.05 : -0.5 });
         host.addEventListener('keydown', (e) => {
           const d = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
           if (d) { e.preventDefault(); stage3d.turn(d); }
