@@ -1,0 +1,106 @@
+{
+  "amp-head": {
+    "title": "amp-head.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "compact-disc": {
+    "title": "compact-disc.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "fuzz-pedal": {
+    "title": "fuzz-pedal.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "headphone-open": {
+    "title": "headphone-open.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "iem": {
+    "title": "iem.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "ipod": {
+    "title": "ipod.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "monitor-black": {
+    "title": "monitor-black.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "phonograph": {
+    "title": "phonograph.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "ribbon-mic": {
+    "title": "ribbon-mic.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "speaker-walnut": {
+    "title": "speaker-walnut.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "tape-machine": {
+    "title": "tape-machine.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "tr-808": {
+    "title": "tr-808.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  },
+  "turntable": {
+    "title": "turntable.glb",
+    "author": "Oura Acoustics (generated in code by tools/build-models.mjs)",
+    "license": "CC0 1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "source": "tools/build-models.mjs",
+    "note": "Interpretive studies, not manufacturer CAD."
+  }
+}

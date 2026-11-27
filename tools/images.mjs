@@ -16,7 +16,9 @@ const WIDTHS = [480, 960, 1600];
 const FREE = /^(public domain|pd|cc0|cc[- ]by(-sa)?[- ]?\d|cc[- ]by(-sa)?$|no restrictions|attribution|by(-sa)?$)/i;
 const NOT_FREE = /\b(nc|nd|non-?commercial|no-?deriv|fair use|copyrighted)\b/i;
 
-const strip = (html = '') => html.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
+const ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', '#39': "'", nbsp: ' ' };
+const decode = (s) => s.replace(/&(amp|lt|gt|quot|#39|nbsp);/g, (_, e) => ENTITIES[e]);
+const strip = (html = '') => decode(decode(html.replace(/<[^>]+>/g, ''))).replace(/\s+/g, ' ').trim();
 const slug = (s) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').slice(0, 40);
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 

@@ -36,12 +36,14 @@ Studied in a 1440×900 browser, scrolled end to end.
 - **Line-art (edges) rendering in History, physical materials on Home/Store**: the same .glb serves both looks.
 - **Models are generated in code** (`tools/models/*.mjs`, three.js geometry) and exported as meshopt-compressed .glb
   with gltf-transform: no Blender on this machine, and code keeps every part named for the exploded views.
-- **Materials are assigned at runtime by part material name** (brass, brushed steel, lacquer, leather, glass, walnut,
-  rubber, paper) so they react to the theme and get procedural brushed/grain normal maps without texture downloads.
+- **Materials are assigned at runtime by part material name** (brass, steel, chrome, lacquer, resin, glass, walnut,
+  velour, rubber, paper…) as MeshPhysicalMaterial presets with clearcoat, sheen and transmission. No texture maps:
+  the generated meshes carry no UVs, and physical presets under the room environment read as metal and lacquer without them.
 - **Environment lighting uses three.js RoomEnvironment** (procedural, 0 KB) instead of a downloaded HDRI: product
   reflections stay soft and neutral, which suits the gallery look.
-- **WebGL silk retired on Home**: it competed with the hero object. A still, CSS-only "plinth light" replaces it;
-  the audio-reactive part lives on in the dock meter and the hero's light ring. The History wave shader is retired too.
+- **WebGL silk kept only as a quiet, masked backdrop on Home** (bottom half, low intensity, paused on other pages)
+  so the "press System audio and the page moves" feature survives without competing with the hero object. The hero's
+  brass ring also breathes with the bass. The History wave shader (`era-gl.js`) is retired: the line-drawn stage replaced it.
 - **VengeanceUI glow/beam removed** (`vengeance.css` deleted). Replaced by hairline borders, a slow light sweep on
   hover and a gentle lift with a long soft shadow.
 - **Fonts**: Fraunces (display, light optical sizes) + Instrument Sans (UI) + Geist Mono (data). All OFL, self-hosted.
@@ -87,4 +89,53 @@ Manifest: `tools/images.json` (Wikimedia Commons, Library of Congress, Openverse
 Models: `npm run models` writes `public/models/*.glb` (meshopt). Fonts: `public/fonts/`.
 
 ## 6. Needs Kayne
-(Filled in as we go: anything that would need an account or a judgment call only you can make.)
+- **Product photos** (`public/products/*.webp` and the detail crops made from them) are the catalogue's existing
+  manufacturer, RTINGS and retailer images (see `products/sources.json`). They are not freely licensed: fine for a
+  private prototype, but get permission or use press-kit images before this goes public.
+- **Unsplash / Pexels** need an API key to search, so nothing was fetched from them directly. Commons and Openverse
+  (Flickr CC) covered every slot; a few Commons files are Unsplash/Pixabay uploads under CC0.
+- **3D studies** are interpretive models generated in code, labelled "Interpretive 3D study" on product pages. Real
+  manufacturer CAD would need permission from each brand.
+- **History facts** were written short and checked against general knowledge, not against primary sources. Worth a
+  read before publishing (e.g. part stories, dates in chapters 2 and 9).
+- **Gemini key** for the AI Sommelier is still optional (`.env`); nothing changed there.
+- The untracked `Figma/` folder was left alone.
+
+## 7. Summary (end of the redesign)
+
+### What changed
+- **System**: new tokens (type scale, 8-pt spacing, radii, easing), five themes sharing one brass accent, self-hosted
+  Fraunces + Instrument Sans + Geist Mono, hairline panels, light sweeps, brass lever switches. VengeanceUI removed.
+- **Motion**: intro loader (once per session, skippable, skipped under reduced motion), route curtain with a brass
+  hairline, brass cursor ring with Drag / View / Play states, synthesized interface sounds (muted by default).
+- **Assets**: 75 freely licensed photos graded into one set (AVIF + WebP, 3 sizes, credits on every image);
+  13 procedural 3D models (meshopt .glb, 25–410 KB); tree-shaken three.js (150 KB brotli), lazy-loaded.
+- **History**: ten chapters, each with a cinematic opener, a sticky line-engraving stage that separates into parts
+  (hover / focus / tap for the story, arrow keys to turn), a photo mosaic, a needle-drop player and a brass Then/Today
+  switch. Chapter rail and rolling year. The last chapter leads into the Lab.
+- **Home**: the reference IEM as a gallery piece in front of a giant wordmark; scroll takes it apart with spec labels.
+  Editorial promises list, "listening room" photo strip, photo-led teasers.
+- **Store**: plinths, gallery paper, detail-shot swap and light sweep on hover, featured large tile, editorial
+  lifestyle tiles, category banners, 3D studies for four flagships, tilt turntable for the rest, engraved specs,
+  brass "Tune it in the Lab" plate, calm bag and checkout.
+- **Lab & Guide**: brushed faceplate with recessed graph, brass curve and nodes, gliding redraws, fading overlays,
+  hinged Advanced panel, guided-setup rail, machined knobs with inertia, detents and rolling values.
+- **Server**: brotli/gzip, ETags, week-long caching for media; fixed static `.json` being served as an encoded Buffer.
+
+### Key decisions
+See section 2. History is vertical-chaptered with one shared WebGL stage; everything else stays quick and practical.
+
+### Validation results
+- `npm test`: 49 passing (36 original + 10 contrast across all themes + 3 credits/licence checks).
+- Browser: every route in all five themes, desktop 1440, tablet 834, phone 390: no console errors or warnings, no
+  failed requests, no horizontal overflow. Screenshots in `/screenshots`.
+- End to end: PEQ add / keyboard / undo, templates, Advanced, all three exports, lessons, A/B, needle drop and
+  Then/Today, store search / category / sort / favourites, quick view, product views, checkout validation and order.
+- Lighthouse (desktop): Home, History, Store, Lab all 100 for Accessibility, Best Practices and SEO.
+- Performance trace, Home with 4x CPU slowdown + Fast 4G: LCP 759 ms, CLS 0.00.
+- Reduced motion: intro and curtain skipped, History stacks with static exploded views, knobs and drums stop animating.
+
+### Known issues
+- Eight stylesheets are render-blocking; merging them would trim first paint a little (LCP is already under 0.8 s).
+- Each photo credit is a link, so keyboard users tab through several credits on photo-heavy sections.
+- The 3D models are stylised studies; close up they read as clean renders, not photographs.

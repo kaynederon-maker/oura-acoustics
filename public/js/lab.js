@@ -135,7 +135,7 @@ function markStep(n, done = true) {
     const btn = x.querySelector('button');
     if (x === current) btn.setAttribute('aria-current', 'step');
     else btn.removeAttribute('aria-current');
-    btn.setAttribute('aria-label', `Step ${x.dataset.step}: ${x.querySelector('.ls-t').textContent}${x.dataset.done === 'true' ? ', done' : ''}`);
+    btn.querySelector('.ls-done').textContent = x.dataset.done === 'true' ? ', done' : '';
   }
 }
 
@@ -217,7 +217,7 @@ function exportEq(kind) {
   const specs = eqSpecs();
   if (!specs.length && !peq.crossover.enabled) return toast('Nothing to export yet. Load a model or add a band.', 'error');
   if (kind === 'apo') {
-    download(fileName('Oura APO config'), toApoConfig({ preamp: preamp(), specs, crossover: peq.crossover, alignment: peq.alignment }));
+    download(fileName('APO config'), toApoConfig({ preamp: preamp(), specs, crossover: peq.crossover, alignment: peq.alignment }));
     return;
   }
   if (kind === 'graphic') {

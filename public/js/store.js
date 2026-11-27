@@ -140,12 +140,12 @@ function card(p, index, { feature = false } = {}) {
 }
 
 function editorialTile(t) {
-  return h('button', {
-    type: 'button', class: 'editorial-tile', 'aria-label': `${t.title}: show ${t.kicker.toLowerCase()}`,
-    onclick: () => { setCategory(t.category); $('#store-grid').scrollIntoView({ behavior: 'smooth', block: 'start' }); },
-  }, photo(t.photo, { sizes: '(max-width: 760px) 100vw, 50vw', caption: true }),
-  h('span', { class: 'editorial-copy' }, h('span', { class: 'caps' }, t.kicker), h('span', { class: 'editorial-title' }, t.title),
-    h('span', { class: 'text-link' }, 'Shop the edit')));
+  return h('div', { class: 'editorial-tile' },
+    photo(t.photo, { sizes: '(max-width: 760px) 100vw, 50vw' }),
+    h('button', {
+      type: 'button', class: 'editorial-copy',
+      onclick: () => { setCategory(t.category); $('#store-grid').scrollIntoView({ behavior: 'smooth', block: 'start' }); },
+    }, h('span', { class: 'caps' }, t.kicker), h('span', { class: 'editorial-title' }, t.title), h('span', { class: 'text-link' }, 'Shop the edit')));
 }
 
 // A photo you can turn like an object on a turntable: drag, arrow keys, or just hover.
