@@ -1,80 +1,712 @@
 {
-  "nav": [
-    { "x": 612, "y": 18, "w": 72, "h": 35, "to": "home", "kind": "navigate" },
-    { "x": 689, "y": 18, "w": 77, "h": 35, "to": "store", "kind": "navigate" },
-    { "x": 770, "y": 18, "w": 119, "h": 35, "to": "lab", "kind": "navigate" },
-    { "x": 893, "y": 18, "w": 75, "h": 35, "to": "guide", "kind": "navigate" },
-    { "x": 972, "y": 18, "w": 93, "h": 35, "to": "history-hero", "kind": "navigate" },
-    { "x": 1228, "y": 16, "w": 40, "h": 40, "to": "bag", "kind": "overlay" },
-    { "x": 56, "y": 23, "w": 153, "h": 25, "to": "home", "kind": "navigate" }
-  ],
-  "screens": {
-    "home": { "nav": true, "title": "Home · hero", "links": [
-      { "x": 803, "y": 742, "w": 247, "h": 46, "to": "lab", "kind": "navigate" },
-      { "x": 1068, "y": 743, "w": 174, "h": 44, "to": "guide", "kind": "navigate" },
-      { "x": 108, "y": 72, "w": 1210, "h": 612, "to": "home-exploded", "kind": "smart" } ] },
-    "home-exploded": { "nav": true, "title": "Home · object taken apart", "links": [
-      { "x": 108, "y": 72, "w": 1210, "h": 612, "to": "home-promises", "kind": "smart" } ] },
-    "home-promises": { "nav": true, "title": "Home · promises", "links": [
-      { "x": 93, "y": 316, "w": 1240, "h": 584, "to": "home-room", "kind": "navigate" } ] },
-    "home-room": { "nav": true, "title": "Home · listening room strip", "links": [
-      { "x": 0, "y": 427, "w": 1440, "h": 473, "to": "home-teaser", "kind": "navigate" } ] },
-    "home-teaser": { "nav": true, "title": "Home · History teaser", "links": [
-      { "x": 789, "y": 656, "w": 216, "h": 46, "to": "history-hero", "kind": "navigate" } ] },
-    "store": { "nav": true, "title": "Store · head + banner", "links": [
-      { "x": 93, "y": 450, "w": 1240, "h": 306, "to": "store-grid", "kind": "navigate" } ] },
-    "store-grid": { "nav": true, "title": "Store · grid, card hover", "links": [
-      { "x": 95, "y": 850, "w": 413, "h": 42, "to": "product-hd600", "kind": "navigate" },
-      { "x": 1043, "y": 478, "w": 196, "h": 26, "to": "product-hd600", "kind": "navigate" },
-      { "x": 808, "y": 393, "w": 125, "h": 36, "to": "quickview", "kind": "overlay" } ] },
-    "quickview": { "nav": false, "title": "Quick view (overlay)", "overlay": true, "links": [
-      { "x": 1166, "y": 125, "w": 40, "h": 40, "to": "back", "kind": "close" },
-      { "x": 740, "y": 707, "w": 220, "h": 50, "to": "bag", "kind": "swap" },
-      { "x": 1034, "y": 709, "w": 154, "h": 46, "to": "product-hd600", "kind": "navigate" } ] },
-    "product-hd600": { "nav": true, "title": "Product · 3D study", "links": [
-      { "x": 93, "y": 120, "w": 45, "h": 14, "to": "store", "kind": "navigate" },
-      { "x": 802, "y": 418, "w": 531, "h": 84, "to": "lab", "kind": "navigate" },
-      { "x": 934, "y": 526, "w": 337, "h": 50, "to": "bag", "kind": "overlay" },
-      { "x": 277, "y": 648, "w": 84, "h": 63, "to": "product-hd600-detail", "kind": "smart" } ] },
-    "product-hd600-detail": { "nav": true, "title": "Product · detail close-up", "links": [
-      { "x": 93, "y": 648, "w": 84, "h": 63, "to": "product-hd600", "kind": "smart" },
-      { "x": 802, "y": 418, "w": 531, "h": 84, "to": "lab", "kind": "navigate" },
-      { "x": 934, "y": 526, "w": 337, "h": 50, "to": "bag", "kind": "overlay" } ] },
-    "bag": { "nav": false, "title": "Bag (overlay)", "overlay": true, "links": [
-      { "x": 1376, "y": 32, "w": 40, "h": 40, "to": "back", "kind": "close" },
-      { "x": 1013, "y": 822, "w": 395, "h": 54, "to": "checkout", "kind": "swap" } ] },
-    "checkout": { "nav": false, "title": "Checkout (overlay)", "overlay": true, "links": [
-      { "x": 1376, "y": 32, "w": 40, "h": 40, "to": "back", "kind": "close" },
-      { "x": 1013, "y": 822, "w": 395, "h": 54, "to": "confirmation", "kind": "swap" },
-      { "x": 1013, "y": 109, "w": 120, "h": 44, "to": "bag", "kind": "swap" } ] },
-    "confirmation": { "nav": false, "title": "Order placed (overlay)", "overlay": true, "links": [
-      { "x": 1376, "y": 32, "w": 40, "h": 40, "to": "back", "kind": "close" },
-      { "x": 1123, "y": 458, "w": 175, "h": 46, "to": "store", "kind": "navigate" } ] },
-    "lab": { "nav": true, "title": "Tuning Lab · head + setup rail", "links": [
-      { "x": 93, "y": 631, "w": 310, "h": 56, "to": "lab-graph", "kind": "navigate" } ] },
-    "lab-graph": { "nav": true, "title": "Tuning Lab · faceplate (Simple)", "links": [
-      { "x": 1143, "y": 246, "w": 128, "h": 40, "to": "lab-advanced", "kind": "smart" } ] },
-    "lab-advanced": { "nav": true, "title": "Tuning Lab · Advanced", "links": [
-      { "x": 126, "y": 294, "w": 128, "h": 40, "to": "lab-graph", "kind": "smart" } ] },
-    "guide": { "nav": true, "title": "Guide · sweep dial", "links": [
-      { "x": 708, "y": 231, "w": 624, "h": 480, "to": "guide-missions", "kind": "navigate" } ] },
-    "guide-missions": { "nav": true, "title": "Guide · mission knobs", "links": [] },
-    "history-hero": { "nav": true, "title": "History · hero", "links": [
-      { "x": 125, "y": 720, "w": 1208, "h": 64, "to": "history-1877", "kind": "navigate" } ] },
-    "history-1877": { "nav": true, "title": "History · 1877 opener", "links": [
-      { "x": 125, "y": 348, "w": 920, "h": 520, "to": "history-1967-stage", "kind": "navigate" } ] },
-    "history-1967-stage": { "nav": true, "title": "History · 1967 exploded view", "links": [
-      { "x": 125, "y": 390, "w": 238, "h": 40, "to": "history-1967-part", "kind": "smart" },
-      { "x": 20, "y": 571, "w": 76, "h": 28, "to": "history-2026", "kind": "navigate" } ] },
-    "history-1967-part": { "nav": true, "title": "History · 1967 part story", "links": [
-      { "x": 125, "y": 432, "w": 238, "h": 40, "to": "history-1967-stage", "kind": "smart" },
-      { "x": 386, "y": 96, "w": 654, "h": 708, "to": "history-1967-lore", "kind": "navigate" } ] },
-    "history-1967-lore": { "nav": true, "title": "History · 1967 lore + needle", "links": [
-      { "x": 875, "y": 576, "w": 172, "h": 64, "to": "history-1967-playing", "kind": "smart" } ] },
-    "history-1967-playing": { "nav": true, "title": "History · 1967 playing", "links": [
-      { "x": 875, "y": 576, "w": 225, "h": 64, "to": "history-1967-lore", "kind": "smart" },
-      { "x": 1227, "y": 593, "w": 64, "h": 30, "to": "history-1967-lore", "kind": "navigate" } ] },
-    "history-2026": { "nav": true, "title": "History · 2026, into the Lab", "links": [
-      { "x": 875, "y": 635, "w": 306, "h": 46, "to": "lab", "kind": "navigate" } ] }
+ "nav": [
+  {
+   "x": 612,
+   "y": 18,
+   "w": 72,
+   "h": 35,
+   "to": "home",
+   "kind": "navigate"
+  },
+  {
+   "x": 689,
+   "y": 18,
+   "w": 77,
+   "h": 35,
+   "to": "store",
+   "kind": "navigate"
+  },
+  {
+   "x": 770,
+   "y": 18,
+   "w": 119,
+   "h": 35,
+   "to": "lab",
+   "kind": "navigate"
+  },
+  {
+   "x": 893,
+   "y": 18,
+   "w": 75,
+   "h": 35,
+   "to": "guide",
+   "kind": "navigate"
+  },
+  {
+   "x": 972,
+   "y": 18,
+   "w": 93,
+   "h": 35,
+   "to": "history-hero",
+   "kind": "navigate"
+  },
+  {
+   "x": 1228,
+   "y": 16,
+   "w": 40,
+   "h": 40,
+   "to": "bag",
+   "kind": "overlay"
+  },
+  {
+   "x": 56,
+   "y": 23,
+   "w": 153,
+   "h": 25,
+   "to": "home",
+   "kind": "navigate"
   }
+ ],
+ "screens": {
+  "home": {
+   "nav": true,
+   "title": "Home · hero",
+   "links": [
+    {
+     "x": 803,
+     "y": 742,
+     "w": 247,
+     "h": 46,
+     "to": "lab",
+     "kind": "navigate"
+    },
+    {
+     "x": 1068,
+     "y": 743,
+     "w": 174,
+     "h": 44,
+     "to": "guide",
+     "kind": "navigate"
+    },
+    {
+     "x": 108,
+     "y": 72,
+     "w": 1210,
+     "h": 612,
+     "to": "home-exploded",
+     "kind": "smart"
+    }
+   ]
+  },
+  "home-exploded": {
+   "nav": true,
+   "title": "Home · object taken apart",
+   "links": [
+    {
+     "x": 108,
+     "y": 72,
+     "w": 1210,
+     "h": 612,
+     "to": "home-promises",
+     "kind": "smart"
+    }
+   ]
+  },
+  "home-promises": {
+   "nav": true,
+   "title": "Home · promises",
+   "links": [
+    {
+     "x": 93,
+     "y": 316,
+     "w": 1240,
+     "h": 584,
+     "to": "home-room",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "home-room": {
+   "nav": true,
+   "title": "Home · listening room strip",
+   "links": [
+    {
+     "x": 0,
+     "y": 427,
+     "w": 1440,
+     "h": 473,
+     "to": "home-teaser",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "home-teaser": {
+   "nav": true,
+   "title": "Home · History teaser",
+   "links": [
+    {
+     "x": 789,
+     "y": 656,
+     "w": 216,
+     "h": 46,
+     "to": "history-hero",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "store": {
+   "nav": true,
+   "title": "Store · head + banner",
+   "links": [
+    {
+     "x": 93,
+     "y": 450,
+     "w": 1240,
+     "h": 306,
+     "to": "store-grid",
+     "kind": "navigate"
+    },
+    {
+     "x": 1234,
+     "y": 760,
+     "w": 135,
+     "h": 48,
+     "to": "assistant",
+     "kind": "overlay"
+    }
+   ]
+  },
+  "store-grid": {
+   "nav": true,
+   "title": "Store · grid, card hover",
+   "links": [
+    {
+     "x": 95,
+     "y": 720,
+     "w": 413,
+     "h": 42,
+     "to": "product-hd600",
+     "kind": "navigate"
+    },
+    {
+     "x": 725,
+     "y": 96,
+     "w": 292,
+     "h": 386,
+     "to": "product-hd600",
+     "kind": "navigate"
+    },
+    {
+     "x": 1124,
+     "y": 263,
+     "w": 125,
+     "h": 36,
+     "to": "quickview",
+     "kind": "overlay"
+    },
+    {
+     "x": 1234,
+     "y": 760,
+     "w": 135,
+     "h": 48,
+     "to": "assistant",
+     "kind": "overlay"
+    }
+   ]
+  },
+  "quickview": {
+   "nav": false,
+   "title": "Quick view (overlay)",
+   "overlay": true,
+   "links": [
+    {
+     "x": 1166,
+     "y": 125,
+     "w": 40,
+     "h": 40,
+     "to": "back",
+     "kind": "close"
+    },
+    {
+     "x": 740,
+     "y": 707,
+     "w": 220,
+     "h": 50,
+     "to": "bag",
+     "kind": "swap"
+    },
+    {
+     "x": 1034,
+     "y": 709,
+     "w": 154,
+     "h": 46,
+     "to": "product-hd600",
+     "kind": "navigate"
+    },
+    {
+     "x": 656,
+     "y": 123,
+     "w": 40,
+     "h": 40,
+     "to": "lightbox",
+     "kind": "overlay"
+    }
+   ]
+  },
+  "product-hd600": {
+   "nav": true,
+   "title": "Product · 3D study",
+   "links": [
+    {
+     "x": 93,
+     "y": 120,
+     "w": 45,
+     "h": 14,
+     "to": "store",
+     "kind": "navigate"
+    },
+    {
+     "x": 802,
+     "y": 418,
+     "w": 531,
+     "h": 84,
+     "to": "lab",
+     "kind": "navigate"
+    },
+    {
+     "x": 802,
+     "y": 526,
+     "w": 531,
+     "h": 84,
+     "to": "assistant",
+     "kind": "overlay"
+    },
+    {
+     "x": 934,
+     "y": 634,
+     "w": 337,
+     "h": 50,
+     "to": "bag",
+     "kind": "overlay"
+    },
+    {
+     "x": 277,
+     "y": 648,
+     "w": 84,
+     "h": 63,
+     "to": "product-hd600-detail",
+     "kind": "smart"
+    },
+    {
+     "x": 1234,
+     "y": 760,
+     "w": 135,
+     "h": 48,
+     "to": "assistant",
+     "kind": "overlay"
+    }
+   ]
+  },
+  "product-hd600-detail": {
+   "nav": true,
+   "title": "Product · photo inspector",
+   "links": [
+    {
+     "x": 93,
+     "y": 648,
+     "w": 84,
+     "h": 63,
+     "to": "product-hd600",
+     "kind": "smart"
+    },
+    {
+     "x": 678,
+     "y": 170,
+     "w": 40,
+     "h": 40,
+     "to": "lightbox",
+     "kind": "overlay"
+    },
+    {
+     "x": 93,
+     "y": 210,
+     "w": 585,
+     "h": 426,
+     "to": "product-zoom",
+     "kind": "smart"
+    },
+    {
+     "x": 802,
+     "y": 418,
+     "w": 531,
+     "h": 84,
+     "to": "lab",
+     "kind": "navigate"
+    },
+    {
+     "x": 802,
+     "y": 526,
+     "w": 531,
+     "h": 84,
+     "to": "assistant",
+     "kind": "overlay"
+    },
+    {
+     "x": 934,
+     "y": 634,
+     "w": 337,
+     "h": 50,
+     "to": "bag",
+     "kind": "overlay"
+    },
+    {
+     "x": 1234,
+     "y": 760,
+     "w": 135,
+     "h": 48,
+     "to": "assistant",
+     "kind": "overlay"
+    }
+   ]
+  },
+  "product-zoom": {
+   "nav": true,
+   "title": "Product · inspector zoomed 2.4x",
+   "links": [
+    {
+     "x": 678,
+     "y": 170,
+     "w": 40,
+     "h": 40,
+     "to": "lightbox",
+     "kind": "overlay"
+    },
+    {
+     "x": 93,
+     "y": 210,
+     "w": 585,
+     "h": 426,
+     "to": "product-hd600-detail",
+     "kind": "smart"
+    },
+    {
+     "x": 802,
+     "y": 526,
+     "w": 531,
+     "h": 84,
+     "to": "assistant",
+     "kind": "overlay"
+    },
+    {
+     "x": 1234,
+     "y": 760,
+     "w": 135,
+     "h": 48,
+     "to": "assistant",
+     "kind": "overlay"
+    }
+   ]
+  },
+  "lightbox": {
+   "nav": false,
+   "title": "Full-screen image viewer (overlay)",
+   "overlay": true,
+   "links": [
+    {
+     "x": 1344,
+     "y": 14,
+     "w": 40,
+     "h": 40,
+     "to": "back",
+     "kind": "close"
+    }
+   ]
+  },
+  "bag": {
+   "nav": false,
+   "title": "Bag (overlay)",
+   "overlay": true,
+   "links": [
+    {
+     "x": 1376,
+     "y": 32,
+     "w": 40,
+     "h": 40,
+     "to": "back",
+     "kind": "close"
+    },
+    {
+     "x": 1013,
+     "y": 822,
+     "w": 395,
+     "h": 54,
+     "to": "checkout",
+     "kind": "swap"
+    }
+   ]
+  },
+  "checkout": {
+   "nav": false,
+   "title": "Checkout (overlay)",
+   "overlay": true,
+   "links": [
+    {
+     "x": 1376,
+     "y": 32,
+     "w": 40,
+     "h": 40,
+     "to": "back",
+     "kind": "close"
+    },
+    {
+     "x": 1013,
+     "y": 822,
+     "w": 395,
+     "h": 54,
+     "to": "confirmation",
+     "kind": "swap"
+    },
+    {
+     "x": 1013,
+     "y": 109,
+     "w": 120,
+     "h": 44,
+     "to": "bag",
+     "kind": "swap"
+    }
+   ]
+  },
+  "confirmation": {
+   "nav": false,
+   "title": "Order placed (overlay)",
+   "overlay": true,
+   "links": [
+    {
+     "x": 1376,
+     "y": 32,
+     "w": 40,
+     "h": 40,
+     "to": "back",
+     "kind": "close"
+    },
+    {
+     "x": 1123,
+     "y": 458,
+     "w": 175,
+     "h": 46,
+     "to": "store",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "assistant": {
+   "nav": false,
+   "title": "Ask Oura assistant (overlay)",
+   "overlay": true,
+   "links": [
+    {
+     "x": 1376,
+     "y": 39,
+     "w": 40,
+     "h": 40,
+     "to": "back",
+     "kind": "close"
+    },
+    {
+     "x": 1030,
+     "y": 462,
+     "w": 300,
+     "h": 62,
+     "to": "product-hd600",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "lab": {
+   "nav": true,
+   "title": "Tuning Lab · head + setup rail",
+   "links": [
+    {
+     "x": 93,
+     "y": 631,
+     "w": 310,
+     "h": 56,
+     "to": "lab-graph",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "lab-graph": {
+   "nav": true,
+   "title": "Tuning Lab · faceplate (Simple)",
+   "links": [
+    {
+     "x": 1143,
+     "y": 246,
+     "w": 128,
+     "h": 40,
+     "to": "lab-advanced",
+     "kind": "smart"
+    }
+   ]
+  },
+  "lab-advanced": {
+   "nav": true,
+   "title": "Tuning Lab · Advanced",
+   "links": [
+    {
+     "x": 126,
+     "y": 294,
+     "w": 128,
+     "h": 40,
+     "to": "lab-graph",
+     "kind": "smart"
+    },
+    {
+     "x": 93,
+     "y": 700,
+     "w": 1250,
+     "h": 180,
+     "to": "lab-ai",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "lab-ai": {
+   "nav": true,
+   "title": "Tuning Lab · AI Sommelier advice",
+   "links": []
+  },
+  "guide": {
+   "nav": true,
+   "title": "Guide · sweep dial",
+   "links": [
+    {
+     "x": 708,
+     "y": 231,
+     "w": 624,
+     "h": 480,
+     "to": "guide-missions",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "guide-missions": {
+   "nav": true,
+   "title": "Guide · mission knobs",
+   "links": []
+  },
+  "history-hero": {
+   "nav": true,
+   "title": "History · hero",
+   "links": [
+    {
+     "x": 125,
+     "y": 720,
+     "w": 1208,
+     "h": 64,
+     "to": "history-1877",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "history-1877": {
+   "nav": true,
+   "title": "History · 1877 opener",
+   "links": [
+    {
+     "x": 125,
+     "y": 348,
+     "w": 920,
+     "h": 520,
+     "to": "history-1967-stage",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "history-1967-stage": {
+   "nav": true,
+   "title": "History · 1967 exploded view",
+   "links": [
+    {
+     "x": 125,
+     "y": 390,
+     "w": 238,
+     "h": 40,
+     "to": "history-1967-part",
+     "kind": "smart"
+    },
+    {
+     "x": 20,
+     "y": 571,
+     "w": 76,
+     "h": 28,
+     "to": "history-2026",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "history-1967-part": {
+   "nav": true,
+   "title": "History · 1967 part story",
+   "links": [
+    {
+     "x": 125,
+     "y": 432,
+     "w": 238,
+     "h": 40,
+     "to": "history-1967-stage",
+     "kind": "smart"
+    },
+    {
+     "x": 386,
+     "y": 96,
+     "w": 654,
+     "h": 708,
+     "to": "history-1967-lore",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "history-1967-lore": {
+   "nav": true,
+   "title": "History · 1967 lore + needle",
+   "links": [
+    {
+     "x": 875,
+     "y": 576,
+     "w": 172,
+     "h": 64,
+     "to": "history-1967-playing",
+     "kind": "smart"
+    }
+   ]
+  },
+  "history-1967-playing": {
+   "nav": true,
+   "title": "History · 1967 playing",
+   "links": [
+    {
+     "x": 875,
+     "y": 576,
+     "w": 225,
+     "h": 64,
+     "to": "history-1967-lore",
+     "kind": "smart"
+    },
+    {
+     "x": 1227,
+     "y": 593,
+     "w": 64,
+     "h": 30,
+     "to": "history-1967-lore",
+     "kind": "navigate"
+    }
+   ]
+  },
+  "history-2026": {
+   "nav": true,
+   "title": "History · 2026, into the Lab",
+   "links": [
+    {
+     "x": 875,
+     "y": 635,
+     "w": 306,
+     "h": 46,
+     "to": "lab",
+     "kind": "navigate"
+    }
+   ]
+  }
+ }
 }

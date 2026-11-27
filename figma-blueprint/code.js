@@ -1,4 +1,4 @@
-const DATA = {"live":"https://kaynederon-maker.github.io/oura-acoustics/","base":"https://raw.githubusercontent.com/kaynederon-maker/oura-acoustics/redesign","hotspots":{"nav":[{"x":612,"y":18,"w":72,"h":35,"to":"home","kind":"navigate"},{"x":689,"y":18,"w":77,"h":35,"to":"store","kind":"navigate"},{"x":770,"y":18,"w":119,"h":35,"to":"lab","kind":"navigate"},{"x":893,"y":18,"w":75,"h":35,"to":"guide","kind":"navigate"},{"x":972,"y":18,"w":93,"h":35,"to":"history-hero","kind":"navigate"},{"x":1228,"y":16,"w":40,"h":40,"to":"bag","kind":"overlay"},{"x":56,"y":23,"w":153,"h":25,"to":"home","kind":"navigate"}],"screens":{"home":{"nav":true,"title":"Home · hero","links":[{"x":803,"y":742,"w":247,"h":46,"to":"lab","kind":"navigate"},{"x":1068,"y":743,"w":174,"h":44,"to":"guide","kind":"navigate"},{"x":108,"y":72,"w":1210,"h":612,"to":"home-exploded","kind":"smart"}]},"home-exploded":{"nav":true,"title":"Home · object taken apart","links":[{"x":108,"y":72,"w":1210,"h":612,"to":"home-promises","kind":"smart"}]},"home-promises":{"nav":true,"title":"Home · promises","links":[{"x":93,"y":316,"w":1240,"h":584,"to":"home-room","kind":"navigate"}]},"home-room":{"nav":true,"title":"Home · listening room strip","links":[{"x":0,"y":427,"w":1440,"h":473,"to":"home-teaser","kind":"navigate"}]},"home-teaser":{"nav":true,"title":"Home · History teaser","links":[{"x":789,"y":656,"w":216,"h":46,"to":"history-hero","kind":"navigate"}]},"store":{"nav":true,"title":"Store · head + banner","links":[{"x":93,"y":450,"w":1240,"h":306,"to":"store-grid","kind":"navigate"}]},"store-grid":{"nav":true,"title":"Store · grid, card hover","links":[{"x":95,"y":850,"w":413,"h":42,"to":"product-hd600","kind":"navigate"},{"x":1043,"y":478,"w":196,"h":26,"to":"product-hd600","kind":"navigate"},{"x":808,"y":393,"w":125,"h":36,"to":"quickview","kind":"overlay"}]},"quickview":{"nav":false,"title":"Quick view (overlay)","overlay":true,"links":[{"x":1166,"y":125,"w":40,"h":40,"to":"back","kind":"close"},{"x":740,"y":707,"w":220,"h":50,"to":"bag","kind":"swap"},{"x":1034,"y":709,"w":154,"h":46,"to":"product-hd600","kind":"navigate"}]},"product-hd600":{"nav":true,"title":"Product · 3D study","links":[{"x":93,"y":120,"w":45,"h":14,"to":"store","kind":"navigate"},{"x":802,"y":418,"w":531,"h":84,"to":"lab","kind":"navigate"},{"x":934,"y":526,"w":337,"h":50,"to":"bag","kind":"overlay"},{"x":277,"y":648,"w":84,"h":63,"to":"product-hd600-detail","kind":"smart"}]},"product-hd600-detail":{"nav":true,"title":"Product · detail close-up","links":[{"x":93,"y":648,"w":84,"h":63,"to":"product-hd600","kind":"smart"},{"x":802,"y":418,"w":531,"h":84,"to":"lab","kind":"navigate"},{"x":934,"y":526,"w":337,"h":50,"to":"bag","kind":"overlay"}]},"bag":{"nav":false,"title":"Bag (overlay)","overlay":true,"links":[{"x":1376,"y":32,"w":40,"h":40,"to":"back","kind":"close"},{"x":1013,"y":822,"w":395,"h":54,"to":"checkout","kind":"swap"}]},"checkout":{"nav":false,"title":"Checkout (overlay)","overlay":true,"links":[{"x":1376,"y":32,"w":40,"h":40,"to":"back","kind":"close"},{"x":1013,"y":822,"w":395,"h":54,"to":"confirmation","kind":"swap"},{"x":1013,"y":109,"w":120,"h":44,"to":"bag","kind":"swap"}]},"confirmation":{"nav":false,"title":"Order placed (overlay)","overlay":true,"links":[{"x":1376,"y":32,"w":40,"h":40,"to":"back","kind":"close"},{"x":1123,"y":458,"w":175,"h":46,"to":"store","kind":"navigate"}]},"lab":{"nav":true,"title":"Tuning Lab · head + setup rail","links":[{"x":93,"y":631,"w":310,"h":56,"to":"lab-graph","kind":"navigate"}]},"lab-graph":{"nav":true,"title":"Tuning Lab · faceplate (Simple)","links":[{"x":1143,"y":246,"w":128,"h":40,"to":"lab-advanced","kind":"smart"}]},"lab-advanced":{"nav":true,"title":"Tuning Lab · Advanced","links":[{"x":126,"y":294,"w":128,"h":40,"to":"lab-graph","kind":"smart"}]},"guide":{"nav":true,"title":"Guide · sweep dial","links":[{"x":708,"y":231,"w":624,"h":480,"to":"guide-missions","kind":"navigate"}]},"guide-missions":{"nav":true,"title":"Guide · mission knobs","links":[]},"history-hero":{"nav":true,"title":"History · hero","links":[{"x":125,"y":720,"w":1208,"h":64,"to":"history-1877","kind":"navigate"}]},"history-1877":{"nav":true,"title":"History · 1877 opener","links":[{"x":125,"y":348,"w":920,"h":520,"to":"history-1967-stage","kind":"navigate"}]},"history-1967-stage":{"nav":true,"title":"History · 1967 exploded view","links":[{"x":125,"y":390,"w":238,"h":40,"to":"history-1967-part","kind":"smart"},{"x":20,"y":571,"w":76,"h":28,"to":"history-2026","kind":"navigate"}]},"history-1967-part":{"nav":true,"title":"History · 1967 part story","links":[{"x":125,"y":432,"w":238,"h":40,"to":"history-1967-stage","kind":"smart"},{"x":386,"y":96,"w":654,"h":708,"to":"history-1967-lore","kind":"navigate"}]},"history-1967-lore":{"nav":true,"title":"History · 1967 lore + needle","links":[{"x":875,"y":576,"w":172,"h":64,"to":"history-1967-playing","kind":"smart"}]},"history-1967-playing":{"nav":true,"title":"History · 1967 playing","links":[{"x":875,"y":576,"w":225,"h":64,"to":"history-1967-lore","kind":"smart"},{"x":1227,"y":593,"w":64,"h":30,"to":"history-1967-lore","kind":"navigate"}]},"history-2026":{"nav":true,"title":"History · 2026, into the Lab","links":[{"x":875,"y":635,"w":306,"h":46,"to":"lab","kind":"navigate"}]}}}};
+const DATA = {"live":"https://kaynederon-maker.github.io/oura-acoustics/","base":"https://raw.githubusercontent.com/kaynederon-maker/oura-acoustics/redesign","hotspots":{"nav":[{"x":612,"y":18,"w":72,"h":35,"to":"home","kind":"navigate"},{"x":689,"y":18,"w":77,"h":35,"to":"store","kind":"navigate"},{"x":770,"y":18,"w":119,"h":35,"to":"lab","kind":"navigate"},{"x":893,"y":18,"w":75,"h":35,"to":"guide","kind":"navigate"},{"x":972,"y":18,"w":93,"h":35,"to":"history-hero","kind":"navigate"},{"x":1228,"y":16,"w":40,"h":40,"to":"bag","kind":"overlay"},{"x":56,"y":23,"w":153,"h":25,"to":"home","kind":"navigate"}],"screens":{"home":{"nav":true,"title":"Home · hero","links":[{"x":803,"y":742,"w":247,"h":46,"to":"lab","kind":"navigate"},{"x":1068,"y":743,"w":174,"h":44,"to":"guide","kind":"navigate"},{"x":108,"y":72,"w":1210,"h":612,"to":"home-exploded","kind":"smart"}]},"home-exploded":{"nav":true,"title":"Home · object taken apart","links":[{"x":108,"y":72,"w":1210,"h":612,"to":"home-promises","kind":"smart"}]},"home-promises":{"nav":true,"title":"Home · promises","links":[{"x":93,"y":316,"w":1240,"h":584,"to":"home-room","kind":"navigate"}]},"home-room":{"nav":true,"title":"Home · listening room strip","links":[{"x":0,"y":427,"w":1440,"h":473,"to":"home-teaser","kind":"navigate"}]},"home-teaser":{"nav":true,"title":"Home · History teaser","links":[{"x":789,"y":656,"w":216,"h":46,"to":"history-hero","kind":"navigate"}]},"store":{"nav":true,"title":"Store · head + banner","links":[{"x":93,"y":450,"w":1240,"h":306,"to":"store-grid","kind":"navigate"},{"x":1234,"y":760,"w":135,"h":48,"to":"assistant","kind":"overlay"}]},"store-grid":{"nav":true,"title":"Store · grid, card hover","links":[{"x":95,"y":720,"w":413,"h":42,"to":"product-hd600","kind":"navigate"},{"x":725,"y":96,"w":292,"h":386,"to":"product-hd600","kind":"navigate"},{"x":1124,"y":263,"w":125,"h":36,"to":"quickview","kind":"overlay"},{"x":1234,"y":760,"w":135,"h":48,"to":"assistant","kind":"overlay"}]},"quickview":{"nav":false,"title":"Quick view (overlay)","overlay":true,"links":[{"x":1166,"y":125,"w":40,"h":40,"to":"back","kind":"close"},{"x":740,"y":707,"w":220,"h":50,"to":"bag","kind":"swap"},{"x":1034,"y":709,"w":154,"h":46,"to":"product-hd600","kind":"navigate"},{"x":656,"y":123,"w":40,"h":40,"to":"lightbox","kind":"overlay"}]},"product-hd600":{"nav":true,"title":"Product · 3D study","links":[{"x":93,"y":120,"w":45,"h":14,"to":"store","kind":"navigate"},{"x":802,"y":418,"w":531,"h":84,"to":"lab","kind":"navigate"},{"x":802,"y":526,"w":531,"h":84,"to":"assistant","kind":"overlay"},{"x":934,"y":634,"w":337,"h":50,"to":"bag","kind":"overlay"},{"x":277,"y":648,"w":84,"h":63,"to":"product-hd600-detail","kind":"smart"},{"x":1234,"y":760,"w":135,"h":48,"to":"assistant","kind":"overlay"}]},"product-hd600-detail":{"nav":true,"title":"Product · photo inspector","links":[{"x":93,"y":648,"w":84,"h":63,"to":"product-hd600","kind":"smart"},{"x":678,"y":170,"w":40,"h":40,"to":"lightbox","kind":"overlay"},{"x":93,"y":210,"w":585,"h":426,"to":"product-zoom","kind":"smart"},{"x":802,"y":418,"w":531,"h":84,"to":"lab","kind":"navigate"},{"x":802,"y":526,"w":531,"h":84,"to":"assistant","kind":"overlay"},{"x":934,"y":634,"w":337,"h":50,"to":"bag","kind":"overlay"},{"x":1234,"y":760,"w":135,"h":48,"to":"assistant","kind":"overlay"}]},"product-zoom":{"nav":true,"title":"Product · inspector zoomed 2.4x","links":[{"x":678,"y":170,"w":40,"h":40,"to":"lightbox","kind":"overlay"},{"x":93,"y":210,"w":585,"h":426,"to":"product-hd600-detail","kind":"smart"},{"x":802,"y":526,"w":531,"h":84,"to":"assistant","kind":"overlay"},{"x":1234,"y":760,"w":135,"h":48,"to":"assistant","kind":"overlay"}]},"lightbox":{"nav":false,"title":"Full-screen image viewer (overlay)","overlay":true,"links":[{"x":1344,"y":14,"w":40,"h":40,"to":"back","kind":"close"}]},"bag":{"nav":false,"title":"Bag (overlay)","overlay":true,"links":[{"x":1376,"y":32,"w":40,"h":40,"to":"back","kind":"close"},{"x":1013,"y":822,"w":395,"h":54,"to":"checkout","kind":"swap"}]},"checkout":{"nav":false,"title":"Checkout (overlay)","overlay":true,"links":[{"x":1376,"y":32,"w":40,"h":40,"to":"back","kind":"close"},{"x":1013,"y":822,"w":395,"h":54,"to":"confirmation","kind":"swap"},{"x":1013,"y":109,"w":120,"h":44,"to":"bag","kind":"swap"}]},"confirmation":{"nav":false,"title":"Order placed (overlay)","overlay":true,"links":[{"x":1376,"y":32,"w":40,"h":40,"to":"back","kind":"close"},{"x":1123,"y":458,"w":175,"h":46,"to":"store","kind":"navigate"}]},"assistant":{"nav":false,"title":"Ask Oura assistant (overlay)","overlay":true,"links":[{"x":1376,"y":39,"w":40,"h":40,"to":"back","kind":"close"},{"x":1030,"y":462,"w":300,"h":62,"to":"product-hd600","kind":"navigate"}]},"lab":{"nav":true,"title":"Tuning Lab · head + setup rail","links":[{"x":93,"y":631,"w":310,"h":56,"to":"lab-graph","kind":"navigate"}]},"lab-graph":{"nav":true,"title":"Tuning Lab · faceplate (Simple)","links":[{"x":1143,"y":246,"w":128,"h":40,"to":"lab-advanced","kind":"smart"}]},"lab-advanced":{"nav":true,"title":"Tuning Lab · Advanced","links":[{"x":126,"y":294,"w":128,"h":40,"to":"lab-graph","kind":"smart"},{"x":93,"y":700,"w":1250,"h":180,"to":"lab-ai","kind":"navigate"}]},"lab-ai":{"nav":true,"title":"Tuning Lab · AI Sommelier advice","links":[]},"guide":{"nav":true,"title":"Guide · sweep dial","links":[{"x":708,"y":231,"w":624,"h":480,"to":"guide-missions","kind":"navigate"}]},"guide-missions":{"nav":true,"title":"Guide · mission knobs","links":[]},"history-hero":{"nav":true,"title":"History · hero","links":[{"x":125,"y":720,"w":1208,"h":64,"to":"history-1877","kind":"navigate"}]},"history-1877":{"nav":true,"title":"History · 1877 opener","links":[{"x":125,"y":348,"w":920,"h":520,"to":"history-1967-stage","kind":"navigate"}]},"history-1967-stage":{"nav":true,"title":"History · 1967 exploded view","links":[{"x":125,"y":390,"w":238,"h":40,"to":"history-1967-part","kind":"smart"},{"x":20,"y":571,"w":76,"h":28,"to":"history-2026","kind":"navigate"}]},"history-1967-part":{"nav":true,"title":"History · 1967 part story","links":[{"x":125,"y":432,"w":238,"h":40,"to":"history-1967-stage","kind":"smart"},{"x":386,"y":96,"w":654,"h":708,"to":"history-1967-lore","kind":"navigate"}]},"history-1967-lore":{"nav":true,"title":"History · 1967 lore + needle","links":[{"x":875,"y":576,"w":172,"h":64,"to":"history-1967-playing","kind":"smart"}]},"history-1967-playing":{"nav":true,"title":"History · 1967 playing","links":[{"x":875,"y":576,"w":225,"h":64,"to":"history-1967-lore","kind":"smart"},{"x":1227,"y":593,"w":64,"h":30,"to":"history-1967-lore","kind":"navigate"}]},"history-2026":{"nav":true,"title":"History · 2026, into the Lab","links":[{"x":875,"y":635,"w":306,"h":46,"to":"lab","kind":"navigate"}]}}}};
 const W = 1440;
 const H = 900;
 const REPORT = { ok: [], errors: [] };
@@ -133,9 +133,21 @@ async function imageFill(url) {
   return [{ type: 'IMAGE', imageHash: img.hash, scaleMode: 'FILL' }];
 }
 
+const TEXT_STYLES = [['Display/112', 112], ['Display/72', 72], ['Display/48', 48], ['Title/27', 27], ['Body/17', 17], ['Body/15', 15], ['Caps/11', 11], ['Mono/13', 13]];
+const PAGE_NAMES = ['00 · Cover', '01 · Design system', '02 · Blueprint', '03 · Prototype', '04 · Themes & devices'];
+const COLLECTION = 'Oura · Luxury tokens';
+
+async function clearPrevious() {
+  const old = figma.root.children.filter((p) => PAGE_NAMES.includes(p.name));
+  for (const c of await figma.variables.getLocalVariableCollectionsAsync()) if (c.name === COLLECTION) c.remove();
+  const names = new Set(TEXT_STYLES.map(([n]) => n));
+  for (const st of await figma.getLocalTextStylesAsync()) if (names.has(st.name)) st.remove();
+  return old;
+}
+
 const VARS = {};
 async function buildVariables() {
-  const coll = figma.variables.createVariableCollection('Oura · Luxury tokens');
+  const coll = figma.variables.createVariableCollection(COLLECTION);
   const names = Object.keys(THEMES);
   coll.renameMode(coll.modes[0].modeId, names[0]);
   const modeIds = { [names[0]]: coll.modes[0].modeId };
@@ -292,10 +304,10 @@ async function buildComponents(board) {
 async function buildCover() {
   const page = await newPage('00 · Cover');
   const f = put(page, frame('Cover', 1920, 1080), 0, 0);
-  caption(f, 'Oura Acoustics · Redesign blueprint v3', 140, 180);
+  caption(f, 'Oura Acoustics · Redesign blueprint v3.1', 140, 180);
   put(f, text('Luxury', { font: 'display', size: 220, tracking: -4 }), 132, 230);
   put(f, text('listening room.', { font: 'displayItalic', size: 220, tracking: -4, color: T.accent }), 132, 470);
-  put(f, text('Design system, sitemap and flows, annotated wireframes, and a clickable prototype built from the live site.', { size: 22, color: T.textLo, width: 900, lineHeight: 150 }), 140, 760);
+  put(f, text('Design system, sitemap and flows, annotated wireframes, and a 29-screen clickable prototype of the live site, including the Ask Oura assistant, the photo inspector and the AI Sommelier.', { size: 22, color: T.textLo, width: 900, lineHeight: 150 }), 140, 760);
   put(f, text(DATA.live, { font: 'mono', size: 16, color: T.accent }), 140, 880);
   line(f, 140, 940, 1780, 940, T.textHi, 1);
   put(f, text('Pages: 01 Design system · 02 Blueprint · 03 Prototype · 04 Themes & devices', { font: 'uiMedium', size: 13, tracking: 14, upper: true, color: T.textLo }), 140, 960);
@@ -333,7 +345,7 @@ async function buildDesignSystem() {
     put(type, text(`${F[font].family} ${F[font].style} · ${size}px`, { font: 'mono', size: 11, color: T.textLo }), 80, y + t.height + 6);
     y += t.height + 54;
   }
-  for (const [name, size] of [['Display/112', 112], ['Display/72', 72], ['Display/48', 48], ['Title/27', 27], ['Body/17', 17], ['Body/15', 15], ['Caps/11', 11], ['Mono/13', 13]]) {
+  for (const [name, size] of TEXT_STYLES) {
     const st = figma.createTextStyle();
     st.name = name;
     st.fontName = /^(Display|Title)/.test(name) ? F.display : name.startsWith('Mono') ? F.mono : name.startsWith('Caps') ? F.uiMedium : F.ui;
@@ -381,6 +393,9 @@ async function buildBlueprint() {
   for (const n of Object.values(nodes)) line(map, home.x + 150, home.y + 96, n.x + n.width / 2, n.y, T.accent, 1);
   const product = sitemapNode(map, 'Product', '#/product/:id · 3D study or turntable', 120, 560);
   sitemapNode(map, 'Quick view', 'dialog over the grid', 400, 560);
+  sitemapNode(map, 'Ask Oura', 'AI assistant sheet on store and product pages', 680, 560, 300);
+  sitemapNode(map, 'Photo inspector', 'tilt, zoom 2.4x, full-screen viewer', 120, 900, 520);
+  line(map, 480, 456, 830, 560, T.accent, 1);
   sitemapNode(map, 'Bag → Checkout → Order placed', 'side sheet, demo checkout', 120, 760, 520);
   line(map, 240, 456, 240, 560);
   line(map, 360, 456, 520, 560);
@@ -392,15 +407,16 @@ async function buildBlueprint() {
   const flows = [
     'Flow A · Buy and tune: Store → Product (3D) → Tune it in the Lab → Lab loads the measured correction → Export',
     'Flow B · Listen through history: History → chapter opener → part story → needle drop → Then / Today → 2026 → Lab',
-    'Flow C · Tune: Your headphones → Listen (analyze 20 s) → Hearing check → Take it home (APO, AutoEq, GraphicEQ)',
+    'Flow C · Tune: Your headphones → Listen (analyze 20 s) → Hearing check → AI Sommelier → Take it home (APO, AutoEq, GraphicEQ)',
+    'Flow D · Ask: Store → Ask Oura → answer with product picks → product page → photo inspector → Add to bag',
   ];
-  stack(map, flows.map((s) => text(s, { font: 'mono', size: 14, color: T.textHi, width: 2200 })), 80, 1000, 18);
+  stack(map, flows.map((s) => text(s, { font: 'mono', size: 14, color: T.textHi, width: 2200 })), 80, 1060, 18);
 
   let y = 1500;
   const wf = [
     ['Home · gallery hero', [['Nav + sound + theme', 0, 0, W, 72], ['Giant wordmark (behind)', 120, 170, 1200, 420, 'media'], ['3D IEM (drag, scroll explodes)', 560, 150, 320, 420, 'accent'], ['Study No. 01 caption', 93, 100, 220, 90], ['H1 + lede + CTA', 93, 600, 1250, 200], ['Audio dock', 93, 820, 1250, 64]], 'Pinned 260vh. Scroll 15–70%: explode 0→0.85, yaw 0→0.9π. Spec labels fade in one by one, alternating sides. Brass ring traces progress and scales with bass.'],
     ['Store · objects on display', [['Nav', 0, 0, W, 72], ['Eyebrow + H1 112', 93, 110, 900, 180], ['Category banner photo', 93, 330, 1250, 300, 'media'], ['Sticky filter bar', 93, 650, 1250, 60, 'accent'], ['Featured 2×2 card', 93, 730, 600, 170, 'media'], ['Card', 720, 730, 290, 170, 'media'], ['Card', 1040, 730, 300, 170, 'media']], 'Cards: plinth shadow, light sweep + detail swap on hover, Quick view on hover/focus. Editorial tiles at positions 3, 11, 20 when unfiltered.'],
-    ['Product page', [['Breadcrumb', 93, 100, 300, 30], ['Viewer: 3D study or tilt turntable', 93, 150, 700, 500, 'media'], ['Thumbs: 3D · photo · details', 93, 670, 400, 64], ['Brand · H1 · rating · price', 860, 150, 480, 220], ['Tune it in the Lab plate', 860, 400, 480, 90, 'accent'], ['Qty · Add to bag · ♥', 860, 510, 480, 60], ['Engraved spec rows', 860, 600, 480, 260]], 'Viewer sticky on desktop. Specs slide their value along a brass rule on hover. Related grid + full-bleed category photo below.'],
+    ['Product page', [['Breadcrumb', 93, 100, 300, 30], ['Viewer: 3D study or tilt turntable', 93, 150, 700, 500, 'media'], ['Thumbs: 3D · photo · details', 93, 670, 400, 64], ['Brand · H1 · rating · price', 860, 150, 480, 220], ['Tune it in the Lab plate', 860, 400, 480, 80, 'accent'], ['Ask Oura plate', 860, 490, 480, 80, 'accent'], ['Qty · Add to bag · ♥', 860, 580, 480, 50], ['Engraved spec rows', 860, 640, 480, 220]], 'Viewer sticky on desktop. Photos open in the inspector: hover tilt with a moving sheen, click to zoom 2.4x, scroll or pinch to 3x, full-screen viewer. Ask Oura opens the assistant with this product in context.'],
     ['Tuning Lab', [['H1 + console photo', 93, 100, 1250, 400, 'media'], ['Setup rail 01–04', 93, 520, 1250, 60, 'accent'], ['Faceplate: toolbar', 93, 600, 1250, 60], ['Recessed PEQ graph', 93, 670, 1250, 230, 'accent']], 'Advanced opens the hidden columns with a hinge (rotateX −80° → 0). Curve glides 420 ms; overlays fade 900 ms. Preamp rolls on mechanical digits.'],
     ['History chapter', [['Backdrop photo + scrim', 0, 0, W, H, 'media'], ['Chapter n / 10', 125, 330, 300, 24], ['Year 340px', 125, 360, 900, 260], ['Place · Title · lead', 125, 640, 900, 200], ['Rail years', 20, 380, 80, 300, 'accent']], 'Then: sticky stage (280vh). Parts list | line-engraving canvas | story column. Explode eases 10–65% of the stage. Lore: photo mosaic + facts + needle + Then/Today lever.'],
   ];
@@ -444,14 +460,14 @@ async function buildPrototype() {
       });
     }
   }
-  for (const id of ['quickview', 'bag', 'checkout', 'confirmation']) {
+  for (const id of ['quickview', 'bag', 'checkout', 'confirmation', 'lightbox', 'assistant']) {
     if (!frames[id]) continue;
     await step(`overlay ${id}`, async () => {
       frames[id].overlayPositionType = 'CENTER';
       frames[id].overlayBackground = { type: 'NONE' };
     });
   }
-  const flows = [['Full site', 'home'], ['Store & checkout', 'store'], ['Tuning Lab', 'lab'], ['History', 'history-hero'], ['Guide', 'guide']].filter(([, id]) => frames[id]);
+  const flows = [['Full site', 'home'], ['Store & checkout', 'store'], ['Ask Oura & inspector', 'product-hd600'], ['Tuning Lab', 'lab'], ['History', 'history-hero'], ['Guide', 'guide']].filter(([, id]) => frames[id]);
   page.flowStartingPoints = flows.map(([name, id]) => ({ nodeId: frames[id].id, name }));
 }
 
@@ -484,13 +500,15 @@ async function buildGallery() {
 
 async function main() {
   await loadFonts();
+  const previous = await clearPrevious();
   await step('cover', buildCover);
   await step('design system', buildDesignSystem);
   await step('blueprint', buildBlueprint);
   await step('prototype', buildPrototype);
   await step('gallery', buildGallery);
-  const proto = figma.root.children.find((p) => p.name === '03 · Prototype');
+  const proto = figma.root.children.find((p) => p.name === '03 · Prototype' && !previous.includes(p));
   if (proto) await figma.setCurrentPageAsync(proto);
+  for (const page of previous) await step(`remove old ${page.name}`, async () => page.remove());
   const msg = REPORT.errors.length
     ? `Built with ${REPORT.errors.length} issue(s): ${REPORT.errors.slice(0, 3).join(' | ')}`
     : `Built ${REPORT.ok.length} steps. Open "03 · Prototype" and press Present.`;

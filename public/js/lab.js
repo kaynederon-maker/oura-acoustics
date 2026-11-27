@@ -356,7 +356,7 @@ async function serverAdvice(body) {
   if (location.hostname.endsWith('github.io')) return null;
   try {
     const res = await fetch('api/advice', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
-    if (SERVER_UNAVAILABLE.has(res.status)) return null;
+    if (SERVER_UNAVAILABLE.has(res.status) || res.status >= 500) return null;
     const data = await res.json().catch(() => ({}));
     if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
     return data;
