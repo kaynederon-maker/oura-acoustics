@@ -35,7 +35,7 @@ contact sheet. `tools/picks.txt` records which result I picked for each image.
 | Home | The reference in-ear as a 3D object in front of a giant wordmark. Drag to turn it, scroll to take it apart. Behind it there's a masked silk backdrop that reacts to audio, and a strip of listening-room photos |
 | Tuning Lab | 1) pick headphones (8,800+ [AutoEq](https://github.com/jaakkopasanen/AutoEq) profiles, or Detect from OS device names) 2) analyze 20 s of system audio / mic 3) hearing check 4) bass/treble taste → recommendations, optional Gemini advice, export to Equalizer APO / Wavelet |
 | Tuning Guide | A boost-and-sweep dial, two pro missions (IEM drum monitoring, desk sub crossover) with knobs, scores and exploded hardware, a scroll through the spectrum, 8 practice lessons and a reference handbook |
-| History | Ten chapters from 1877 to 2026. Each one is built around a single object drawn as a brass line engraving that comes apart into parts (hover, focus or tap a part for its story), with period photos, a needle-drop player and a Then/Today switch to hear each era |
+| History | Ten chapters from 1877 to 2026. Each one is built around a single object drawn as a brass line engraving that comes apart into parts (hover, focus or tap a part for its story), with period photos and a needle-drop player. Its Then/Today switch plays a real recording from the era next to a modern version, usually of the same song (Bessie Smith's St. Louis Blues from 1925 against Herbie Hancock's from 1998, Sgt. Pepper's in 1967 against the 2017 mix) |
 
 ## Studio (Tuning Lab + Guide)
 

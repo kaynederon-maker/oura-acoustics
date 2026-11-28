@@ -90,6 +90,13 @@ Each chapter opens with a huge year, a place line, a lead and a backdrop photo. 
 the object comes together and then apart and its parts become hoverable. After that there's the lore with photos and
 facts, and a brass Then/Today toggle with a needle-drop play button. Chapter 10 ends in the Tuning Lab.
 
+The toggle plays real music. Then is a recording from the era and Today is a modern version, the same song where I
+could find one (`public/js/history-songs.js` has the list). The audio is Apple Music's 30-second previews, streamed
+and credited with a link, so no copyrighted files live in the repo. The only local file is Edison reciting "Mary
+Had a Little Lamb", which is public domain (`public/audio/credits.json`). If the previews can't load, the player
+falls back to the old synthesized loop played through the era's EQ. Chapter 10 plays one modern song, flat or
+with your Lab tuning.
+
 ## 5. Images and assets
 
 The manifest is `tools/images.json` (Wikimedia Commons, Library of Congress, Openverse/Flickr CC).

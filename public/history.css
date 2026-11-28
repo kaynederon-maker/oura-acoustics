@@ -236,6 +236,9 @@ body[data-view='history'].hx-staging .hx-hudbar { opacity: 1; }
 .hx-cta { justify-self: start; }
 
 .hx-listen { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--sp-4); padding: var(--sp-4) 0; border-top: 1px solid var(--hairline); border-bottom: 1px solid var(--hairline); }
+.hx-credit { flex-basis: 100%; margin: 0; font: 400 var(--fs-11) var(--font-mono); letter-spacing: 0.04em; color: var(--text-lo); }
+.hx-credit-side { margin-right: 10px; color: var(--accent); text-transform: uppercase; letter-spacing: 0.12em; }
+.hx-credit a { display: inline-block; min-height: 24px; color: var(--text-hi); text-underline-offset: 3px; }
 .needle {
   display: inline-flex;
   align-items: center;

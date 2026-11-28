@@ -15,7 +15,7 @@ const PORT = Number(process.env.PORT) || 3000;
 const PUBLIC_DIR = fileURLToPath(new URL('./public/', import.meta.url));
 const MAX_BODY_BYTES = 32 * 1024;
 const COMPRESSIBLE = /^(text\/|application\/json|image\/svg)/;
-const ASSET_DIRS = /^(img|models|fonts|products|guide|vendor)[/\\]/;
+const ASSET_DIRS = /^(img|models|fonts|products|guide|vendor|audio)[/\\]/;
 const ASSET_MAX_AGE = 7 * 24 * 3600;
 const compressed = new Map();
 
@@ -32,6 +32,7 @@ const MIME = {
   '.avif': 'image/avif',
   '.glb': 'model/gltf-binary',
   '.woff2': 'font/woff2',
+  '.mp3': 'audio/mpeg',
   '.txt': 'text/plain; charset=utf-8',
   '.ico': 'image/x-icon',
 };
@@ -42,7 +43,7 @@ const SECURITY_HEADERS = {
     "script-src 'self' 'wasm-unsafe-eval'",
     "style-src 'self' 'unsafe-inline'",
     "font-src 'self'",
-    "connect-src 'self' https://raw.githubusercontent.com https://text.pollinations.ai",
+    "connect-src 'self' https://raw.githubusercontent.com https://text.pollinations.ai https://itunes.apple.com https://audio-ssl.itunes.apple.com",
     "img-src 'self' data: blob:",
     "media-src 'self' blob:",
   ].join('; '),
