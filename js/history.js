@@ -1,5 +1,6 @@
 import * as engine from './audio-engine.js';
 import { playTrack } from './synth.js';
+import { SONGS, songFor, songLabel } from './history-songs.js';
 import { makeBand, expandBands } from './peq.js';
 import { safePreamp } from './eq.js';
 import { eqSpecs } from './peq-state.js';
@@ -168,7 +169,7 @@ const ERAS = [
   },
 ];
 
-const T = { index: -1, tuned: true, loading: false, stage: null, stageIndex: -1, part: null, lastExplode: ERAS.map(() => 0) };
+const T = { index: -1, tuned: true, loading: false, fallback: false, stage: null, stageIndex: -1, part: null, lastExplode: ERAS.map(() => 0) };
 const playing = () => engine.state.source === 'guide' && engine.state.owner === 'history';
 const era = () => ERAS[Math.max(0, T.index)];
 const pad = (n) => String(n).padStart(2, '0');
@@ -176,25 +177,86 @@ const slugYear = (e) => `ch-${e.year}`;
 
 const eraSpecs = (e) => (e.personal ? eqSpecs() : expandBands(e.filters));
 
+const filtered = (e) => e.personal || T.fallback;
+
 function applyEq() {
-  const specs = eraSpecs(era());
+  const e = era();
+  const specs = filtered(e) ? eraSpecs(e) : [];
   engine.setGuideEq(specs, safePreamp(specs));
-  engine.setGuideBypass(T.tuned);
+  engine.setGuideBypass(filtered(e) ? T.tuned : true);
 }
 
+const APPLE_LOOKUP = 'https://itunes.apple.com/lookup';
+let previews = null;
+const buffers = new Map();
+
+function applePreviews() {
+  const ids = Object.values(SONGS).flatMap((pair) => Object.values(pair)).filter((s) => s.apple).map((s) => s.apple);
+  previews ??= fetch(`${APPLE_LOOKUP}?country=US&entity=song&id=${ids.join(',')}`)
+    .then((res) => {
+      if (!res.ok) throw new Error(`Apple Music lookup failed (${res.status})`);
+      return res.json();
+    })
+    .then((data) => new Map(data.results.filter((r) => r.previewUrl).map((r) => [r.trackId, r.previewUrl])))
+    .catch((err) => {
+      previews = null;
+      throw err;
+    });
+  return previews;
+}
+
+async function songUrl(song) {
+  if (song.src) return song.src;
+  const url = (await applePreviews()).get(song.apple);
+  if (!url) throw new Error(`No preview for ${song.title}`);
+  return url;
+}
+
+function songBuffer(song) {
+  const key = song.src ?? song.apple;
+  if (!buffers.has(key)) {
+    const job = songUrl(song)
+      .then((url) => fetch(url))
+      .then((res) => {
+        if (!res.ok) throw new Error(`${song.title} did not download (${res.status})`);
+        return res.arrayBuffer();
+      })
+      .then((data) => engine.context().decodeAudioData(data))
+      .catch((err) => {
+        buffers.delete(key);
+        throw err;
+      });
+    buffers.set(key, job);
+  }
+  return buffers.get(key);
+}
+
+let request = 0;
 async function startTrack() {
-  if (await playTrack(era().track, 'history')) applyEq();
+  const e = era();
+  const song = songFor(e.year, T.tuned);
+  const id = ++request;
+  const before = engine.startCount();
+  const current = () => id === request && engine.startCount() === before;
+  try {
+    const buffer = await songBuffer(song);
+    if (!current()) return;
+    await engine.playGuideLoop(buffer, songLabel(song), 'history');
+    T.fallback = false;
+    applyEq();
+  } catch {
+    if (!current()) return;
+    T.fallback = true;
+    if (await playTrack(e.track, 'history')) applyEq();
+    toast('The recordings did not load, so this is the built-in loop with the era filter.');
+  }
 }
 
-async function toggle(index) {
-  if (T.loading) return;
-  if (playing() && index === T.index) return engine.stopSource();
-  setEra(index);
+async function withLoading(task) {
   T.loading = true;
   syncPlayers();
-  play('needle');
   try {
-    await startTrack();
+    await task();
   } catch (err) {
     toast(`Could not start the track: ${err.message}`, 'error');
   } finally {
@@ -203,11 +265,22 @@ async function toggle(index) {
   }
 }
 
+async function toggle(index) {
+  if (T.loading) return;
+  if (playing() && index === T.index) return engine.stopSource();
+  setEra(index);
+  play('needle');
+  await withLoading(startTrack);
+}
+
 function setTuned(tuned) {
   T.tuned = tuned;
   haptic(6);
   play('click');
-  if (playing()) engine.setGuideBypass(tuned);
+  if (playing()) {
+    if (filtered(era())) engine.setGuideBypass(tuned);
+    else withLoading(startTrack);
+  }
   syncPlayers();
 }
 
@@ -222,12 +295,22 @@ function syncPlayers() {
     btn.setAttribute('aria-disabled', String(T.loading));
     btn.querySelector('.needle-label').textContent = on ? 'Lift the needle' : T.loading && i === T.index ? 'Dropping…' : `Hear ${e.personal ? 'your sound' : e.year}`;
     p.querySelector('.era-switch').setAttribute('aria-checked', String(T.tuned));
+    p.querySelector('.hx-credit').replaceChildren(...credit(e));
   }
+}
+
+function credit(e) {
+  const song = songFor(e.year, T.tuned);
+  const side = e.personal ? 'Song' : T.tuned ? 'Then' : 'Today';
+  return [
+    h('span', { class: 'hx-credit-side' }, side),
+    `${songLabel(song)} · preview from `,
+    h('a', { href: song.link, target: '_blank', rel: 'noopener' }, song.via),
+  ];
 }
 
 function setEra(index) {
   if (index === T.index) return;
-  const previous = T.index >= 0 ? era() : null;
   T.index = index;
   const e = era();
   rollNumber($('#hx-year'), e.year);
@@ -237,7 +320,7 @@ function setEra(index) {
     if (i === index) b.setAttribute('aria-current', 'step');
     else b.removeAttribute('aria-current');
   }
-  if (playing()) (previous?.track === e.track ? Promise.resolve(applyEq()) : startTrack()).catch((err) => toast(err.message, 'error'));
+  if (playing()) startTrack().catch((err) => toast(err.message, 'error'));
   syncPlayers();
 }
 
@@ -340,10 +423,11 @@ function listen(e, i) {
       h('span', { class: 'era-ab-l', 'aria-hidden': 'true' }, e.personal ? 'Flat' : 'Today'),
       h('button', {
         type: 'button', role: 'switch', class: 'era-switch', 'aria-checked': 'true',
-        'aria-label': e.personal ? 'Apply your Lab tuning' : `Hear it as in ${e.year}`,
+        'aria-label': e.personal ? 'Apply your Lab tuning' : `Play the recording from ${e.year} instead of today's version`,
         onclick: () => setTuned(!T.tuned),
       }, h('span', { class: 'era-lever', 'aria-hidden': 'true' })),
-      h('span', { class: 'era-ab-r', 'aria-hidden': 'true' }, e.personal ? 'Your tuning' : String(e.year))));
+      h('span', { class: 'era-ab-r', 'aria-hidden': 'true' }, e.personal ? 'Your tuning' : String(e.year))),
+    h('p', { class: 'hx-credit' }, ...credit(e)));
 }
 
 function chapter(e, i) {
