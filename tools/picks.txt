@@ -1,0 +1,80 @@
+# id | source | search query | result index | alt text
+# History · 1877 Menlo Park
+h1877-tinfoil | commons | Edison tinfoil phonograph | 1 | Edison's tinfoil phonograph of 1878: brass cylinder, mouthpiece and crank
+h1877-foil | commons | Edison tinfoil phonograph | 0 | A strip of tinfoil recording from about 1879, the grooves pressed into the foil
+h1877-sketch | commons | Edison tinfoil phonograph | 4 | Edison's 1877 pen sketch of the phonograph
+h1877-lab | commons | Menlo Park laboratory Edison | 8 | The electricians' room inside Edison's Menlo Park laboratory
+h1877-menlo | commons | Menlo Park laboratory Edison | 5 | Edison's main laboratory building at Menlo Park, New Jersey
+# 1925 Camden
+h1925-rca44bx | commons | RCA 44 ribbon microphone | 2 | An RCA 44-BX velocity ribbon microphone
+h1925-control | commons | 1920s radio studio microphone | 1 | A radio studio control room, 1927 to 1934
+h1925-mics | commons | 1920s radio studio microphone | 0 | Early broadcast microphones on a desk stand
+h1925-label | commons | Victor Talking Machine Camden | 0 | A Victor record label from Camden, New Jersey
+h1925-plate | commons | Victor Talking Machine Camden | 19 | The brass maker's plate of a Victrola, Victor Talking Machine Co., Camden
+h1925-reproducer | commons | Victor Talking Machine Camden | 21 | A Victrola No. 2 sound box resting in its case
+# 1948 New York
+h1948-billie | commons | William P. Gottlieb jazz New York 1947 | 2 | Billie Holiday singing at the Downbeat club, New York, 1947
+h1948-monk | commons | William P. Gottlieb jazz New York 1947 | 0 | Thelonious Monk at the piano, Minton's Playhouse, New York, 1947
+h1948-bass | commons | William P. Gottlieb jazz New York 1947 | 8 | Eddie Safranski playing double bass, New York, 1947
+h1948-crates | commons | record shop vinyl | 2 | Rows of LPs in a record shop crate
+h1948-cartridge | commons | turntable tonearm | 14 | A phono cartridge and stylus riding a record groove
+h1948-turntable | commons | turntable tonearm | 1 | A turntable with a record on the platter
+# 1967 Abbey Road
+h1967-abbey | commons | Abbey Road Studios | 11 | The front of Abbey Road Studios, London
+h1967-door | commons | Abbey Road Studios | 16 | The door to Studio 2 at Abbey Road
+h1967-redd | commons | EMI REDD mixing console | 0 | The EMI REDD.17 mixing desk from the 1950s at Abbey Road
+h1967-tg | commons | EMI REDD mixing console | 3 | The EMI TG12345 desk with vintage microphones at Abbey Road
+h1967-reels | commons | reel to reel tape recorder | 7 | A Studer B67 reel-to-reel tape recorder
+# 1982 Tokyo
+h1982-cdp101 | commons | Sony CDP-101 | 0 | The Sony CDP-101 of 1982, the first commercial CD player
+h1982-inside | commons | Sony CDP-101 | 1 | Inside the CDP-101: laser sled and circuit boards
+h1982-tray | commons | Sony CDP-101 | 8 | The CDP-101 disc drawer
+h1982-tokyo | commons | Tokyo night neon street | 1 | Neon signs in Shinjuku, Tokyo, at blue hour
+h1982-ginza | commons | Tokyo night neon street | 20 | Ginza, Tokyo, in 1971
+# 1991 London
+h1991-muff | commons | Electro-Harmonix Big Muff | 3 | An Electro-Harmonix Big Muff fuzz pedal
+h1991-board | commons | guitar effects pedalboard | 5 | A guitarist's pedalboard full of effects
+h1991-jazzmaster | commons | Fender Jazzmaster | 14 | The floating tremolo bridge of a Fender Jazzmaster
+h1991-camden | commons | Camden Town London | 6 | Camden Town, London
+# 2001 Cupertino
+h2001-ipod-hp | ov | ipod classic | 0 | An iPod classic resting on a pair of headphones
+h2001-ipod-pair | ov | ipod classic | 3 | Two iPod classics side by side
+h2001-chip | ov | ipod classic | 7 | Inside an iPod: the PortalPlayer system chip
+h2001-earbuds | ov | listening to music headphones | 13 | White earbuds on a black background
+h2001-street | ov | listening to music headphones | 17 | Listening on earbuds in the street
+# 2013 San Francisco
+h2013-dh18 | commons | Deafheaven live | 0 | Deafheaven live in 2018
+h2013-alcest | commons | Alcest live concert | 3 | Alcest live at Prophecy Fest
+h2013-alcest2 | commons | Alcest live concert | 5 | Alcest on stage in 2020
+h2013-sf | commons | San Francisco fog Golden Gate | 2 | San Francisco in fog with rays of light
+# 2016 Atlanta
+h2016-808mim | commons | Roland TR-808 | 12 | A Roland TR-808 at the Musical Instrument Museum, Phoenix
+h2016-808-909 | commons | Roland TR-808 | 5 | A Roland TR-808 and TR-909 side by side
+h2016-atlanta | commons | Atlanta skyline night | 1 | The Atlanta skyline at night from the Jackson Street Bridge
+h2016-crowd | commons | concert crowd lights | 4 | A crowd with hands up under stage lights
+# 2026 Everywhere
+h2026-iem1 | commons | in-ear monitors IEM | 3 | Planar magnetic in-ear monitors, close up
+h2026-iem2 | commons | in-ear monitors IEM | 6 | Planar magnetic in-ear monitors on a dark surface
+h2026-studio | commons | studio headphones mixing | 0 | A cart of headphones in a recording studio
+h2026-listen | ov | listening to music headphones | 12 | Listening on headphones with eyes closed
+# Home mosaic
+m-listen1 | ov | listening to music headphones | 10 | Listening on red headphones in a crowd
+m-listen2 | ov | listening to music headphones | 6 | Listening on earbuds over coffee
+m-pads | ov | listening to music headphones | 0 | Close-up of headphone ear pads in warm light
+m-speakers | commons | bookshelf loudspeakers | 2 | A row of high-end loudspeakers at a show
+m-kef | commons | bookshelf loudspeakers | 5 | Gloss white loudspeakers in a listening room
+m-tube | commons | headphone amplifier tube | 4 | A valve amplifier glowing in a dark room
+m-neve | commons | studio headphones mixing | 5 | A large Neve mixing console
+m-crowd | commons | concert crowd lights | 3 | A huge crowd at a concert under coloured lights
+m-studio | commons | studio headphones mixing | 3 | A recording studio control room
+# Store category headers
+s-speakers | commons | bookshelf loudspeakers | 0 | A bookshelf speaker driver, close up
+s-headphones | ov | listening to music headphones | 18 | Listening on studio headphones
+s-earbuds | ov | listening to music headphones | 2 | A single earbud, macro
+s-iems | commons | in-ear monitors IEM | 5 | Planar in-ear monitors with their cable
+s-monitors | commons | studio monitor speakers desk | 0 | A home studio desk with monitors
+s-dacs | commons | headphone amplifier tube | 7 | A valve headphone amplifier
+s-interfaces | commons | audio interface recording | 5 | A recording studio set up in a living room
+s-accessories | commons | XLR cables | 2 | An XLR connector, macro
+# Lab and Guide
+l-console | commons | EMI REDD mixing console | 2 | The EMI TG12345 desk at Abbey Road

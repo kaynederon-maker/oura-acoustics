@@ -1,5 +1,3 @@
-// Tuning Lab: AutoEq correction + a full parametric EQ (D3 graph, crossover, time & phase)
-// + listening analysis + hearing check + advice + exports + hardware push.
 import * as engine from './audio-engine.js';
 import {
   AUTOEQ_INDEX, parseIndex, profileUrls, parseParametricEq, parseFrCsv, responseDb, searchIndex, matchDevices,
@@ -16,7 +14,10 @@ import { createPeqGraph } from './peq-graph.js';
 import { initPeqPanel } from './peq-panel.js';
 import { initHardware } from './hardware.js';
 import { attachGraphHover } from './freq-hover.js';
+import { complete, parseJson, AI_CREDIT } from './ai.js';
+import { SYSTEM_PROMPT, JSON_SHAPE, sanitizeInput, sanitizeOutput } from './advice-core.js';
 import { $, $$, h, toast, download, fmtHz, fmtDb, store } from './ui.js';
+import { photo } from './img.js';
 
 const ANALYZE_MS = 20000;
 const STEP_MS = 100;
@@ -35,14 +36,11 @@ async function fetchText(url) {
   return res.text();
 }
 
-// Value at 1 kHz → 0 dB, so a headphone and a target line up on the graph.
 function normalize(freqs, values) {
   let i = 0;
   while (i < freqs.length - 1 && freqs[i + 1] <= 1000) i++;
   return values.map((v) => v - values[i]);
 }
-
-// ---------- step 1: headphones ----------
 
 async function loadIndex() {
   lab.index ??= fetchText(AUTOEQ_INDEX).then(parseIndex);
@@ -109,6 +107,7 @@ async function selectEntry(entry) {
         h('a', { class: 'chip link', href: AUTOEQ_TREE + entry.path, target: '_blank', rel: 'noopener' }, `AutoEq · ${entry.source}`)),
       h('button', { type: 'button', class: 'btn ghost small', onclick: clearEntry }, 'Remove'));
     store.set('aura.lab', { entry });
+    markStep(1);
   } catch (err) {
     clearEntry();
     selected.replaceChildren(`Could not load that profile: ${err.message}.`);
@@ -120,13 +119,25 @@ function clearEntry() {
   setCorrection(null);
   store.set('aura.lab', {});
   $('#hp-selected').replaceChildren('No profile loaded. The EQ only has your own bands.');
+  markStep(1, false);
 }
 
-// ---------- graph model (D3) ----------
+function markStep(n, done = true) {
+  const li = $(`.lab-steps [data-step="${n}"]`);
+  if (li) li.dataset.done = String(done);
+  const items = $$('.lab-steps li');
+  const current = items.find((x) => x.dataset.done !== 'true');
+  for (const x of items) {
+    const btn = x.querySelector('button');
+    if (x === current) btn.setAttribute('aria-current', 'step');
+    else btn.removeAttribute('aria-current');
+    btn.querySelector('.ls-done').textContent = x.dataset.done === 'true' ? ', done' : '';
+  }
+}
 
 async function ensureTarget(id) {
   if (!id || lab.targets.has(id)) return;
-  lab.targets.set(id, null); // in flight
+  lab.targets.set(id, null);
   try {
     const fr = parseFrCsv(await fetchText(targetUrl(id)));
     lab.targets.set(id, { freqs: fr.frequency, values: normalize(fr.frequency, fr.raw) });
@@ -192,15 +203,13 @@ function renderSummary() {
   $('#eq-summary').textContent = parts.join(' · ');
 }
 
-// ---------- exports ----------
-
 const fileName = (suffix) => `${(lab.entry?.name ?? 'Oura').replace(/[\\/:*?"<>|]/g, '')} ${suffix}.txt`;
 
 function exportEq(kind) {
   const specs = eqSpecs();
   if (!specs.length && !peq.crossover.enabled) return toast('Nothing to export yet. Load a model or add a band.', 'error');
   if (kind === 'apo') {
-    download(fileName('Oura APO config'), toApoConfig({ preamp: preamp(), specs, crossover: peq.crossover, alignment: peq.alignment }));
+    download(fileName('APO config'), toApoConfig({ preamp: preamp(), specs, crossover: peq.crossover, alignment: peq.alignment }));
     return;
   }
   if (kind === 'graphic') {
@@ -211,8 +220,6 @@ function exportEq(kind) {
   if (portable.length < specs.length) toast('The AutoEq format only holds peak and shelf filters; pass, notch and all-pass bands were left out. Use the APO config for everything.');
   download(fileName('ParametricEQ'), toParametricText({ preamp: preamp(), filters: portable }));
 }
-
-// ---------- step 2: listen & analyze ----------
 
 let analyzing = false;
 async function analyze() {
@@ -228,7 +235,6 @@ async function analyze() {
   const listener = createListener(engine.measureAnalyser(), engine.context().sampleRate);
   const started = performance.now();
   try {
-    // Time-based, so throttled background timers only mean fewer frames, not a longer wait.
     for (let elapsed = 0; elapsed < ANALYZE_MS; elapsed = performance.now() - started) {
       if (engine.state.source === 'none') throw new Error('The sound source stopped before the analysis finished.');
       listener.step();
@@ -241,6 +247,7 @@ async function analyze() {
     if (lab.content.silent) toast('That was nearly silent. Turn the music up and analyze again.', 'error');
     renderStats();
     renderRecs();
+    markStep(2);
   } catch (err) {
     toast(err.message, 'error');
   } finally {
@@ -270,19 +277,17 @@ function spectrumLoop() {
   drawSpectrum($('#spectrum'), analyser, spectrum, engine.context().sampleRate);
 }
 
-// ---------- step 3: hearing check ----------
-
 function toneRamp(ctx, freq, button) {
   return new Promise((resolve) => {
     const osc = new OscillatorNode(ctx, { frequency: freq });
     const gain = new GainNode(ctx, { gain: 0 });
-    osc.connect(gain).connect(ctx.destination); // ponytail: bypasses the EQ; route via eqIn to test "as tuned"
+    osc.connect(gain).connect(ctx.destination);
     osc.start();
     let db = TONE.startDb;
     const set = () => gain.gain.setTargetAtTime(10 ** (db / 20), ctx.currentTime, 0.03);
     const timer = setInterval(() => {
       db += TONE.stepDb;
-      if (db > TONE.maxDb) finish(TONE.maxDb + TONE.stepDb * 3); // never heard: flag it
+      if (db > TONE.maxDb) finish(TONE.maxDb + TONE.stepDb * 3);
       else set();
     }, TONE.stepMs);
     const heard = () => finish(db);
@@ -319,14 +324,13 @@ async function hearingCheck() {
       ? `Done. You heard ${flagged.join(', ')} later than expected. See the recommendations below.`
       : 'Done. Every band was within the expected range for this quick check.';
     renderRecs();
+    markStep(3);
   } finally {
     start.hidden = false;
     start.textContent = 'Run again';
     tap.hidden = true;
   }
 }
-
-// ---------- recommendations + AI ----------
 
 function applyBand(band, message) {
   upsertBand(band);
@@ -342,44 +346,72 @@ function renderRecs() {
   const empty = lab.content
     ? 'Your setup looks balanced for what you play. Nothing to change.'
     : 'Analyze some music in step 2 to get personal recommendations.';
-  $('#recs').replaceChildren(...(items.length ? items : [h('li', { class: 'rec empty' }, empty)]));
+  $('#recs').replaceChildren(...(items.length ? items : [h('li', { class: 'rec empty' },
+    photo('m-pads', { className: 'rec-photo', sizes: '160px', caption: false }), h('p', {}, empty))]));
+}
+
+const SERVER_UNAVAILABLE = new Set([404, 405, 501, 503]);
+
+async function serverAdvice(body) {
+  if (location.hostname.endsWith('github.io')) return null;
+  try {
+    const res = await fetch('api/advice', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
+    if (SERVER_UNAVAILABLE.has(res.status) || res.status >= 500) return null;
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+    return data;
+  } catch (err) {
+    if (err instanceof TypeError) return null;
+    throw err;
+  }
+}
+
+async function browserAdvice(body) {
+  const reply = await complete({
+    system: `${SYSTEM_PROMPT}
+${JSON_SHAPE}`,
+    messages: [{ role: 'user', content: JSON.stringify(sanitizeInput(body)) }],
+    json: true,
+    onWait: (s) => { $('#ai-advice').textContent = s ? `Free AI cooldown: ${s} s` : 'Thinking…'; },
+  });
+  return sanitizeOutput(parseJson(reply));
 }
 
 async function askAi() {
   const btn = $('#ai-advice');
   const out = $('#ai-out');
+  if (!lab.entry && !lab.content) {
+    out.replaceChildren(h('p', { class: 'muted' }, 'Pick your headphones in step 1 first, and ideally analyze some music in step 2, so the Sommelier has something to tune.'));
+    return;
+  }
   btn.disabled = true;
   btn.textContent = 'Thinking…';
   try {
-    const res = await fetch('/api/advice', {
-      method: 'POST',
-      headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({
-        device: lab.entry?.name,
-        correction: peq.correction,
-        taste: { bass: 0, treble: 0 },
-        content: lab.content && { ...lab.content, rmsDb: lab.listening.rmsDb, clipFrames: lab.listening.clipFrames, bands: lab.listening.bands },
-        hearing: lab.hearing,
-      }),
-    });
-    const data = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(data.error ?? `HTTP ${res.status}`);
+    const body = {
+      device: lab.entry?.name,
+      correction: peq.correction,
+      taste: { bass: 0, treble: 0 },
+      content: lab.content && { ...lab.content, rmsDb: lab.listening.rmsDb, clipFrames: lab.listening.clipFrames, bands: lab.listening.bands },
+      hearing: lab.hearing,
+    };
+    const fromServer = await serverAdvice(body);
+    const data = fromServer ?? (await browserAdvice(body));
+    if (!data.summary && !data.adjustments.length) throw new Error('The AI did not return any advice.');
     const toBand = (a) => ({ id: `ai-${a.type}-${a.fc}`, type: a.type, fc: a.fc, gain: a.gain, q: a.q });
-    out.replaceChildren(
+    out.replaceChildren(...[
       h('p', { class: 'ai-summary' }, data.summary),
       h('ul', { class: 'recs' }, data.adjustments.map((a) => h('li', { class: 'rec' },
         h('div', {}, h('strong', {}, `${TYPES[a.type]} · ${fmtHz(a.fc)} · ${fmtDb(a.gain)}`), h('p', {}, a.reason)),
         h('button', { type: 'button', class: 'btn small', onclick: () => applyBand(toBand(a)) }, 'Apply')))),
-      data.tips.length ? h('ul', { class: 'tips' }, data.tips.map((t) => h('li', {}, t))) : null);
+      data.tips.length ? h('ul', { class: 'tips' }, data.tips.map((t) => h('li', {}, t))) : null,
+      fromServer ? null : h('p', { class: 'muted small' }, AI_CREDIT)].filter(Boolean));
   } catch (err) {
-    out.replaceChildren(h('p', { class: 'muted' }, `AI Sommelier unavailable: ${err.message} The built-in recommendations still work.`));
+    out.replaceChildren(h('p', { class: 'muted' }, `AI Sommelier unavailable: ${err.message} The built-in recommendations above still work.`));
   } finally {
     btn.disabled = false;
     btn.textContent = 'Ask the AI Sommelier';
   }
 }
-
-// ---------- wiring ----------
 
 export function initLab() {
   let debounce;
@@ -398,11 +430,20 @@ export function initLab() {
     try {
       await navigator.clipboard.writeText(toApoConfig({ preamp: preamp(), specs: eqSpecs(), crossover: peq.crossover, alignment: peq.alignment }));
       toast('Copied as an Equalizer APO config.');
+      markStep(4);
     } catch {
       toast('Clipboard is blocked here. Use the download buttons instead.', 'error');
     }
   });
-  $$('[data-export]').forEach((b) => b.addEventListener('click', () => exportEq(b.dataset.export)));
+  $$('[data-export]').forEach((b) => b.addEventListener('click', () => { exportEq(b.dataset.export); markStep(4); }));
+  for (const b of $$('.lab-steps button')) {
+    b.addEventListener('click', () => {
+      const card = $(`#${b.dataset.target}`);
+      card.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center' });
+      card.querySelector('input, button')?.focus({ preventScroll: true });
+    });
+  }
+  markStep(1, false);
   $('#peq-phase').addEventListener('change', (e) => { lab.showPhase = e.target.checked; graph?.relayout(); });
 
   initPeqPanel();
@@ -417,16 +458,15 @@ export function initLab() {
   attachGraphHover($('#spectrum'));
   initPeqState();
 
-  const entry = store.get('aura.lab', {}).entry; // the last model (older Lab versions saved it here too)
+  const entry = store.get('aura.lab', {}).entry;
   if (entry?.path) selectEntry(entry);
   renderRecs();
   renderSummary();
   requestAnimationFrame(spectrumLoop);
 }
 
-export const redrawLab = () => graph?.relayout(); // the graph has no size while its view is hidden
+export const redrawLab = () => graph?.relayout();
 
-// Store → Lab hand-off: search the AutoEq index for a model and let the user pick the measurement.
 export function tuneFor(model) {
   const search = $('#hp-search');
   search.value = model;

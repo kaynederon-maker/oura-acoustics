@@ -1,12 +1,9 @@
-// Real-time visualizers: a scrolling log-frequency spectrogram and an oscilloscope,
-// both reading the shared visual analyser and coloured from the active theme.
 import * as engine from './audio-engine.js';
 
 const SCROLL_PX = 2;
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const rgb = (hex) => hex.replace('#', '').match(/../g).map((x) => parseInt(x, 16));
 
-// 256-step colour ramp: background -> plot-1 -> accent -> near white.
 function ramp() {
   const stops = [rgb(css('--bg')), rgb(css('--plot-1')), rgb(css('--accent')), [255, 248, 236]];
   return Array.from({ length: 256 }, (_, i) => {
@@ -39,7 +36,6 @@ export function startVisualizers({ spectrogram, scope, isVisible }) {
     const live = engine.state.source !== 'none';
     const analyser = live ? engine.visualAnalyser() : null;
 
-    // Spectrogram: shift left, paint the newest column on the right (log frequency, low at bottom).
     const { w, h } = fit(spectrogram);
     if (!w || !h) return;
     sg.drawImage(spectrogram, -SCROLL_PX, 0);
@@ -57,7 +53,6 @@ export function startVisualizers({ spectrogram, scope, isVisible }) {
     }
     sg.putImageData(column, w - SCROLL_PX, 0);
 
-    // Oscilloscope.
     const s = fit(scope);
     sc.clearRect(0, 0, s.w, s.h);
     sc.strokeStyle = css('--plot-2');

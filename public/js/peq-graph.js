@@ -1,12 +1,3 @@
-// Interactive PEQ graph (D3): drag nodes for frequency/gain, scroll for Q, double-click to add,
-// keyboard for everything. The curve is computed with the same biquad maths the audio engine runs.
-//
-// model = {
-//   bands(): Band[]            selected(): id|null          select(id)
-//   change(id, changes, { live })   commit()   add(bandLike)   remove(id)
-//   layers(freqs): { curve: dB[], series: [{ cls, freqs, values }], phase?: deg[] }
-//   readout?(freq): string[]
-// }
 import { responseDb, logFreqs } from './eq.js';
 import { expandBands, GAIN_TYPES, TYPES } from './peq.js';
 import { showTip, hideTip } from './freq-hover.js';
@@ -16,7 +7,7 @@ const d3 = globalThis.d3;
 const FREQS = logFreqs(240);
 const GRID_FREQS = [20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000];
 const SNAP_FREQS = [20, 25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000, 1250, 1600,
-  2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000]; // ISO third-octave centres
+  2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000];
 const MARGIN = { top: 14, right: 46, bottom: 28, left: 46 };
 const SNAP_PX = 6;
 const GAIN_STEP = 0.5;
@@ -26,6 +17,9 @@ const KEY_OCTAVE = 1 / 24;
 const COMMIT_AFTER_WHEEL_MS = 350;
 const TOUCH_TIP_MS = 2500;
 const BAND_COLORS = ['--plot-1', '--plot-2', '--accent', '--aura-1', '--aura-3', '--aura-2'];
+const REDRAW_MS = 420;
+const OVERLAY_MS = 900;
+const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 const css = (name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim();
 const tick = (f) => (f >= 1000 ? `${f / 1000}k` : String(f));
@@ -89,10 +83,15 @@ export function createPeqGraph(host, model, { yDomain = [-20, 20], phase = () =>
     if (!x) layout();
     const bands = model.bands();
     const data = model.layers(FREQS);
-    layers.selectAll('path').data(data.series, (d) => d.cls).join('path')
+    layers.selectAll('path').data(data.series, (d) => d.cls).join(
+      (enter) => enter.append('path').attr('opacity', 0).call((e) => e.transition().duration(OVERLAY_MS).ease(d3.easeCubicOut).attr('opacity', 1)),
+      (update) => update,
+      (exit) => exit.transition().duration(OVERLAY_MS / 2).attr('opacity', 0).remove(),
+    )
       .attr('class', (d) => `peq-series ${d.cls}`)
       .attr('d', (d) => line(d.values, y, d.freqs));
-    curve.attr('d', line(data.curve));
+    const glide = !dragging && !REDUCED && curve.attr('d');
+    (glide ? curve.transition('shape').duration(REDRAW_MS).ease(d3.easeCubicOut) : curve.interrupt('shape')).attr('d', line(data.curve));
     phasePath.attr('d', phase() && data.phase ? line(data.phase, yPhase) : null);
 
     const sel = bands.find((b) => b.id === model.selected());
@@ -112,7 +111,8 @@ export function createPeqGraph(host, model, { yDomain = [-20, 20], phase = () =>
       g.call(dragBehaviour).on('wheel', onWheel).on('keydown', onKey).on('focus', (e, b) => model.select(b.id));
       return g;
     })
-      .attr('transform', (b) => `translate(${x(b.fc)},${y(GAIN_TYPES.has(b.type) ? b.gain : 0)})`)
+      .call((sel) => (glide ? sel.transition('shape').duration(REDRAW_MS).ease(d3.easeCubicOut) : sel.interrupt('shape'))
+        .attr('transform', (b) => `translate(${x(b.fc)},${y(GAIN_TYPES.has(b.type) ? b.gain : 0)})`))
       .classed('selected', (b) => b.id === model.selected())
       .classed('disabled', (b) => !b.enabled)
       .attr('aria-label', (b, i) => describe(b, i))
@@ -123,8 +123,6 @@ export function createPeqGraph(host, model, { yDomain = [-20, 20], phase = () =>
         g.select('.lbl').text(compact ? typeShort[b.type] : i + 1);
       });
   }
-
-  // ---------- interactions ----------
 
   let lastSnap = '';
   const dragBehaviour = d3.drag()
@@ -144,7 +142,7 @@ export function createPeqGraph(host, model, { yDomain = [-20, 20], phase = () =>
         changes.gain = gain;
       }
       const snapKey = `${snapF ?? ''}|${changes.gain === 0 ? 'zero' : ''}`;
-      if (snapKey !== '|' && snapKey !== lastSnap) haptic(8); // physical tick on each new snap
+      if (snapKey !== '|' && snapKey !== lastSnap) haptic(8);
       lastSnap = snapKey;
       model.change(b.id, changes, { live: true });
     })

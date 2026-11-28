@@ -8,12 +8,11 @@ import { FREQ_TIPS, tipFor } from '../public/js/freq-tips.js';
 test('frequency tips cover 20 Hz–20 kHz without gaps', () => {
   assert.equal(tipFor(1000).name, 'Midrange core');
   assert.equal(tipFor(8000).name, 'Sibilance and brilliance');
-  assert.equal(tipFor(5).name, 'Deep sub-bass'); // clamped
+  assert.equal(tipFor(5).name, 'Deep sub-bass');
   assert.equal(tipFor(25000).name, 'Ultra highs');
   FREQ_TIPS.slice(1).forEach((t, i) => assert.equal(t.lo, FREQ_TIPS[i].hi, `gap before ${t.name}`));
 });
 
-// Synthetic third-octave spectrum: flat mids at -30 dB, with given bass/treble offsets.
 const listening = (bassDb, trebleDb, extra = {}) => ({
   bands: THIRD_OCTAVES.map((f) => ({ f, db: -30 + (f <= 160 ? bassDb : f >= 4000 ? trebleDb : 0) })),
   rmsDb: -18, peakDb: -1, clipFrames: 0, ...extra,
@@ -57,7 +56,6 @@ test('recommend flags clipping and missing device', () => {
 });
 
 test('hearing deviations remove the normal ear curve', () => {
-  // ISO 226 puts the 8 kHz threshold 10.2 dB above 1 kHz, so hearing it 10.2 dB later is normal.
   const at8k = (thresholds) => hearingDeviations(thresholds).find((d) => d.f === 8000).deviation;
   assert.ok(Math.abs(at8k({ 1000: -60, 8000: -49.8 })) < 0.01);
   assert.ok(at8k({ 1000: -60, 8000: -35 }) > 10);

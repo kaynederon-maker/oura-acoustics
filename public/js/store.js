@@ -1,5 +1,3 @@
-// Store: product grid, product pages, favourites + bag sheets, demo checkout.
-// Sheets are native <dialog>s (focus trap, Esc and inert page for free), styled after shadcn's Sheet.
 import { PRODUCTS, CATEGORIES, findProduct } from './catalog.js';
 import {
   filterProducts, addToBag, setQty, bagLines, bagTotals, toggleFavorite, validateCheckout,
@@ -7,9 +5,13 @@ import {
 } from './shop-logic.js';
 import { $, $$, h, icon, toast, store } from './ui.js';
 import { tuneFor } from './lab.js';
+import { photo } from './img.js';
+import { play } from './sound.js';
+import { openAssistant } from './assistant.js';
+import { inspector, openLightbox } from './inspector.js';
 
 const ADDED_FEEDBACK_MS = 1400;
-const CHECKOUT_DELAY_MS = 1100; // demo "processing" so the loading state is visible
+const CHECKOUT_DELAY_MS = 1100;
 const RELATED_COUNT = 4;
 const STAGGER_CAP = 8;
 const FEATURED_IDS = ['edifier-r1280t', 'sony-wh-1000xm5', 'airpods-pro-2', 'moondrop-blessing-3'];
@@ -21,7 +23,7 @@ const state = {
 };
 
 const fmtCount = (n) => n.toLocaleString('en-US');
-const imgSrc = (p) => `/products/${p.id}.webp`;
+const imgSrc = (p) => `products/${p.id}.webp`;
 
 function save() {
   store.set('aura.bag', state.bag);
@@ -29,12 +31,10 @@ function save() {
   renderCounts();
 }
 
-// ---------- shared pieces ----------
-
 function media(p, { eager = false } = {}) {
   return h('img', {
     src: imgSrc(p), alt: `${p.brand} ${p.name}`, loading: eager ? 'eager' : 'lazy', decoding: 'async',
-    width: '1200', height: '900', // every product image is reframed to 4:3 (see products/sources.json)
+    width: '1200', height: '900',
   });
 }
 
@@ -60,7 +60,6 @@ function favButton(p, extraClass = '') {
   }, icon('heart'));
 }
 
-// Grid cards get a quiet button; the product page keeps the accent for its single primary action.
 function addButton(p, qtyFn = () => 1, { primary = false, label = 'Add to bag' } = {}) {
   const btn = h('button', { type: 'button', class: `btn add-btn${primary ? ' primary' : ''}` }, icon('bag'), h('span', {}, label));
   btn.addEventListener('click', () => {
@@ -76,6 +75,7 @@ function addButton(p, qtyFn = () => 1, { primary = false, label = 'Add to bag' }
 }
 
 function addAndAnnounce(p, qty = 1) {
+  play('click');
   state.bag = addToBag(state.bag, p.id, qty);
   save();
   bumpBag();
@@ -94,12 +94,33 @@ function toggleFav(p) {
   if ($('#fav-sheet').open) renderFavorites();
 }
 
-function card(p, index) {
+const STUDIES = { 'edifier-r1280t': 'speaker-walnut', 'yamaha-hs5': 'monitor-black', 'sennheiser-hd-600': 'headphone-open', 'moondrop-blessing-3': 'iem' };
+const CATEGORY_LOOK = {
+  all: ['m-speakers', 'Everything on the shelf, from desk speakers to in-ear monitors.'],
+  speakers: ['s-speakers', 'Cabinets you will want to leave the grilles off.'],
+  headphones: ['s-headphones', 'Closed, open, wireless. All of them measured.'],
+  earbuds: ['s-earbuds', 'Small enough to forget you are wearing them.'],
+  iems: ['s-iems', 'Custom-fit sound, without the dentist chair.'],
+  monitors: ['s-monitors', 'Honest speakers for people who mix.'],
+  dacs: ['s-dacs', 'The quiet box between your music and your headphones.'],
+  interfaces: ['s-interfaces', 'Plug in a microphone. Press record.'],
+  accessories: ['s-accessories', 'Tips, pads and cables: the cheapest upgrades.'],
+};
+const EDITORIAL = [
+  { at: 3, photo: 'm-kef', kicker: 'Speakers', title: 'Speakers that disappear', category: 'speakers' },
+  { at: 11, photo: 's-iems', kicker: 'In-ear monitors', title: 'A whole studio, in your ear', category: 'iems' },
+  { at: 20, photo: 'm-tube', kicker: 'DACs & amps', title: 'Warm valves, quiet nights', category: 'dacs' },
+];
+
+function card(p, index, { feature = false } = {}) {
   const href = `#/product/${p.id}`;
-  const el = h('article', { class: 'product-card vng-spot' },
-    h('span', { class: 'vng-beam', 'aria-hidden': 'true' }),
-    h('a', { class: `product-media fit-${p.fit}`, href, tabindex: '-1', 'aria-hidden': 'true' }, media(p)),
+  const el = h('article', { class: `product-card${feature ? ' feature' : ''}` },
+    h('a', { class: `product-media fit-${p.fit}`, href, tabindex: '-1', 'aria-hidden': 'true', 'data-cursor': 'view' },
+      h('span', { class: 'plinth', 'aria-hidden': 'true' }),
+      media(p),
+      h('img', { class: 'alt-shot', src: `products/detail/${p.id}-a.webp`, alt: '', loading: 'lazy', decoding: 'async', width: '800', height: '600' })),
     p.badge ? h('span', { class: 'badge' }, p.badge) : null,
+    STUDIES[p.id] ? h('span', { class: 'badge study' }, '3D') : null,
     favButton(p),
     h('div', { class: 'product-info' },
       h('p', { class: 'product-brand' }, p.brand),
@@ -113,11 +134,69 @@ function card(p, index) {
   return el;
 }
 
-// Quick view: the essentials and full spec sheet without leaving the grid.
+function editorialTile(t) {
+  return h('div', { class: 'editorial-tile' },
+    photo(t.photo, { sizes: '(max-width: 760px) 100vw, 50vw' }),
+    h('button', {
+      type: 'button', class: 'editorial-copy',
+      onclick: () => { setCategory(t.category); $('#store-grid').scrollIntoView({ behavior: 'smooth', block: 'start' }); },
+    }, h('span', { class: 'caps' }, t.kicker), h('span', { class: 'editorial-title' }, t.title), h('span', { class: 'text-link' }, 'Shop the edit')));
+}
+
+function photoShots(p) {
+  return [
+    { src: imgSrc(p), alt: `${p.brand} ${p.name}`, fit: p.fit, label: 'Photo' },
+    { src: `products/detail/${p.id}-a.webp`, alt: `Detail of the ${p.brand} ${p.name}`, fit: 'cover', label: 'Detail' },
+    { src: `products/detail/${p.id}-b.webp`, alt: `Close-up of the ${p.brand} ${p.name}`, fit: 'cover', label: 'Close-up' },
+  ];
+}
+
+function viewer(p) {
+  const main = h('div', { class: 'viewer-main' });
+  const photos = photoShots(p);
+  const shots = [...(STUDIES[p.id] ? [{ kind: '3d', label: '3D study' }] : []), ...photos.map((s) => ({ ...s, kind: 'img' }))];
+  const offset = shots.length - photos.length;
+  let stage3d = null;
+  let photoView = null;
+  async function show(i) {
+    const s = shots[i];
+    for (const [n, b] of [...thumbs.children].entries()) b.setAttribute('aria-pressed', String(n === i));
+    stage3d?.dispose();
+    stage3d = null;
+    photoView?.dispose();
+    photoView = null;
+    if (s.kind === '3d') {
+      const host = h('div', { class: 'viewer-3d', tabindex: '0', role: 'img', 'data-cursor': 'drag', 'aria-label': `3D study of the ${p.brand} ${p.name}. Drag or use the arrow keys to turn it.` },
+        h('span', { class: 'plinth', 'aria-hidden': 'true' }), h('span', { class: 'viewer-note caps' }, 'Interpretive 3D study'));
+      main.replaceChildren(host);
+      try {
+        const { createStage } = await import('./stage3d.js');
+        stage3d = await createStage(host, { look: 'lux', model: STUDIES[p.id], distance: 1.3, autoTurn: 0.002, tilt: 0.2, yaw: STUDIES[p.id] === 'iem' ? -1.05 : -0.5 });
+        host.addEventListener('keydown', (e) => {
+          const d = { ArrowLeft: -1, ArrowRight: 1 }[e.key];
+          if (d) { e.preventDefault(); stage3d.turn(d); }
+        });
+      } catch (err) {
+        console.error('[product 3d]', err);
+        show(1);
+      }
+    } else {
+      photoView = inspector({ ...s, onExpand: () => openLightbox(photos, i - offset) });
+      main.replaceChildren(photoView.el);
+    }
+  }
+  const thumbs = h('div', { class: 'viewer-thumbs', role: 'group', 'aria-label': 'Views' }, shots.map((s, i) => h('button', {
+    type: 'button', class: 'viewer-thumb', 'aria-pressed': 'false', 'aria-label': `Show ${s.label.toLowerCase()}`, onclick: () => show(i),
+  }, s.kind === '3d' ? h('span', { class: 'thumb-3d' }, '3D')
+    : h('img', { src: s.src, alt: '', loading: 'lazy', width: '120', height: '90' }))));
+  show(0);
+  return { el: h('div', { class: 'viewer' }, main, thumbs), dispose: () => { stage3d?.dispose(); photoView?.dispose(); } };
+}
+
 function quickView(p) {
   const href = `#/product/${p.id}`;
   $('#qv-body').replaceChildren(
-    h('div', { class: `qv-media fit-${p.fit}` }, media(p, { eager: true }), p.badge ? h('span', { class: 'badge' }, p.badge) : null),
+    h('div', { class: 'qv-media' }, inspector({ ...photoShots(p)[0], onExpand: () => openLightbox(photoShots(p), 0) }).el, p.badge ? h('span', { class: 'badge' }, p.badge) : null),
     h('div', { class: 'qv-info' },
       h('p', { class: 'product-brand' }, `${p.brand} · ${CATEGORIES.find((c) => c.id === p.category).label}`),
       h('h2', { id: 'qv-title' }, p.name),
@@ -126,7 +205,7 @@ function quickView(p) {
       h('p', { class: 'qv-blurb' }, p.blurb),
       h('ul', { class: 'highlights' }, p.highlights.map((x) => h('li', {}, icon('check'), x))),
       h('h3', { class: 'qv-spec-title' }, 'Spec sheet'),
-      h('dl', { class: 'spec-list' }, Object.entries(p.specs).flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, v)])),
+      specList(p),
       h('div', { class: 'buy-row' },
         addButton(p, () => 1, { primary: true }),
         favButton(p, 'large'),
@@ -134,17 +213,36 @@ function quickView(p) {
   $('#quick-view').showModal();
 }
 
-// ---------- store grid ----------
+function specList(p) {
+  return h('dl', { class: 'spec-list' }, Object.entries(p.specs).map(([k, v]) => h('div', { class: 'spec' }, h('dt', {}, k), h('dd', {}, v))));
+}
+
+function categoryBanner() {
+  const id = state.filters.category;
+  const [ph, line] = CATEGORY_LOOK[id] ?? CATEGORY_LOOK.all;
+  const label = CATEGORIES.find((c) => c.id === id)?.label ?? 'All';
+  $('#store-banner').replaceChildren(
+    photo(ph, { className: 'banner-photo', sizes: '100vw', eager: true }),
+    h('div', { class: 'banner-copy' }, h('p', { class: 'caps' }, id === 'all' ? 'The collection' : 'Category'),
+      h('p', { class: 'banner-title' }, id === 'all' ? 'Forty-two objects' : label), h('p', { class: 'banner-line' }, line)));
+}
 
 function renderGrid() {
   const list = filterProducts(PRODUCTS, { ...state.filters, favorites: state.favorites });
+  const f = state.filters;
+  const editorial = f.category === 'all' && !f.query && !f.favoritesOnly && f.sort === 'featured';
   $('#store-count').textContent = `${list.length} ${list.length === 1 ? 'product' : 'products'}`;
-  $('#store-grid').replaceChildren(...(list.length
-    ? list.map(card)
-    : [h('div', { class: 'store-empty' },
-      h('h3', {}, state.filters.favoritesOnly ? 'No favourites here yet' : 'Nothing matches that search'),
-      h('p', {}, state.filters.favoritesOnly ? 'Tap the heart on any product to save it.' : 'Try a brand like "Sony" or a type like "speakers".'),
-      h('button', { type: 'button', class: 'btn', onclick: resetFilters }, 'Show everything'))]));
+  categoryBanner();
+  if (!list.length) {
+    $('#store-grid').replaceChildren(h('div', { class: 'store-empty' },
+      h('h3', {}, f.favoritesOnly ? 'No favourites here yet' : 'Nothing matches that search'),
+      h('p', {}, f.favoritesOnly ? 'Tap the heart on any product to save it.' : 'Try a brand like "Sony" or a type like "speakers".'),
+      h('button', { type: 'button', class: 'btn', onclick: resetFilters }, 'Show everything')));
+    return;
+  }
+  const items = list.map((p, i) => card(p, i, { feature: editorial && i === 0 }));
+  if (editorial) for (const t of [...EDITORIAL].reverse()) if (t.at < items.length) items.splice(t.at, 0, editorialTile(t));
+  $('#store-grid').replaceChildren(...items);
 }
 
 function resetFilters() {
@@ -156,16 +254,19 @@ function resetFilters() {
   renderGrid();
 }
 
+function setCategory(id) {
+  state.filters = { ...state.filters, category: id };
+  syncChips();
+  renderGrid();
+}
+
 function syncChips() {
   for (const chip of $$('[data-category]')) chip.setAttribute('aria-pressed', String(chip.dataset.category === state.filters.category));
 }
 
 function initFilters() {
   $('#store-chips').replaceChildren(...CATEGORIES.map((c) =>
-    h('button', {
-      type: 'button', class: 'filter-chip', 'data-category': c.id, 'aria-pressed': 'false',
-      onclick: () => { state.filters = { ...state.filters, category: c.id }; syncChips(); renderGrid(); },
-    }, c.label)));
+    h('button', { type: 'button', class: 'filter-chip', 'data-category': c.id, 'aria-pressed': 'false', onclick: () => { play('detent'); setCategory(c.id); } }, c.label)));
   syncChips();
   let debounce;
   $('#store-search').addEventListener('input', (e) => {
@@ -176,12 +277,13 @@ function initFilters() {
   $('#store-favs-only').addEventListener('change', (e) => { state.filters = { ...state.filters, favoritesOnly: e.target.checked }; renderGrid(); });
 }
 
-// ---------- product page ----------
+let currentViewer = null;
 
-// Renders #view-product and returns the page title.
 export function showProduct(id) {
   const p = findProduct(id);
   const view = $('#view-product');
+  currentViewer?.dispose();
+  currentViewer = null;
   if (!p) {
     view.replaceChildren(h('div', { class: 'page-head' },
       h('h1', { tabindex: '-1' }, 'We could not find that product'),
@@ -190,42 +292,46 @@ export function showProduct(id) {
   }
   let qty = 1;
   const qtyOut = h('output', { 'aria-live': 'polite' }, '1');
-  const step = (d) => { qty = Math.max(1, Math.min(MAX_QTY, qty + d)); qtyOut.textContent = String(qty); };
+  const step = (d) => { qty = Math.max(1, Math.min(MAX_QTY, qty + d)); qtyOut.textContent = String(qty); play('detent'); };
   const related = PRODUCTS.filter((x) => x.category === p.category && x.id !== p.id).slice(0, RELATED_COUNT);
+  const cat = CATEGORIES.find((c) => c.id === p.category);
+  currentViewer = viewer(p);
 
   view.replaceChildren(
     h('nav', { class: 'crumbs', 'aria-label': 'Breadcrumb' },
-      h('a', { href: '#/store' }, 'Store'), h('span', { 'aria-hidden': 'true' }, '/'),
-      h('span', {}, CATEGORIES.find((c) => c.id === p.category).label)),
+      h('a', { href: '#/store' }, 'Store'), h('span', { 'aria-hidden': 'true' }, '/'), h('span', {}, cat.label)),
     h('div', { class: 'product-page' },
-      h('div', { class: `product-hero card fit-${p.fit}` }, media(p, { eager: true }), p.badge ? h('span', { class: 'badge' }, p.badge) : null),
+      h('div', { class: 'product-hero' }, currentViewer.el, p.badge ? h('span', { class: 'badge' }, p.badge) : null),
       h('div', { class: 'product-detail' },
-        h('p', { class: 'product-brand' }, p.brand),
+        h('p', { class: 'product-brand caps' }, p.brand),
         h('h1', { tabindex: '-1' }, p.name),
         rating(p),
         price(p),
         h('p', { class: 'lede' }, p.blurb),
+        p.autoeq ? h('a', {
+          class: 'tune-link', href: '#/lab',
+          onclick: () => requestAnimationFrame(() => tuneFor(p.autoeq)),
+        }, h('span', { class: 'tune-icon' }, icon('wave')), h('span', {}, h('strong', {}, 'Tune it in the Lab'), h('small', {}, 'Load the measured correction for this exact model')), icon('arrow')) : null,
+        h('button', { type: 'button', class: 'tune-link ask-link', onclick: () => openAssistant(p) },
+          h('span', { class: 'tune-icon' }, icon('search')), h('span', {}, h('strong', {}, 'Ask Oura about it'), h('small', {}, 'Compare it, check if it suits you, find alternatives')), icon('arrow')),
         h('div', { class: 'buy-row' },
           h('div', { class: 'qty', role: 'group', 'aria-label': 'Quantity' },
             h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Decrease quantity', onclick: () => step(-1) }, icon('minus')),
             qtyOut,
             h('button', { type: 'button', class: 'icon-btn', 'aria-label': 'Increase quantity', onclick: () => step(1) }, icon('plus'))),
-          addButton(p, () => qty, { primary: true }),
+          addButton(p, () => qty, { primary: !p.autoeq }),
           favButton(p, 'large')),
         h('p', { class: 'ship-note' }, icon('truck'), `Free shipping over ${money(FREE_SHIPPING_MIN)} · 30-day returns`),
-        p.autoeq ? h('a', {
-          class: 'tune-link', href: '#/lab',
-          onclick: () => requestAnimationFrame(() => tuneFor(p.autoeq)),
-        }, icon('wave'), h('span', {}, h('strong', {}, 'Tune it in the Lab'), h('small', {}, 'Load the measured correction for this model'))) : null,
         h('ul', { class: 'highlights' }, p.highlights.map((x) => h('li', {}, icon('check'), x))),
-        h('dl', { class: 'spec-list' }, Object.entries(p.specs).flatMap(([k, v]) => [h('dt', {}, k), h('dd', {}, v)])))),
+        h('h2', { class: 'spec-title caps' }, 'Specifications'),
+        specList(p))),
+    h('section', { class: 'product-room' }, photo((CATEGORY_LOOK[p.category] ?? CATEGORY_LOOK.all)[0], { className: 'room-photo', sizes: '100vw' }),
+      h('p', { class: 'room-line' }, (CATEGORY_LOOK[p.category] ?? CATEGORY_LOOK.all)[1])),
     related.length ? h('section', { class: 'related' },
       h('h2', {}, 'You might also like'),
-      h('div', { class: 'product-grid' }, related.map(card))) : null);
+      h('div', { class: 'product-grid' }, related.map((x, i) => card(x, i)))) : null);
   return `${p.brand} ${p.name}`;
 }
-
-// ---------- favourites + bag sheets ----------
 
 function closeSheets() {
   for (const d of $$('dialog.sheet[open], dialog.qv[open]')) d.close();
@@ -350,6 +456,7 @@ async function placeOrder(form) {
   button.replaceChildren(h('span', { class: 'spinner', 'aria-hidden': 'true' }), 'Placing order…');
   await new Promise((r) => setTimeout(r, CHECKOUT_DELAY_MS));
 
+  play('needle');
   const orderNo = `AU-${Date.now().toString(36).toUpperCase().slice(-6)}`;
   const first = values.name.trim().split(/\s+/)[0];
   state.bag = [];
@@ -362,8 +469,6 @@ async function placeOrder(form) {
     h('a', { class: 'btn primary', href: '#/store', onclick: closeSheets }, 'Keep browsing')));
   $('#bag-foot').replaceChildren();
 }
-
-// ---------- header counts ----------
 
 function renderCounts() {
   const count = bagTotals(bagLines(state.bag, PRODUCTS)).count;
@@ -380,11 +485,9 @@ function renderCounts() {
 function bumpBag() {
   const badge = $('#bag-count');
   badge.classList.remove('bump');
-  void badge.offsetWidth; // restart the keyframe
+  void badge.offsetWidth;
   badge.classList.add('bump');
 }
-
-// ---------- wiring ----------
 
 export function initStore() {
   initFilters();
@@ -396,12 +499,11 @@ export function initStore() {
   for (const dialog of $$('dialog.sheet, dialog.qv')) {
     dialog.addEventListener('click', (e) => {
       if (e.target.closest('[data-close]')) return dialog.close();
-      const r = dialog.getBoundingClientRect(); // clicks on ::backdrop land on the dialog itself
+      const r = dialog.getBoundingClientRect();
       const outside = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
       if (e.target === dialog && outside) dialog.close();
     });
   }
-  // Another tab changed the bag or favourites: stay in sync.
   addEventListener('storage', (e) => {
     if (e.key !== 'aura.bag' && e.key !== 'aura.favorites') return;
     state.bag = store.get('aura.bag', []);

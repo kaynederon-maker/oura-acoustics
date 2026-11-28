@@ -1,8 +1,3 @@
-// Store catalogue. Prices are approximate US list prices; ratings and review counts are demo data.
-// Images live in /products/<id>.webp (sources recorded in /products/sources.json).
-// fit: 'contain' for studio cut-outs, 'cover' for photographed products.
-// autoeq: the model name to look up in the Tuning Lab.
-
 export const CATEGORIES = [
   { id: 'all', label: 'All' },
   { id: 'speakers', label: 'Speakers' },
@@ -198,7 +193,6 @@ export const PRODUCTS = [
     highlights: ['Single dynamic driver', 'Replaceable nozzle filters', 'Zinc-alloy shells', '0.78 mm 2-pin cable'],
     specs: { Type: 'Wired IEM', Driver: '1 dynamic', Impedance: '33 Ω' },
   },
-  // ---------- DACs & amps ----------
   {
     id: 'fiio-k11', brand: 'FiiO', name: 'K11 R2R Desktop DAC/Amp', category: 'dacs',
     price: 169.99, rating: 4.6, reviews: 412, badge: 'New', fit: 'contain',
@@ -227,7 +221,6 @@ export const PRODUCTS = [
     highlights: ['Hardware PEQ', 'Bluetooth LDAC', 'Balanced XLR + 4.4 mm', 'Colour display'],
     specs: { Type: 'Desktop DAC + headphone amp', Inputs: 'USB, optical, coaxial, Bluetooth', Outputs: '6.35 mm, 4.4 mm, XLR, RCA', DSP: 'Built-in parametric EQ' },
   },
-  // ---------- studio monitors ----------
   {
     id: 'yamaha-hs5', brand: 'Yamaha', name: 'HS5 Powered Studio Monitor', category: 'monitors',
     price: 199.99, rating: 4.7, reviews: 7342, badge: 'Bestseller', fit: 'contain',
@@ -256,7 +249,6 @@ export const PRODUCTS = [
     highlights: ['Pair included', 'Front headphone + aux', 'HF and LF tuning', 'TRS + RCA inputs'],
     specs: { Type: 'Active media reference monitors (pair)', Woofer: '3.5 in', Response: '80 Hz – 20 kHz', Power: '2 × 25 W', 'Max SPL': '97 dB @ 1 m' },
   },
-  // ---------- audio interfaces ----------
   {
     id: 'focusrite-scarlett-2i2', brand: 'Focusrite', name: 'Scarlett 2i2 (4th Gen)', category: 'interfaces',
     price: 199.99, rating: 4.7, reviews: 15422, badge: 'Bestseller', fit: 'contain',
@@ -285,7 +277,6 @@ export const PRODUCTS = [
     highlights: ['Class-A console preamps', 'ScrollControl volume', 'ADAT input (+8 channels)', 'Dual headphone outputs'],
     specs: { Type: 'USB-C audio interface', 'I/O': '10 in / 6 out (with ADAT)', Resolution: '96 kHz / 24-bit', Preamps: '2 Audient console' },
   },
-  // ---------- cables & accessories ----------
   {
     id: 'apple-usb-c-dongle', brand: 'Apple', name: 'USB-C to 3.5 mm Adapter', category: 'accessories',
     price: 9, rating: 4.6, reviews: 48210, fit: 'contain',

@@ -1,0 +1,37 @@
+{
+  "fraunces-italic.woff2": {
+    "family": "Fraunces",
+    "author": "The Fraunces Project Authors (Undercase Type, Phaedra Charles, Flavia Zimbardi)",
+    "license": "OFL-1.1",
+    "licenseFile": "/fonts/OFL-fraunces.txt",
+    "source": "https://github.com/undercasetype/Fraunces"
+  },
+  "fraunces.woff2": {
+    "family": "Fraunces",
+    "author": "The Fraunces Project Authors (Undercase Type, Phaedra Charles, Flavia Zimbardi)",
+    "license": "OFL-1.1",
+    "licenseFile": "/fonts/OFL-fraunces.txt",
+    "source": "https://github.com/undercasetype/Fraunces"
+  },
+  "geist-mono.woff2": {
+    "family": "Geist Mono",
+    "author": "The Geist Project Authors (Vercel)",
+    "license": "OFL-1.1",
+    "licenseFile": "/fonts/OFL-geistmono.txt",
+    "source": "https://github.com/vercel/geist-font"
+  },
+  "instrument-sans-italic.woff2": {
+    "family": "Instrument Sans",
+    "author": "The Instrument Sans Project Authors (Instrument)",
+    "license": "OFL-1.1",
+    "licenseFile": "/fonts/OFL-instrumentsans.txt",
+    "source": "https://github.com/Instrument/instrument-sans"
+  },
+  "instrument-sans.woff2": {
+    "family": "Instrument Sans",
+    "author": "The Instrument Sans Project Authors (Instrument)",
+    "license": "OFL-1.1",
+    "licenseFile": "/fonts/OFL-instrumentsans.txt",
+    "source": "https://github.com/Instrument/instrument-sans"
+  }
+}

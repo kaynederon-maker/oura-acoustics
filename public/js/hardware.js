@@ -1,16 +1,13 @@
-// Hardware bridge: pushes the current tuning to DSP dongles, DACs and headphones through
-// devicePEQ (jeromeof/devicePEQ, 0BSD) over WebHID, Web Serial, Web Bluetooth or the local network.
 import { peq, update, correctionSpecs } from './peq-state.js';
 import { makeBand, toDeviceFilters, fromDeviceFilters } from './peq.js';
 import { safePreamp } from './eq.js';
 import { $, h, toast } from './ui.js';
 
-const PLUGIN_URL = '/vendor/devicePEQ/plugin.js';
-const CONSTRAINTS_URL = '/vendor/devicePEQ/peqConstraintsConfig.json';
+const PLUGIN_URL = '../vendor/devicePEQ/plugin.js';
+const CONSTRAINTS_URL = 'vendor/devicePEQ/peqConstraintsConfig.json';
 
 const supported = () => 'hid' in navigator || 'serial' in navigator || 'bluetooth' in navigator;
 
-// What the device receives: the AutoEq correction (if on) followed by your own bands.
 function bandsToPush() {
   const correction = correctionSpecs().map((s) => makeBand({ type: s.type, fc: s.fc, gain: s.gain, q: s.q }));
   return [...correction, ...peq.bands];

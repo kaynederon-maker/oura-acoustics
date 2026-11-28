@@ -14,7 +14,7 @@ test('Butterworth high-pass is -3 dB at Fc; 24 dB/oct expands to two stages', ()
   const two = expandBands([makeBand({ type: 'HPF', fc: 100, slope: 24 })]);
   assert.equal(two.length, 2);
   near(responseDb(two, 0, [100], FS)[0], -6.02, 0.05);
-  near(responseDb(two, 0, [25], FS)[0], -48, 1.5); // two octaves down at 24 dB/oct
+  near(responseDb(two, 0, [25], FS)[0], -48, 1.5);
 });
 
 test('notch is deep at Fc, all-pass keeps magnitude and turns phase', () => {

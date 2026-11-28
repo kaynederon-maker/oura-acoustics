@@ -1,4 +1,3 @@
-// PEQ controls beside the graph: band table, toolbar, crossover, time & phase.
 import {
   peq, subscribe, update, setBand, addBand, removeBand, undo, redo, canUndo, canRedo, preamp,
 } from './peq-state.js';
@@ -6,11 +5,10 @@ import {
   TYPES, GAIN_TYPES, PASS_TYPES, TEMPLATES, TARGETS, applyTemplate, distanceToMs, DEFAULT_ALIGNMENT, DEFAULT_CROSSOVER,
 } from './peq.js';
 import { $, $$, h, icon, fmtDb, toast, haptic, store } from './ui.js';
+import { rollNumber } from './img.js';
 
 const MAX_BANDS = 16;
 const num = (v) => Number.parseFloat(v);
-
-// ---------- band table ----------
 
 function bandRow(b, i) {
   const field = (name, attrs) => h('input', {
@@ -39,7 +37,6 @@ function renderBands() {
     structureKey = key;
     body.replaceChildren(...peq.bands.map(bandRow));
   } else {
-    // Same rows: sync values without stealing focus from whatever the user is typing in.
     for (const b of peq.bands) {
       const row = body.querySelector(`tr[data-id="${b.id}"]`);
       if (!row) continue;
@@ -53,7 +50,7 @@ function renderBands() {
   }
   $('#peq-empty').hidden = peq.bands.length > 0;
   $('#peq-add').disabled = peq.bands.length >= MAX_BANDS;
-  $('#peq-preamp').textContent = `Preamp ${fmtDb(preamp())}`;
+  rollNumber($('#peq-preamp'), fmtDb(preamp()));
   $('#peq-undo').disabled = !canUndo();
   $('#peq-redo').disabled = !canRedo();
 }
@@ -69,8 +66,6 @@ function onBandInput(e, live) {
   if (typeof value === 'number' && !Number.isFinite(value)) return;
   setBand(row.dataset.id, { [field]: value }, { live });
 }
-
-// ---------- crossover + time & phase ----------
 
 function syncAdvanced() {
   const c = peq.crossover;
@@ -103,7 +98,6 @@ function readAlignment() {
   return { ...DEFAULT_ALIGNMENT, delayL: ms('#al-delayL'), delayR: ms('#al-delayR'), invertL: $('#al-invertL').checked, invertR: $('#al-invertR').checked };
 }
 
-// Delay the nearer speaker so both arrive together.
 function computeDistanceDelays() {
   const dl = num($('#al-distL').value);
   const dr = num($('#al-distR').value);
@@ -115,8 +109,6 @@ function computeDistanceDelays() {
   toast(diff ? `Delayed the ${dl < dr ? 'left' : 'right'} speaker by ${diff.toFixed(2)} ms.` : 'Both speakers are the same distance away; no delay needed.');
 }
 
-// ---------- templates ----------
-
 export function loadTemplate(id) {
   const t = TEMPLATES.find((x) => x.id === id);
   if (!t) return;
@@ -124,10 +116,6 @@ export function loadTemplate(id) {
   toast(`${t.name}: ${t.note}`);
 }
 
-// ---------- wiring ----------
-
-// Simple mode (default): frequency, gain and dragging. Advanced settings reveal type, Q, slope,
-// phase, crossover and time alignment.
 function initProToggle() {
   const toggle = $('#peq-pro');
   const apply = (pro) => {
@@ -170,7 +158,6 @@ export function initPeqPanel() {
     addBand({ type: 'AP', fc: 80, q: 0.71 });
     toast('All-pass added: it shifts phase around its frequency without changing level. Drag it to line up a sub or a second speaker.');
   });
-  // Undo/redo shortcuts while the Lab is open (not while typing in a field).
   addEventListener('keydown', (e) => {
     if ($('#view-lab').hidden || !(e.ctrlKey || e.metaKey) || e.target.matches('input, select, textarea')) return;
     if (e.key.toLowerCase() === 'z') { e.preventDefault(); (e.shiftKey ? redo : undo)(); }

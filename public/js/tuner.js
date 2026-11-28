@@ -1,17 +1,11 @@
-// Listening analysis + rule-based tuning advice. No DOM; the rules are unit-tested.
-
 export const THIRD_OCTAVES = [
   25, 31.5, 40, 50, 63, 80, 100, 125, 160, 200, 250, 315, 400, 500, 630, 800, 1000,
   1250, 1600, 2000, 2500, 3150, 4000, 5000, 6300, 8000, 10000, 12500, 16000, 20000,
 ];
 export const HEARING_BANDS = [125, 250, 500, 1000, 2000, 4000, 8000, 12000];
 
-// ISO 226:2003 hearing threshold (dB SPL), used to remove the ear's natural curve
-// from a headphone tone test so only *personal* differences remain.
 const ISO_THRESHOLD = { 125: 22.1, 250: 11.4, 500: 4.4, 1000: 2.4, 2000: -1.3, 4000: -5.4, 8000: 12.6, 12000: 13.9 };
 
-
-// Long-term average spectrum of whatever is playing, in third-octave bands.
 export function createListener(analyser, sampleRate) {
   const spectrum = new Float32Array(analyser.frequencyBinCount);
   const wave = new Float32Array(analyser.fftSize);
@@ -57,7 +51,6 @@ const average = (bands, lo, hi) => {
   return inRange.reduce((s, b) => s + b.db, 0) / inRange.length;
 };
 
-// ponytail: thresholds hand-tuned against typical commercial mixes; calibrate with a reference playlist.
 export function describeContent(listening) {
   const mids = average(listening.bands, 500, 2000);
   const bass = average(listening.bands, 40, 160) - mids;
@@ -71,7 +64,6 @@ export function describeContent(listening) {
   };
 }
 
-// thresholds: { [freq]: dBFS at which the tone was first heard }
 export function hearingDeviations(thresholds) {
   const ref = thresholds[1000];
   if (ref == null) return [];
@@ -85,7 +77,6 @@ const isLowBoost = (b) => (b.type === 'LSC' && b.fc <= 250) || (b.type === 'PK' 
 const isHighBoost = (b) => (b.type === 'HSC' && b.fc >= 4000) || (b.type === 'PK' && b.fc > 5000);
 const strongest = (bands, test) => bands.filter((b) => b.enabled && test(b) && b.gain > 0).sort((a, b) => b.gain - a.gain)[0];
 
-// Each recommendation may carry `apply: { band }`, inserted or replaced by id in the PEQ.
 export function recommend({ device, bands = [], content, listening, hearing = [] }) {
   const recs = [];
   const has = (id) => bands.some((b) => b.id === id);

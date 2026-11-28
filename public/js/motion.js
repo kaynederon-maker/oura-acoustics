@@ -1,9 +1,3 @@
-// Motion layer: Lenis smooth scrolling driven by the GSAP ticker, plus declarative scroll effects.
-//   [data-split]        heading whose lines rise out of a mask (SplitText)
-//   [data-clip]         image/card that opens from an inset clip-path
-//   [data-speed="0.2"]  parallax drift (fraction of its own height)
-//   [data-velocity]     skews with scroll velocity (kinetic type, marquees)
-// Effects are built the first time each view is shown (hidden views have no layout to measure).
 const { gsap, ScrollTrigger, SplitText, Lenis } = globalThis;
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const MAX_SKEW_DEG = 6;
@@ -22,7 +16,6 @@ export function initMotion() {
   lenis = new Lenis({
     lerp: 0.085,
     wheelMultiplier: 0.95,
-    // Let nested scrollers, dialogs and the EQ graphs (wheel = Q) handle their own wheel.
     prevent: (node) => Boolean(node.closest?.('dialog, [data-lenis-prevent], .theme-panel, .peq-graph')),
   });
   lenis.on('scroll', ScrollTrigger.update);
@@ -31,7 +24,6 @@ export function initMotion() {
   initVelocitySkew();
 }
 
-// Jump to the top on navigation, without easing through the old page.
 export function scrollTop() {
   if (lenis) lenis.scrollTo(0, { immediate: true, force: true });
   else scrollTo(0, 0);
@@ -42,7 +34,6 @@ export function scrollToY(y) {
   else scrollTo({ top: y, behavior: REDUCED ? 'auto' : 'smooth' });
 }
 
-// Called after a view becomes visible.
 export function showView(view) {
   if (!motionReady) return;
   if (!built.has(view)) {
@@ -80,7 +71,6 @@ function splitReveal(el) {
   });
 }
 
-// Kinetic type: anything marked [data-velocity] leans into the scroll and springs back.
 function initVelocitySkew() {
   const setters = new Map();
   const setter = (el) => {
@@ -93,7 +83,6 @@ function initVelocitySkew() {
     const skew = gsap.utils.clamp(-MAX_SKEW_DEG, MAX_SKEW_DEG, velocity * -0.22);
     for (const el of document.querySelectorAll('.view:not([hidden]) [data-velocity]')) setter(el)(skew);
   });
-  // Settle back to upright once scrolling stops.
   gsap.ticker.add(() => {
     if (lenis.isScrolling || !leaning) return;
     leaning = false;

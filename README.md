@@ -1,21 +1,41 @@
 # Oura Acoustics
 
-A headphone tuning site that reacts to whatever you're listening to. It has no npm dependencies: plain Node + browser ES modules.
+A headphone tuning site that looks like a luxury listening room. The server and the site have no runtime npm
+dependencies (plain Node + browser ES modules). The build tools below are dev dependencies only.
 
 ```bash
 cp .env.example .env   # add GEMINI_API_KEY (optional; rule-based advice works without it)
 npm start              # http://localhost:3000
-npm test
+npm test               # maths, store logic, AA contrast for all five themes, image/model/font credits
 ```
+
+Live prototype: https://kaynederon-maker.github.io/oura-acoustics/ (GitHub Pages, served from the `gh-pages` branch).
+Everything runs in the browser except the AI Sommelier, which needs the Node server (`npm start`). To republish after
+changing `public/`: `git subtree split --prefix public -b gh-pages && git push -f origin gh-pages`.
+
+My design notes and open questions are in [DESIGN_NOTES.md](DESIGN_NOTES.md), and there are screenshots of every page
+in every theme in [`screenshots/`](screenshots).
+
+### Asset pipeline (only needed to rebuild assets)
+
+| Script | What it does | Uses |
+| --- | --- | --- |
+| `npm run images` | Downloads the photos in `tools/images.json`, refuses anything not CC0 / PD / CC BY / CC BY-SA, grades them into one set and writes AVIF + WebP at 480/960/1600 px plus `public/img/credits.json` | `sharp`, Wikimedia Commons + Openverse APIs (no account) |
+| `npm run models` | Builds the 13 3D objects from three.js geometry and writes meshopt-compressed `public/models/*.glb` | `three`, `@gltf-transform/*`, `meshoptimizer` |
+| `npm run vendor` | Bundles the tree-shaken three.js module (GLTFLoader, meshopt decoder, RoomEnvironment) to `public/vendor/three/three.js` | `esbuild` |
+| `node tools/product-details.mjs` | Cuts two close-ups from each product photo for the hover swap and product galleries | `sharp` |
+
+`node tools/images.mjs search "<query>"` / `ov "<query>"` prints numbered candidates with their licences and writes a
+contact sheet. `tools/picks.txt` records which result I picked for each image.
 
 ## Pages
 
 | Page | |
 | --- | --- |
-| Home | A hero section over a live "silk aurora" WebGL background that reacts to whichever audio source is on |
+| Home | The reference in-ear as a 3D object in front of a giant wordmark. Drag to turn it, scroll to take it apart. Behind it there's a masked silk backdrop that reacts to audio, and a strip of listening-room photos |
 | Tuning Lab | 1) pick headphones (8,800+ [AutoEq](https://github.com/jaakkopasanen/AutoEq) profiles, or Detect from OS device names) 2) analyze 20 s of system audio / mic 3) hearing check 4) bass/treble taste → recommendations, optional Gemini advice, export to Equalizer APO / Wavelet |
 | Tuning Guide | A boost-and-sweep dial, two pro missions (IEM drum monitoring, desk sub crossover) with knobs, scores and exploded hardware, a scroll through the spectrum, 8 practice lessons and a reference handbook |
-| History | A pinned horizontal timeline from 1877 to 2026 (phonograph to shoegaze, blackgaze and trap) over a WebGL wave field. You can hear the practice track at each era's fidelity |
+| History | Ten chapters from 1877 to 2026. Each one is built around a single object drawn as a brass line engraving that comes apart into parts (hover, focus or tap a part for its story), with period photos, a needle-drop player and a Then/Today switch to hear each era |
 
 ## Studio (Tuning Lab + Guide)
 
@@ -30,11 +50,12 @@ npm test
 
 ## Motion and scroll
 
+- three.js 0.187 (bundled, lazy-loaded) renders the shared stage in `stage3d.js`. Home and Store get a physical "lux" look, History gets brass line engravings. It has drag inertia, keyboard turning, part highlighting, and explode offsets read from each .glb.
 - Lenis 1.1.20 smooth scrolling runs on the GSAP 3.13 ticker (`motion.js`). Both are vendored in `public/vendor`, so the CSP stays `'self'`. Dialogs, knobs and the EQ graphs opt out of smooth wheel (`data-lenis-prevent`).
 - Effects are declared in the markup and built the first time a view opens: `data-split` (SplitText masked line reveals), `data-clip` (inset clip-path opening), `data-speed` (parallax), `data-velocity` (skews with scroll speed).
-- With `prefers-reduced-motion` all of it is skipped and the timeline stacks vertically.
+- With `prefers-reduced-motion` all of it is skipped: no intro or route curtain, History chapters stack with static exploded views, and knobs and rolling digits stop animating.
 - There's no global `scroll-behavior: smooth` because ScrollTrigger measures by jumping the scroll position.
-- History (`history.js`, `era-gl.js`, `history.css`): a pinned horizontal track with snapping, rail navigation, a rolling year counter and a shader whose wave shape changes from era to era as you scroll. The era photos are from Wikimedia Commons and credited on each image (`public/history/credits.json`).
+- History (`history.js`, `history.css`): vertical chapters, each with a sticky stage that one shared WebGL renderer moves into. Scrolling puts the object together and then takes it apart. You can hover, focus or tap each part to get a leader line and its story, and there's a chapter rail with a rolling year counter. Photos are credited on each image (`public/img/credits.json`).
 - Missions (`missions.js`, `widgets.js`, `mission-model.js`): rotary knobs (drag, wheel, keyboard, screen-reader slider), small response plots, live A/B through the guide audio path, and CSS 3D exploded views scrubbed by scroll. `test/missions.test.mjs` covers the crossover maths.
 - The coach, journey, history and missions all share the guide audio path, and `engine.state.owner` records which one is playing.
 
@@ -44,11 +65,13 @@ npm test
 
 - Data: `public/js/catalog.js` (approximate list prices; ratings are made up for the demo). Logic: `public/js/shop-logic.js` (tested). UI: `public/js/store.js`, `public/store.css`.
 - Images: `public/products/*.webp`, 800 px WebP taken from manufacturer pages, RTINGS and retailers. `sources.json` lists where each one came from. I cropped the watermark band off the RTINGS photos.
-- Look: VengeanceUI patterns (MIT) ported to plain CSS in `public/vengeance.css`, with a rotating conic glow border, a hover beam and a cursor spotlight on the cards.
+- Products sit on plinths, with a light sweep and a close-up swap on hover (`public/products/detail/`). The lifestyle tiles and category banners use the credited photo set. Four flagships have interpretive 3D studies and the rest have a photo you can drag to tilt.
 
 ## Themes
 
-There are five palettes in `public/styles.css` (`[data-theme=…]`), picked from the top bar and remembered per browser: Obsidian (dark), Ivory (light), Bordeaux (burgundy), Terra (earth tone) and Mist (soft). They all remap the same semantic tokens. The WebGL silk reads `--bg` and `--aura-1..3`, and the graphs read `--plot-1/2`. Every text pair passes WCAG AA and every graph line passes 3:1.
+There are five palettes in `public/styles.css` (`[data-theme=…]`), picked from the top bar and remembered per browser: Obsidian (dark), Ivory (light), Bordeaux (burgundy), Terra (earth tone) and Mist (soft). They all share one brass accent and remap the same semantic tokens. WebGL reads `--bg`, `--accent` and `--aura-1..3`, and the graphs read `--plot-1/2`. `test/contrast.test.mjs` checks that every text pair passes WCAG AA and every graph line passes 3:1.
+
+Fonts are self-hosted OFL (Fraunces, Instrument Sans, Geist Mono) in `public/fonts/`. The interface sounds (needle drop, knob detents, switch clicks) are synthesized and stay muted until you turn on the Sound switch.
 
 ## Audio sources (dock)
 
@@ -61,7 +84,7 @@ A browser can listen to system audio but can't change it. To hear your tuning in
 ## Layout
 
 ```
-server.mjs            static files + POST /api/advice (rate-limited, 32 KB body cap)
+server.mjs            static files (brotli/gzip, ETags, cached media) + POST /api/advice (rate-limited, 32 KB body cap)
 server/advice.mjs     Gemini call; input whitelist, output clamped to ±4 dB / 5 filters
 public/js/eq.js       AutoEq index/EQ/CSV parsing, RBJ biquad math, exports   (tested)
 public/js/tuner.js    listening analysis + recommendation rules              (tested)
