@@ -1,4 +1,4 @@
-const apple = (id, artist, title, year) => ({ apple: id, artist, title, year, link: `https://music.apple.com/us/song/${id}`, via: 'Apple Music' });
+const apple = (id, artist, title, year) => ({ apple: id, artist, title, year, link: `https://music.apple.com/us/song/${id}`, via: 'Apple Music preview' });
 
 export const SONGS = {
   1877: {

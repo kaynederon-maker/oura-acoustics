@@ -304,7 +304,7 @@ function credit(e) {
   const side = e.personal ? 'Song' : T.tuned ? 'Then' : 'Today';
   return [
     h('span', { class: 'hx-credit-side' }, side),
-    `${songLabel(song)} · preview from `,
+    `${songLabel(song)} · `,
     h('a', { href: song.link, target: '_blank', rel: 'noopener' }, song.via),
   ];
 }
